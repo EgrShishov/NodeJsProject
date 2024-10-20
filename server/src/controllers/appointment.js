@@ -66,3 +66,27 @@ exports.cancelAppointment = async (req, res) => {
         res.status(500).json({error: 'Ошибка при отмене приёма' })
     }
 };
+
+exports.getAppointmentsSchedule = async (req, res) => {
+    try{
+        const doctorId = req.params.doctorId;
+        const appointments = Appointment.find({ DoctorId: doctorId });
+
+        if (!appointments) {
+            return res.status(404).json({ error: 'У врача нет расписания' });
+        }
+
+        res.status(200).json(appointments);
+    } catch (error) {
+        res.status(500).json({error: 'Ошибка при получении расписания'});
+    }
+};
+
+exports.getPatientAppointment = async (req, res) => {
+    try {
+        const appointments = await Appointment.find({ PatientId: req.patientId });
+        res.status(200).json(appointments);
+    } catch (err) {
+        res.status(500).json({ error: 'Error fetching appointments' });
+    }
+};

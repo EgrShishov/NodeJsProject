@@ -1,6 +1,7 @@
 const MedicalProcedure = require('../models/MedicalProcedures');
 const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
+const Payment = require('../models/Payment');
 
 exports.getAllProcedures = async (req, res) => {
     try {
@@ -52,6 +53,15 @@ exports.createProcedure = async (req, res) => {
         });
 
         const savedProcedure = await newProcedure.save();
+
+        const newPayment = new Payment({
+            AppointmentId: null,
+            Amount: procedureCost,
+            UserId: patientId,
+            PaymentDate: new Date(),
+        });
+        const savedPayment = await newPayment.save();
+
         res.status(201).json(savedProcedure);
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании процедуры' });

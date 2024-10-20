@@ -10,4 +10,4 @@ const OfficeSchema = mongoose.Schema({
     PhoneNumber: { type: String, required: true }
 });
 
-module.exports = OfficeSchema;
+module.exports = mongoose.model('Offices', OfficeSchema);

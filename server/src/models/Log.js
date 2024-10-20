@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const LogSchema = new Schema({
     UserId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -6,4 +7,4 @@ const LogSchema = new Schema({
     ActionDate: { type: Date, default: Date.now }
 });
 
-module.exports = LogSchema;
+module.exports =  mongoose.model('Logs', LogSchema);

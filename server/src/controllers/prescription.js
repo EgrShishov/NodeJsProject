@@ -87,3 +87,19 @@ exports.deletePrescription = async (req, res) => {
         res.status(500).json({ error: 'Ошибка при удалении рецепта' });
     }
 };
+
+exports.getPatientPrescriptions = async (req, res) => {
+    try {
+        const prescription = await Prescription.find({ PatientId: req.params.patientId })
+            .populate('doctorId', 'firstName lastName')
+            .populate('patientId', 'firstName lastName');
+
+        if (!prescription) {
+            return res.status(404).json({ error: 'Рецепт не найден' });
+        }
+
+        res.status(200).json(prescription);
+    } catch (error) {
+        res.status(500).json({ error: 'Ошибка при получении рецепта' });
+    }
+};

@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const ReceptionistSchema = new Schema({
     UserId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -8,4 +9,4 @@ const ReceptionistSchema = new Schema({
     DateOfBirth: { type: Date, required: true }
 });
 
-module.exports = ReceptionistSchema;
+module.exports = mongoose.model('Receptionists', ReceptionistSchema);

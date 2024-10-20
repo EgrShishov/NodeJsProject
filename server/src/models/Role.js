@@ -4,4 +4,4 @@ const RoleSchema = mongoose.Schema({
     RoleName: { type: String, unique: true, required: true }
 });
 
-module.exports = RoleSchema;
+module.exports = mongoose.model('Roles', RoleSchema);

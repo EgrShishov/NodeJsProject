@@ -10,4 +10,4 @@ const AppointmentSchema = mongoose.Schema({
     IsApproved: { type: Boolean, default: false }
 });
 
-module.exports = AppointmentSchema;
+module.exports = mongoose.model('Appointments', AppointmentSchema);

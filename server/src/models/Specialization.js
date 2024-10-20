@@ -4,4 +4,4 @@ const SpecializationSchema = mongoose.Schema({
     SpecializationName: { type: String, required: true }
 });
 
-module.exports = SpecializationSchema;
+module.exports = mongoose.model('Specializations', SpecializationSchema);

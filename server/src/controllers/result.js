@@ -74,3 +74,19 @@ exports.deleteResult = async (req, res) => {
         res.status(500).json({ error: 'Error deleting result' });
     }
 };
+
+exports.getResultByPatient = async (req, res) => {
+    try {
+        const patientId = req.params.patientId;
+        const result = await Result.find({ PatientId: patientId })
+            .populate('patientId doctorId appointmentId documentId');
+
+        if (!result) {
+            return res.status(404).json({ error: 'Result not found' });
+        }
+
+        res.status(200).json(result);
+    } catch (error) {
+        res.status(500).json({ error: 'Error fetching result' });
+    }
+};

@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const PrescriptionSchema = new Schema({
     PatientId: { type: Schema.Types.ObjectId, ref: 'Patient' },
@@ -9,4 +10,4 @@ const PrescriptionSchema = new Schema({
     Duration: { type: Number, required: true }
 });
 
-module.exports = PrescriptionSchema;
+module.exports = mongoose.model('Prescriptions', PrescriptionSchema);

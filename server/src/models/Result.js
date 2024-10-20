@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const ResultSchema = Schema({
     PatientId: { type: Schema.Types.ObjectId, ref: 'Patient' },
@@ -10,4 +11,4 @@ const ResultSchema = Schema({
     Conclusion: { type: String, required: true },
 });
 
-module.exports = ResultSchema;
+module.exports = mongoose.model('Results', ResultSchema);

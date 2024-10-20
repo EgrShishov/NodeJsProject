@@ -8,4 +8,4 @@ const PatientSchema = new mongoose.Schema({
     DateOfBirth: { type: Date, required: true }
 });
 
-module.exports = PatientSchema;
+module.exports = mongoose.model('Patients', PatientSchema);

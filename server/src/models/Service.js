@@ -6,4 +6,4 @@ const ServiceSchema = mongoose.Schema({
     IsActive: { type: Boolean, required: true }
 });
 
-module.exports = ServiceSchema;
+module.exports = mongoose.model('Services', ServiceSchema);

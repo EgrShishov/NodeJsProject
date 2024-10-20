@@ -4,7 +4,9 @@ const User = require('../models/User');
 
 exports.getAllPayments = async (req, res) => {
     try {
-        const payments = await Payment.find().populate('userId', 'UserName Email').populate('appointmentId');
+        const payments = await Payment.find()
+            .populate('patientId', 'FirstName SecondName LastName')
+            .populate('appointmentId');
         res.status(200).json(payments);
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при получении платежей' });
@@ -14,7 +16,7 @@ exports.getAllPayments = async (req, res) => {
 exports.getPaymentById = async (req, res) => {
     try {
         const payment = await Payment.findById(req.params.id)
-            .populate('userId', 'UserName Email')
+            .populate('patientId', 'FirstName SecondName LastName')
             .populate('appointmentId');
 
         if (!payment) {
@@ -31,7 +33,6 @@ exports.createPayment = async (req, res) => {
     try {
         const { appointmentId, amount, userId, paymentDate } = req.body;
 
-        // Проверяем, что назначение существует
         const appointment = await Appointment.findById(appointmentId);
         if (!appointment) {
             return res.status(400).json({ error: 'Назначение не найдено' });
@@ -50,3 +51,29 @@ exports.createPayment = async (req, res) => {
         res.status(500).json({ error: 'Ошибка при создании платежа' });
     }
 };
+
+exports.getPaymentHistory = async (req, res) => {
+    try {
+        const payment = await Payment.find({ PatientId: req.params.patientId })
+            .populate('patientId', 'FirstName SecondName LastName')
+            .populate('appointmentId');
+
+        if (!payment) {
+            return res.status(404).json({ error: 'Платеж не найден' });
+        }
+
+        res.status(200).json(payment);
+    } catch (error) {
+        res.status(500).json({ error: 'Ошибка при получении платежа' });
+    }
+};
+
+exports.getPatientPayments = async (req, res) => {
+    try {
+        const payments = await Payment.find({ UserId: req.user._id, IsFinished: true });
+        res.status(200).json(payments);
+    } catch (err) {
+        res.status(500).json({ error: 'Ошибка в получении соевршенных платежей' });
+    }
+};
+

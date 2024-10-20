@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const DoctorSchema = Schema({
     UserId: { type: Schema.Types.ObjectId, ref: 'User' },
@@ -10,4 +11,4 @@ const DoctorSchema = Schema({
     CareerStartYear: { type: Number, required: true }
 });
 
-module.exports = DoctorSchema;
+module.exports =  mongoose.model('Doctors', DoctorSchema);

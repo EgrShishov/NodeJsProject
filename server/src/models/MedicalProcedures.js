@@ -1,4 +1,5 @@
 const { Schema } = require('mongoose');
+const mongoose = require('mongoose');
 
 const MedicalProcedureSchema = new Schema({
     ProcedureName: { type: String, required: true },
@@ -10,4 +11,4 @@ const MedicalProcedureSchema = new Schema({
     ProcedureTime: { type: String, required: true }
 });
 
-module.exports = MedicalProcedureSchema;
+module.exports =  mongoose.model('MedicalProcedures', MedicalProcedureSchema);
