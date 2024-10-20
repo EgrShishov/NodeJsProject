@@ -3,6 +3,8 @@ const mongoose = require('mongoose');
 const passport = require('passport');
 const bodyParser = require('body-parser');
 const session = require('express-session');
+const swaggerUi = require('swagger-ui-express');
+const swaggerDocument = require('swagger.json');
 
 require('./config/passport')(passport);
 require('dotenv').config();
@@ -31,6 +33,18 @@ app.get('/', (req, res) => {
 });
 
 app.use('/auth', require('./routes/auth'));
+app.use('/appointments', require('./routes/appointment'));
+app.use('/services', require('./routes/service'));
+app.use('/doctors', require('./routes/doctor'));
+app.use('/patients', require('./routes/patient'));
+app.use('/receptionists', require('./routes/receptionist'));
+app.use('/offices', require('./routes/office'));
+app.use('/service-category', require('./routes/serviceCategory'));
+app.use('/specializations', require('./routes/specialization'));
+app.use('/results', require('./routes/result'));
+app.use('/documents', require('./routes/documents'));
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

@@ -1,4 +1,4 @@
-/*const mongoose = require('mongoose');
+const mongoose = require('mongoose');
 
 const UserSchema = new mongoose.Schema({
     googleId: { type: String },
@@ -17,8 +17,9 @@ UserSchema.pre('save', async function(next) {
    next();
 });
 
-module.exports = mongoose.model('User', UserSchema);*/
+module.exports = mongoose.model('User', UserSchema);
 
+/*
 const Model = require('../orm/Model');
 
 class User extends Model {
@@ -34,4 +35,4 @@ class User extends Model {
     }
 }
 
-module.exports = User;
+module.exports = User;*/
