@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const specializationsController = require('../controllers/specialization');
+const specializationController = require('../controllers/specialization');
 const { ensureAuthenticated, ensureGuest } = require('../middleware/auth');
 
 router.get('/all', specializationController.getAllSpecializations);

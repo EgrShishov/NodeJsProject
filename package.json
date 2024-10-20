@@ -1,6 +1,9 @@
 {
   "dependencies": {
+    "cors": "^2.8.5",
+    "express-list-endpoints": "^7.1.0",
     "swagger-autogen": "^2.23.7",
+    "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
   }
 }

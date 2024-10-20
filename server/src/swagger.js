@@ -1,6 +1,14 @@
-const swaggerUi = require('swagger-ui-express');
-const swaggerDocument = require('./swagger.json');
-
-module.exports = (app) => {
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+const swaggerAutogen = require('swagger-autogen')();
+const doc = {
+    info: {
+        title: 'My API',
+        description: 'API Documentation',
+    },
+    host: 'localhost:3000',
+    schemes: ['http'],
 };
+
+const outputFile = './swagger-output.json';
+const endpointsFiles = ['./app.js'];
+
+swaggerAutogen(outputFile, endpointsFiles);
