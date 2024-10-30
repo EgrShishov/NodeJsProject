@@ -1,7 +1,6 @@
 import {Component} from "react";
-import {getAllSpecializations} from "../services/specializationsService.js";
 
-class AddAppointmentForm extends Component {
+class AddPatientForm extends Component {
     constructor(props) {
         super(props);
 
@@ -9,9 +8,8 @@ class AddAppointmentForm extends Component {
             patients_first_name: '',
             patients_last_name: '',
             patients_middle_name: '',
-            appointment_date: '',
-            appointment_time: '',
-            doctor_full_name: '',
+            birthday_date: '',
+            email: '',
             formValid: false
         };
 
@@ -20,9 +18,8 @@ class AddAppointmentForm extends Component {
     }
 
     validateForm() {
-        const { patients_first_name, patients_last_name, patients_second_name, appointment_date, appointment_time, doctor_full_name } = this.state;
-        return patients_first_name && patients_last_name &&
-            patients_second_name && appointment_date && appointment_time && doctor_full_name;
+        const { patients_first_name, patients_last_name, patients_middle_name, birthday_date ,email } = this.state;
+        return patients_first_name && patients_last_name && patients_middle_name && birthday_date && email;
     }
 
     handleChange(e) {
@@ -35,46 +32,34 @@ class AddAppointmentForm extends Component {
         );
     }
 
-    handleSubmit(e){
+    handleSubmit(e) {
         e.preventDefault();
-        if (this.state.formValid){
+        if (this.state.formValid) {
             this.setState({
                 patients_first_name: '',
                 patients_last_name: '',
                 patients_middle_name: '',
-                appointment_date: '',
-                appointment_time: '',
-                doctor_full_name: '',
+                birthday_date: '',
+                email: '',
                 formValid: false
             });
         }
     }
 
-    componentDidMount() {
-        this.fetchAppointmentData();
-    }
-
-    async fetchAppointmentData () {
-      /*  const data = await ge();
-        if (data) {
-            this.setState({ specializations: data });
-        }*/
-    }
-
     render() {
-        const { patients_first_name,
+        const {
+            patients_first_name,
             patients_last_name,
             patients_second_name,
-            appointment_date,
-            appointment_time,
-            doctor_full_name,
+            birthday_date,
+            email,
             formValid
         } = this.state;
 
         return (
-            <div className="appointment-form">
+            <div>
                 <form onSubmit={this.handleSubmit}>
-                    <h2>Забронировать консультацию</h2>
+                    <h2>Создать аккаунт пациента</h2>
 
                     <div>
                         <label>Имя пациента:</label><br/>
@@ -88,6 +73,7 @@ class AddAppointmentForm extends Component {
                     </div>
 
                     <div>
+                        <label>Фамилия пациента:</label><br/>
                         <input
                             type="text"
                             name="patients_last_name"
@@ -98,6 +84,7 @@ class AddAppointmentForm extends Component {
                     </div>
 
                     <div>
+                        <label>Отчество пациента:</label><br/>
                         <input
                             type="text"
                             name="patients_second_name"
@@ -108,43 +95,32 @@ class AddAppointmentForm extends Component {
                     </div>
 
                     <div>
-                        <label>Дата:</label><br/>
+                        <label>День рождения:</label><br/>
                         <input
                             type="date"
-                            name="appointment_date"
-                            value={appointment_date}
+                            name="birthday_date"
+                            value={birthday_date}
                             onChange={this.handleChange}
                             required
                         />
                     </div>
 
                     <div>
-                        <label>Время:</label><br/>
+                        <label>Адресс электронной почты:</label><br/>
                         <input
-                            type="time"
-                            name="appointment_time"
-                            value={appointment_time}
+                            type="email"
+                            name="email"
+                            value={email}
                             onChange={this.handleChange}
                             required
                         />
                     </div>
 
-                    <div>
-                        <label>Доктор:</label><br/>
-                        <input
-                            type="text"
-                            name="doctor_full_name"
-                            value={doctor_full_name}
-                            onChange={this.handleChange}
-                            required
-                        />
-                    </div>
-
-                    <button type="submit" disabled={!formValid}>Забронировать</button>
+                    <button type="submit" disabled={!formValid}>Создать пациента</button>
                 </form>
             </div>
-        );
+        )
     }
 }
 
-export default AddAppointmentForm;
+export default AddPatientForm;

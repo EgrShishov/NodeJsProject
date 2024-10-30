@@ -1,6 +1,6 @@
 const Appointment = require('../models/Appointment');
 
-exports.getAllAppointments = async (req, resp) => {
+exports.getAllAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.find()
             .populate('patientId', 'firstName lastName')

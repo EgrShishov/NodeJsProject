@@ -41,9 +41,13 @@ function App() {
                     <Route path="/forbidden" element={<ForbiddenPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
                     <Route path="/receptionists" element={
+/*
                         <RequireRole allowedRoles={["receptionist"]}>
+*/
                             <ReceptionistsPage />
+/*
                         </RequireRole>
+*/
                     }/>
                     <Route path="/patients" element={
                         <RequireRole allowedRoles={["doctor", "receptionist"]}>

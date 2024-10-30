@@ -31,7 +31,7 @@ export const AuthProvider = ({ children }) => {
         };
 
         fetchUserProfile();
-    }, []);
+    }, []); // удаляется isAuthenticated если перезайти на страницу, из-за который fetch profile упадет
 
     const loginAction = async (userData) => {
         try {
