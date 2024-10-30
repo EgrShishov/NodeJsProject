@@ -4,7 +4,7 @@ const doc = {
         title: 'My API',
         description: 'API Documentation',
     },
-    host: 'localhost:3000',
+    host: 'localhost:5000',
     schemes: ['http'],
 };
 

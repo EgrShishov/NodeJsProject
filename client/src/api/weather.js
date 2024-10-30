@@ -1,6 +1,6 @@
-export const getWeatherByCity = async (city) => {
-    const API_KEY = import.meta.env.VITE_OPENWEATHER_API_KEY;
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${API_KEY}&units=metric`;
+export const getWeatherByCity = async (coords) => {
+    const API_KEY = '0f8b781031427c1363d6b2a32c0a6a50\n';
+    const url = `https://api.openweathermap.org/data/2.5/forecast?units=metric&lat=${coords.latitude}&lon=${coords.longitude}&appid=${API_KEY}`;
 
     try {
         const response = await fetch(url);

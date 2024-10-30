@@ -5,9 +5,7 @@ const Payment = require('../models/Payment');
 
 exports.getAllProcedures = async (req, res) => {
     try {
-        const procedures = await MedicalProcedure.find()
-            .populate('doctorId', 'firstName lastName')
-            .populate('patientId', 'firstName lastName');
+        const procedures = await MedicalProcedure.find();
 
         res.status(200).json(procedures);
     } catch (error) {
@@ -17,9 +15,7 @@ exports.getAllProcedures = async (req, res) => {
 
 exports.getProcedureById = async (req, res) => {
     try {
-        const procedure = await MedicalProcedure.findById(req.params.id)
-            .populate('doctorId', 'firstName lastName')
-            .populate('patientId', 'firstName lastName');
+        const procedure = await MedicalProcedure.findById(req.params.id);
 
         if (!procedure) {
             return res.status(404).json({ error: 'Процедура не найдена' });

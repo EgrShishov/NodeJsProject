@@ -5,7 +5,7 @@ const { ensureAuthenticated, ensureGuest, ensureReceptionist, ensureRole} = requ
 
 router.get('/all', doctorController.getAllDoctors);
 router.post('/', ensureReceptionist, doctorController.createDoctor);
-router.get('/:id', ensureRole('patient', 'receptionist'), doctorController.getDoctorById);
+router.get('/:id', doctorController.getDoctorById);
 router.put('/:id', ensureReceptionist, doctorController.editDoctor);
 router.delete('/:id', ensureReceptionist, doctorController.deleteDoctor);
 

@@ -3,10 +3,6 @@ module.exports = {
         if (req.isAuthenticated) return next();
         res.redirect('/login');
     },
-    ensureGuest: (req, res, next) => {
-        if (!req.isAuthenticated) return next();
-        res.redirect('/');
-    },
     ensurePatinet: (req, res, next) => {
         if (req.isAuthenticated && req.body.role === 'patient') return next();
         res.redirect('/');
@@ -19,16 +15,19 @@ module.exports = {
         if (req.isAuthenticated() && req.user.role === 'receptionist') return next();
         res.status(403).json({ message: 'Access denied' });
     },
-    ensureSuperUser: (req, res, next) => {
-        if (req.isAuthenticated() && req.user.role === 'superuser') return next();
-        res.status(403).json({ message: 'Access denied' });
-    },
     ensureRole: (...roles) => {
         return (req, res, next) => {
-            if (req.isAuthenticated() && roles.includes(req.user.role)) {
-                return next();
-            }
-            return res.status(403).json({ message: 'Доступ запрещён ' });
+            console.log(req.user.role);
+            return (req, res, next) => {
+                if (req.isAuthenticated && req.isAuthenticated()) {
+                    if (req.user && roles.includes(req.user.role)) {
+                        return next();
+                    } else {
+                        return res.status(403).json({ message: `Доступ запрещён: недостаточные права` });
+                    }
+                }
+                return res.status(401).json({ message: 'Пользователь не авторизован' });
+            };
         };
     },
 };

@@ -1,21 +1,23 @@
 const Doctor = require('../models/Doctor');
+const {SchemaTypes} = require("mongoose");
 
 exports.getAllDoctors = async (req, res) => {
     try {
         const doctors = await Doctor.find()
-            .populate('specializationId', 'specializationName');
+            .populate('SpecializationId', 'SpecializationName');
 
         res.status(200).json(doctors);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении врачей' });
+        res.status(500).json({ error: `Ошибка при получении врачей: ${error}` });
     }
 };
 
 exports.getDoctorById = async (req, res) => {
     try {
         const doctorId = req.params.id;
+
         const doctor = await Doctor.findById(doctorId)
-            .populate('specializationId', 'specializationName');
+            .populate('SpecializationId', 'SpecializationName');
 
         if (!doctor) {
             return res.status(404).json({ error: 'Врач не найден' });
@@ -23,7 +25,7 @@ exports.getDoctorById = async (req, res) => {
 
         res.status(200).json(doctor);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении данных врача' });
+        res.status(500).json({ error: `Ошибка при получении данных врача: ${error}` });
     }
 };
 
