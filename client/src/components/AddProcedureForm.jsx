@@ -10,9 +10,6 @@ class AddProcedureForm extends Component {
             procedure_cost: 0,
             formValid: false
         };
-
-        this.handleChange = this.handleChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     validateForm() {
@@ -33,6 +30,11 @@ class AddProcedureForm extends Component {
     handleSubmit(e) {
         e.preventDefault();
         if (this.state.formValid) {
+            this.props.onSubmit({
+                procedure_name: this.state.procedure_name,
+                description: this.state.description,
+                procedure_cost: this.state.procedure_cost
+            });
             this.setState({
                 procedure_name: '',
                 procedure_cost: 0,
@@ -57,6 +59,7 @@ class AddProcedureForm extends Component {
                         <label>Название процедуры:</label><br/>
                         <input
                             type="text"
+                            className="input-field"
                             name="procedure_name"
                             value={procedure_name}
                             onChange={this.handleChange}
@@ -68,6 +71,7 @@ class AddProcedureForm extends Component {
                         <label>Описание:</label><br/>
                         <input
                             type="text"
+                            className="input-field"
                             name="description"
                             value={description}
                             onChange={this.handleChange}
@@ -79,6 +83,7 @@ class AddProcedureForm extends Component {
                         <label>Стоимость:</label><br/>
                         <input
                             type="number"
+                            className="input-field"
                             name="procedure_cost"
                             value={procedure_cost}
                             onChange={this.handleChange}
@@ -86,7 +91,11 @@ class AddProcedureForm extends Component {
                         />
                     </div>
 
-                    <button type="submit" disabled={!formValid}>Добавить процедуру</button>
+                    <button
+                        type="submit"
+                        className="submit-btn"
+                        disabled={!formValid}
+                    >Добавить процедуру</button>
                 </form>
             </div>
         )

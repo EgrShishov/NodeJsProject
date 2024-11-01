@@ -19,6 +19,10 @@ import PatientsPage from "./pages/PatientsPage.jsx";
 import PrescriptionPage from "./pages/PrescriptionsPage.jsx";
 import SpecializationPage from "./pages/SpecializationsPage.jsx";
 import ForbiddenPage from "./pages/ForbiddenPage.jsx";
+import AppointmentsPage from "./pages/AppointmentsPage.jsx";
+import PaymentsPage from "./pages/PaymentsPage.jsx";
+import FooterComponent from "./components/FooterComponent.jsx";
+import AddDoctorPage from "./pages/AddDoctorPage.jsx";
 
 function App() {
     return (
@@ -31,8 +35,13 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />}/>
-                    <Route path="/doctors" element={<DoctorsPage />} />
+                    <Route path="/doctors" element={
+                        <RequireRole allowedRoles={["receptionist"]}>
+                            <DoctorsPage />
+                        </RequireRole>
+                    }/>
                     <Route path="/doctors/:id" element={<DoctorDetailsPage />} />
+                    <Route path="/doctors/add" element={<AddDoctorPage />} />
                     <Route path="/procedures" element={<ProceduresPages />} />
                     <Route path="/procedures/:id" element={<ProcedureDetailsPage />} />
                     <Route path="/services" element={<ServicesPage />} />
@@ -41,13 +50,9 @@ function App() {
                     <Route path="/forbidden" element={<ForbiddenPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
                     <Route path="/receptionists" element={
-/*
                         <RequireRole allowedRoles={["receptionist"]}>
-*/
                             <ReceptionistsPage />
-/*
                         </RequireRole>
-*/
                     }/>
                     <Route path="/patients" element={
                         <RequireRole allowedRoles={["doctor", "receptionist"]}>
@@ -59,18 +64,29 @@ function App() {
                             <PrescriptionPage />
                         </RequireRole>
                     }/>
+                    <Route path="/appointments" element={
+                        <RequireRole allowedRoles={["doctor", "patient", "receptionist"]}>
+                            <AppointmentsPage />
+                        </RequireRole>
+                    }/>
+                    <Route path="/payments" element={
+                        <RequireRole allowedRoles={["receptionist"]}>
+                            <PaymentsPage />
+                        </RequireRole>
+                    }>
+                    </Route>
                     <Route path="/specializations" element={<SpecializationPage />}></Route>
                 </Routes>
             </AuthProvider>
+            <FooterComponent/>
         </Router>
     );
 }
 
 function RequireRole({ allowedRoles, children }) {
-    const { user } = useAuth();
+    const { user, isAuthenticated } = useAuth();
 
     if (!user) return <div>Loading...</div>;
-    console.log(user);
     return user && allowedRoles.includes(user.role) ? children : <Navigate to="/forbidden" replace />
 }
 

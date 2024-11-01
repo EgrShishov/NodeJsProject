@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from 'react';
-import {register, logout, login, google, facebook, profile, refresh} from "../services/authService.js";
+import {register, logout, login, google, facebook, profile, refresh} from "../services/authService";
 import { useNavigate } from "react-router-dom";
 
 export const AuthContext = createContext();
@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }) => {
             const profileData = await profile();
             setUser(profileData);
         } catch (error) {
-            console.error(`Error occured in login action: ${error}`);
+            console.error(`Error occurred in login action: ${error}`);
             navigate('/home');
         }
     };

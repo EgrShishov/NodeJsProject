@@ -15,7 +15,7 @@ const ServicesPage = () => {
     }, []);
 
     return (
-        <div>
+        <div className="services-page">
             <h2>Available Services</h2>
             <ServiceListComponent services={serviceList}/>
         </div>

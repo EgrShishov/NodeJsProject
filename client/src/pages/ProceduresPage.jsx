@@ -1,11 +1,15 @@
 import {useEffect, useState} from "react";
-import {getAllProcedures} from "../services/proceduresService";
+import {createProcedure, getAllProcedures} from "../services/proceduresService";
 import ProcedureCard from "../components/ProcedureComponent.jsx";
+import {useAuth} from "../context/AuthContext.jsx";
+import AddProcedureForm from "../components/AddProcedureForm.jsx";
 
 const ProceduresPages = () => {
     const [ proceduresList, setProceduresList ] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
+    const [formOpened, toggleFormOpened] = useState(false);
+    const {user} = useAuth();
 
     useEffect(() => {
         fetchProcedures();
@@ -30,6 +34,8 @@ const ProceduresPages = () => {
         setProceduresList(sortedProcedures);
     };
 
+    const toggleForm = () => toggleFormOpened(!formOpened);
+
     const handleProcedureDelete = async (id) => {
         await deleteProcedure(id);
         fetchProcedures();
@@ -39,8 +45,20 @@ const ProceduresPages = () => {
         procedure.ProcedureName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleAddProcedure = async (newProcedure) => {
+        const response = await createProcedure(newProcedure);
+        if (response) {
+            fetchProcedures();
+        }
+        toggleForm();
+    }
+
+    const handlePurchase = (procedureId) => {
+
+    };
+
     return (
-        <div>
+        <div className="procedures-page">
             <h2>Процедуры, которые мы предлагаем: </h2>
 
             <div className="procedures-search-bar">
@@ -55,8 +73,14 @@ const ProceduresPages = () => {
                     <option value="name">Название</option>
                     <option value="cost">Стоимость</option>
                 </select>
-                <button>Добавить процедуру</button>
+                {user.role === 'receptionist' && (
+                    <button onClick={toggleForm}>Добавить процедуру</button>
+                )}
             </div>
+
+            {formOpened && (
+                <AddProcedureForm onSubmit={handleAddProcedure}/>
+            )}
 
             <div className="procedures">
                 <div className="procedures-list">
@@ -68,6 +92,7 @@ const ProceduresPages = () => {
                                 name={procedure.ProcedureName}
                                 description={procedure.Description}
                                 cost={procedure.ProcedureCost}
+                                handlePurchase={handlePurchase}
                             />
                         );
                     })}

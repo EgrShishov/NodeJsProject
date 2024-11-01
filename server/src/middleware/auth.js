@@ -1,3 +1,6 @@
+const passport = require('passport');
+const Role = require('../models/Role');
+
 module.exports = {
     ensureAuthenticated: (req, res, next) => {
         if (req.isAuthenticated) return next();
@@ -16,18 +19,38 @@ module.exports = {
         res.status(403).json({ message: 'Access denied' });
     },
     ensureRole: (...roles) => {
-        return (req, res, next) => {
-            console.log(req.user.role);
-            return (req, res, next) => {
-                if (req.isAuthenticated && req.isAuthenticated()) {
-                    if (req.user && roles.includes(req.user.role)) {
-                        return next();
-                    } else {
-                        return res.status(403).json({ message: `Доступ запрещён: недостаточные права` });
-                    }
-                }
+        return async (req, res, next) => {
+            const role = await Role.findById(req.user.roleId);
+            if (!role) return res.status(404).json({ message: 'Роль не найдена' });
+
+            if (!req.user) {
                 return res.status(401).json({ message: 'Пользователь не авторизован' });
-            };
+            }
+            if (roles.includes(role.RoleName)) {
+                return next();
+            } else {
+                return res.status(403).json({ message: 'Доступ запрещён: недостаточные права' });
+            }
         };
     },
+    auth: (req, res, next) => {
+        let responseObj = {
+            statusCode: 0,
+            errorMsg: "",
+            data: {}
+        };
+
+        passport.authenticate('jwt', { session: false }, (err, user, info) => {
+            if (err) return next(err);
+
+            if (!user) {
+                responseObj.data = info ? info.message : "No user found";
+                responseObj.statusCode = 401;
+                responseObj.errorMsg = "Unauthorized";
+                return res.status(responseObj.statusCode).send(responseObj);
+            }
+            req.user = user;
+            next();
+        })(req, res, next);
+    }
 };

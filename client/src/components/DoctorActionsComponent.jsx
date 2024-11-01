@@ -1,4 +1,4 @@
-import React, {Component} from "react";
+import {Component} from "react";
 
 class DoctorActions extends Component {
     handleViewPatients = () => {
@@ -19,12 +19,15 @@ class DoctorActions extends Component {
 
     render() {
         return (
-            <div className="doctor-actions">
-                <button onClick={this.handleViewPatients}>View Patients</button>
-                <button onClick={this.handleAddPrescription}>Add Prescription</button>
-                <button onClick={this.handleAddResults}>Add Results</button>
-                <button onClick={this.handleShowSchedule}>Schedule</button>
+            <div className="doctors-actions">
+                <button className="submit-btn" onClick={this.handleViewPatients}>Просмотр пациентов</button>
+                <button className="submit-btn" onClick={this.handleAddPrescription}>Назначить рецепт</button>
+                <button className="submit-btn" onClick={this.handleAddResults}>Добавить результаты</button>
+                <button className="submit-btn" onClick={this.handleAddResults}>Просмотр результатов</button>
+                <button className="submit-btn" onClick={this.handleShowSchedule}>Расписание</button>
             </div>
         );
     }
 }
+
+export default DoctorActions;

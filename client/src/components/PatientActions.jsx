@@ -1,11 +1,17 @@
-const PatientActions = () => {
+const PatientActions = ({
+                            onMyAppointments,
+                            onMyResults,
+                            onMyPrescriptions,
+                            onMyInvoices,
+                            onMyPayments
+                        }) => {
     return (
-        <div className="patient-actions">
-            <button>My appointments</button>
-            <button>My results</button>
-            <button>My prescriptions</button>
-            <button>My invoices</button>
-            <button>My payments</button>
+        <div className="patients-actions">
+            <button className="action-button" onClick={onMyAppointments}>Мои консультации</button>
+            <button className="action-button" onClick={onMyResults}>Мои результаты</button>
+            <button className="action-button" onClick={onMyPrescriptions}>Мои рецепты</button>
+            <button className="action-button" onClick={onMyInvoices}>Мои счета</button>
+            <button className="action-button" onClick={onMyPayments}>Мои платежи</button>
         </div>
     );
 };

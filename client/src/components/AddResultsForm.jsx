@@ -44,9 +44,7 @@ class AddResultsForm extends Component {
         const patients = await getAllPatients();
         const doctors = await getAllDoctors();
 
-        if (appointments && doctors && patients) {
-            this.setState({ appointments: appointments, doctors: doctors, patients: patients });
-        }
+        this.setState({ appointments: appointments, doctors: doctors, patients: patients });
     }
 
     handleChange(e) {
@@ -170,7 +168,7 @@ class AddResultsForm extends Component {
                             {patients ? (
                                 patients.map(patient => (
                                     <option key={patient._id} value={patient._id}>
-                                        {patient.name}
+                                        {patient.FirstName} {patient.LastName}
                                     </option>
                                 ))) : (
                                     <div>Loading patients...</div>
@@ -185,7 +183,7 @@ class AddResultsForm extends Component {
                             {doctors ? (
                                 doctors.map(doctor => (
                                     <option key={doctor._id} value={doctor._id}>
-                                        {doctor.name}
+                                        {doctor.FirstName} {doctor.LastName}
                                     </option>
                             ))) : (
                                 <div>Loading doctors...</div>
@@ -201,7 +199,7 @@ class AddResultsForm extends Component {
                             {appointments ? (
                                 appointments.map(app => (
                                 <option key={app._id} value={app._id}>
-                                    Прием от {app.date}
+                                    Прием от {app.AppointmentDate} {app.AppointmentTime}
                                 </option>
                             ))) : (
                                 <div>Loading appointments...</div>

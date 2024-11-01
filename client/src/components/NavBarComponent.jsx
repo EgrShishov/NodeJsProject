@@ -9,7 +9,7 @@ const NavBarComponent = () => {
             <nav>
                 <ul>
                     <li>
-                        <Link to="/home">Home</Link>
+                        <Link to="/home" className="logo">AgendaClinic</Link>
                     </li>
                     <li>
                         <Link to="/doctors">Doctors</Link>

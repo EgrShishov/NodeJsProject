@@ -7,7 +7,7 @@ const DoctorSchema = Schema({
     LastName: { type: String, required: true },
     MiddleName: { type: String, required: true },
     DateOfBirth: { type: Date, required: true },
-    SpecializationId: { type: Schema.Types.ObjectId, ref: 'Specialization' },
+    SpecializationId: { type: Schema.Types.ObjectId, ref: 'Specializations' },
     CareerStartYear: { type: Number, required: true }
 });
 

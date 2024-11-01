@@ -9,6 +9,8 @@ const cors = require('cors');
 const seeder = require('./db/seeder');
 const cookieParser = require('cookie-parser');
 require('dotenv').config();
+const ORM = require('./db/orm');
+const pool = require('./db/pool');
 
 const app = express();
 const sess = {
@@ -22,7 +24,7 @@ app.use(passport.initialize());
 app.use(session(sess));
 
 var corsOptions = {
-    origin: 'http://localhost:5174', //client
+    origin: 'http://localhost:5173', //client
     credentials: true
 };
 
@@ -32,6 +34,17 @@ mongoose.connect(process.env.MONGO_URI,
     { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => console.log('MongoDB connected'))
     .catch(err => console.log(err));
+
+
+const orm = new ORM(pool);
+
+orm.define('users', {
+    id: 'SERIAL PRIMARY KEY',
+    firstName: 'TEXT',
+    lastName: 'TEXT'
+});
+
+orm.migrate();
 
 /*seeder.insertMockData();
 seeder.seedDatabase();*/

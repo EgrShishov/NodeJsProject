@@ -15,11 +15,14 @@ const OfficesPage = () => {
     }, []);
 
     return (
-        <div>
+        <div className="offices-page">
+            <h2>Все наши офисы</h2>
+            <p>We shape our clients' visions into living, breathing designs. Everything
+                we do along the way reflects our commitment to lasting value.</p>
             <div className="offices-list">
                 {officesList.map((office) => {
                     return (
-                        <OfficeComponent office={office}/>
+                        <OfficeComponent key={office._id} office={office}/>
                     );
                 })}
             </div>

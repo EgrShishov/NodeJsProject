@@ -1,4 +1,9 @@
 const ServiceCategory = require('../models/ServiceCategory');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateServiceCategory = [
+    body('categoryName').notEmpty().withMessage('categoryName обязателен'),
+];
 
 exports.getAllServiceCategories = async (req, res) => {
     try {
@@ -24,7 +29,13 @@ exports.getServiceCategoryById = async (req, res) => {
     }
 };
 
-exports.createServiceCategory = async (req, res) => {
+exports.createServiceCategory = [
+    validateCreateServiceCategory,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const { categoryName } = req.body;
         const newCategory = new ServiceCategory({
@@ -36,7 +47,7 @@ exports.createServiceCategory = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании категории услуг' });
     }
-};
+}];
 
 exports.editServiceCategory = async (req, res) => {
     try {

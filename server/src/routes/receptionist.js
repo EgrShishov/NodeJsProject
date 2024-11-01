@@ -1,12 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const receptionistController = require('../controllers/receptionist');
-const { ensureAuthenticated, ensureGuest, ensureReceptionist} = require('../middleware/auth');
+const {ensureReceptionist, auth} = require('../middleware/auth');
 
-router.get('/all', ensureReceptionist, receptionistController.getAllReceptionists);
-router.get('/:id', ensureReceptionist, receptionistController.getReceptionistById);
-router.post('/', ensureReceptionist, receptionistController.createReceptionist);
-router.put('/:id', ensureReceptionist, receptionistController.editReceptionist);
-router.delete('/:id', ensureReceptionist, receptionistController.deleteReceptionist);
+router.get('/all', auth, ensureReceptionist, receptionistController.getAllReceptionists);
+router.get('/:id', auth, ensureReceptionist, receptionistController.getReceptionistById);
+router.post('/', auth, ensureReceptionist, receptionistController.createReceptionist);
+router.put('/:id', auth, ensureReceptionist, receptionistController.editReceptionist);
+router.delete('/:id', auth, ensureReceptionist, receptionistController.deleteReceptionist);
 
 module.exports = router;

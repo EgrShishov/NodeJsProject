@@ -1,4 +1,10 @@
 const Specialization = require('../models/Specialization');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateSpecialization = [
+    body('specializationName').notEmpty().withMessage('specializationName обязателен'),
+];
+
 
 exports.getAllSpecializations = async (req, res) => {
     try {
@@ -24,7 +30,13 @@ exports.getSpecializationById = async (req, res) => {
     }
 };
 
-exports.createSpecialization = async (req, res) => {
+exports.createSpecialization = [
+    validateCreateSpecialization,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const { specializationName } = req.body;
         const newSpecialization = new Specialization({
@@ -36,7 +48,7 @@ exports.createSpecialization = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании специализации' });
     }
-};
+}];
 
 exports.editSpecialization = async (req, res) => {
     try {

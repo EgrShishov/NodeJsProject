@@ -1,4 +1,4 @@
-const ProcedureCard = ({ id, name, description, cost }) => {
+const ProcedureCard = ({ id, name, description, cost, handlePurchase }) => {
     return (
         <div className="procedure-card">
             <div className="procedure-card__info">
@@ -7,7 +7,7 @@ const ProcedureCard = ({ id, name, description, cost }) => {
                 <p className="doctor-card__description">{description}</p>
             </div>
             <div className="procedure-card__actions">
-                <button className="procedure-card__button">Purchase</button>
+                <button className="procedure-card__button" onClick={() => handlePurchase(id)}>Записаться</button>
             </div>
         </div>
     );

@@ -1,4 +1,12 @@
 const Service = require('../models/Service');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateService = [
+    body('serviceCategoryId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('serviceCategoryId должен быть действительным ID'),
+    body('serviceName').notEmpty().withMessage('serviceName обязателен'),
+    body('isActive').notEmpty().withMessage('isActive обязателен').isBoolean().withMessage('isActive должен быть true or false'),
+];
+
 
 exports.getAllServices = async (req, res) => {
     try {
@@ -9,13 +17,20 @@ exports.getAllServices = async (req, res) => {
     }
 };
 
-exports.createService = async (req, res) => {
+exports.createService = [
+    validateCreateService,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
-        const { serviceCategoryId, serviceName } = req.body;
+        const { serviceCategoryId, serviceName, isActive } = req.body;
 
         const newService = new Service({
             serviceCategoryId,
-            serviceName
+            serviceName,
+            isActive
         });
 
         const savedService = await newService.save();
@@ -23,7 +38,7 @@ exports.createService = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании услуги' });
     }
-};
+}];
 
 exports.makeActive = async (req, res) => {
     try {

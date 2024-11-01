@@ -1,19 +1,37 @@
 const Appointment = require('../models/Appointment');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateAppointment = [
+    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('officeId').notEmpty().withMessage('officeId обязателен').isMongoId().withMessage('officeId должен быть действительным ID'),
+    body('serviceId').notEmpty().withMessage('serviceId обязателен').isMongoId().withMessage('serviceId должен быть действительным ID'),
+    body('appointmentDate').notEmpty().withMessage('appointmentDate обязателен').isDate().withMessage('appointmentDate должен быть датой в формате YYYY-MM-DD'),
+    body('appointmentTime').notEmpty().withMessage('appointmentTime обязателен').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('appointmentTime должен быть временем в формате HH:mm')
+];
 
 exports.getAllAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.find()
-            .populate('patientId', 'firstName lastName')
-            .populate('doctorId', 'firstName lastName')
-            .populate('serviceId', 'serviceName')
-            .populate('officeId', 'city street');
+            .populate('PatientId', 'FirstName LastName')
+            .populate('DoctorId', 'FirstName LastName')
+            .populate('ServiceId', 'ServiceName')
+            .populate('OfficeId', 'City Street');
+        console.log(appointments);
         res.status(200).json(appointments);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении приёмов' });
+        res.status(500).json({ error: `Ошибка при получении приёмов: ${error}` });
     }
 };
 
-exports.createAppointment = async (req, res) => {
+exports.createAppointment = [
+    validateCreateAppointment,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const { patientId, doctorId, officeId, serviceId, appointmentDate, appointmentTime } = req.body;
 
@@ -31,7 +49,7 @@ exports.createAppointment = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании приёма' });
     }
-};
+}];
 
 exports.approveAppointment = async (req, res) => {
     try {

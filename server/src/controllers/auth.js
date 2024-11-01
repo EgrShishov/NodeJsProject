@@ -115,7 +115,7 @@ exports.loginUser = async (req, res) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ email: email });
         if (!user) return res.status(404).json({ message: 'User not found' });
 
         const isMatch = await user.comparePassword(password);
@@ -123,8 +123,17 @@ exports.loginUser = async (req, res) => {
 
         const role = await Role.findOne({ _id: user.roleId });
 
-        const accessToken = jwt.sign({ userId: user._id, role: role.RoleName }, accessTokenSecret, { expiresIn: accessTokenExpiry });
-        const refreshToken = jwt.sign({ userId: user._id }, refreshTokenSecret, { expiresIn: refreshTokenExpiry });
+        const accessToken = jwt.sign(
+            { _id: user._id, role: role.RoleName },
+            accessTokenSecret,
+            { expiresIn: accessTokenExpiry }
+        );
+
+        const refreshToken = jwt.sign(
+            { _id: user._id },
+            refreshTokenSecret,
+            { expiresIn: refreshTokenExpiry }
+        );
 
         res.cookie('access', accessToken, {
             httpOnly: true,
@@ -160,7 +169,7 @@ exports.refreshToken = async (req, res) => {
         jwt.verify(refreshToken, refreshTokenSecret, (err, decoded) => {
             if (err) return res.status(403).json({ message: 'Invalid refresh token' });
             const accessToken = jwt.sign(
-                { userId: user._id },
+                { _id: user._id },
                 accessTokenSecret,
                 { expiresIn: accessTokenExpiry }
             );
@@ -188,7 +197,7 @@ exports.profileInfo = async (req, res) => {
 
     try {
         const decoded = jwt.verify(accessToken, accessTokenSecret);
-        const userId = decoded.userId;
+        const userId = decoded._id;
 
         const user = await User.findById(userId);
         if (!user) {
@@ -207,7 +216,6 @@ exports.profileInfo = async (req, res) => {
             if (receptionist) {
                 profile = receptionist.toObject();
                 profile.role = 'receptionist';
-                console.log(profile);
             }
         } else if (role.RoleName === 'doctor') {
             const doctor = await Doctor.findOne({ UserId: userId });
@@ -215,7 +223,6 @@ exports.profileInfo = async (req, res) => {
             if (doctor) {
                 profile = doctor.toObject();
                 profile.role = 'doctor';
-                console.log(profile);
             }
         } else if (role.RoleName === 'patient') {
             const patient = await Patient.findOne({ UserId: userId });
@@ -223,7 +230,6 @@ exports.profileInfo = async (req, res) => {
             if (patient) {
                 profile = patient.toObject();
                 profile.role = 'patient';
-                console.log(profile);
             }
         }
 

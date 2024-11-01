@@ -2,11 +2,11 @@ const CommonProfileInfo = ({first_name, last_name, middle_name, date_of_birth, p
     return (
         <div className="common-profile-info">
             <img className="profile-picture" src={picture} alt="ProfileComponent"/>
-            <div className="profile-info">
-                <div className="first-name">First Name: {first_name}</div>
-                <div className="last-name">Last Name: {last_name}</div>
-                <div className="middle-name">Middle Name: {middle_name}</div>
-                <div className="dob">Date of Birth: {date_of_birth}</div>
+            <div className="profile-details">
+                <div className="first-name">Имя: {first_name}</div>
+                <div className="last-name">Фамилия: {last_name}</div>
+                <div className="middle-name">Отчество: {middle_name}</div>
+                <div className="dob">Дата рождения: {date_of_birth}</div>
             </div>
         </div>
     );

@@ -1,4 +1,15 @@
 const Result = require('../models/Result');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateResult = [
+    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('appointmentId').notEmpty().withMessage('appointmentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('documentId').notEmpty().withMessage('documentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('complaints').notEmpty().withMessage('complaints обязателен'),
+    body('recommendations').notEmpty().withMessage('recommendations обязателен'),
+    body('conclusion').notEmpty().withMessage('conclusion обязателен'),
+];
 
 exports.getAllResults = async (req, res) => {
     try {
@@ -24,7 +35,13 @@ exports.getResultById = async (req, res) => {
     }
 };
 
-exports.createResult = async (req, res) => {
+exports.createResult = [
+    validateCreateResult,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
         const { patientId, doctorId, appointmentId, documentId, complaints, recommendations, conclusion } = req.body;
         const newResult = new Result({
@@ -42,7 +59,7 @@ exports.createResult = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Error creating result' });
     }
-};
+}];
 
 exports.editResult = async (req, res) => {
     try {

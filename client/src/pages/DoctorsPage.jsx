@@ -2,11 +2,13 @@ import DoctorCard from '../components/DoctorCardComponent.jsx';
 import {deleteDoctor, getAllDoctors} from "../services/doctorsService.js";
 import {useEffect, useState} from "react";
 import {useNavigate} from "react-router-dom";
+import {useAuth} from "../context/AuthContext.jsx";
 
 const DoctorsPage = () => {
     const [doctorProfiles, setDoctorProfiles] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
+    const {user} = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -41,8 +43,12 @@ const DoctorsPage = () => {
         doctor.LastName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handleOnProfileClick = (doctorId) =>  navigate(`/${doctorId}/`);
+    const handleOnEditClick = (doctorId) => navigate(`/edit-doctor/${doctorId}`);
+    const handleDeleteClick = async (doctorId) => await deleteDoctor(doctorId);
+
     return (
-        <div>
+        <div className="doctors-page">
             <h2>Эксперты медицины: </h2>
 
             <div className="doctors-search-bar">
@@ -57,28 +63,22 @@ const DoctorsPage = () => {
                     <option value="name">Имя</option>
                     <option value="experience">Стаж</option>
                 </select>
-                <button>Добавить врача</button>
+                {user.role.includes('receptionist') ? (
+                    <button onClick={() => navigate('add')}>Добавить врача</button>
+                ) : (<></>)}
             </div>
 
             <div className="doctors">
                 <div className="doctors-list">
                     {filteredDoctors.map((doctor) => {
                         return (
-                            <>
-                                <DoctorCard key={doctor._id} profile={doctor} />
-                                <div className="doctor-card__actions">
-                                    <button className="doctor-card__button"
-                                            onClick={() => navigate(`${doctor._id}`)}>View Profile
-                                    </button>
-                                    <button className="doctor-card__button doctor-card__button--primary">Book
-                                        Appointment
-                                    </button>
-                                    <div className="doctor-card__actions">
-                                        <button onClick={() => navigate(`/edit-doctor/${doctor._id}`)}>Редактировать</button>
-                                        <button onClick={() => handleDeleteDoctor(doctor._id)}>Удалить</button>
-                                    </div>
-                                </div>
-                            </>
+                            <DoctorCard
+                                key={doctor._id}
+                                profile={doctor}
+                                onProfileClick={handleOnProfileClick}
+                                onEditClick={handleOnEditClick}
+                                onDeleteClick={handleDeleteClick}
+                            />
                         );
                     })}
                 </div>

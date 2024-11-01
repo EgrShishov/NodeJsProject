@@ -2,6 +2,14 @@ const MedicalProcedure = require('../models/MedicalProcedures');
 const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
 const Payment = require('../models/Payment');
+const { body, validationResult } = require('express-validator');
+
+const validateCreateProcedure = [
+    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('procedureName').notEmpty().withMessage('procedureName обязателен'),
+    body('description').notEmpty().withMessage('description обязателен'),
+    body('procedureCost').notEmpty().withMessage('procedureCost обязателен').isFloat({min: 0.0001}).withMessage('procedureCost не может быть отрицательной')
+];
 
 exports.getAllProcedures = async (req, res) => {
     try {
@@ -27,9 +35,15 @@ exports.getProcedureById = async (req, res) => {
     }
 };
 
-exports.createProcedure = async (req, res) => {
+exports.createProcedure = [
+    validateCreateProcedure,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        return res.status(400).json({ errors: errors.array() });
+    }
     try {
-        const { procedureName, description, procedureCost, doctorId, patientId, procedureDate, procedureTime } = req.body;
+        const { procedureName, description, procedureCost, patientId } = req.body;
 
         const doctor = await Doctor.findById(doctorId);
         const patient = await Patient.findById(patientId);
@@ -42,10 +56,6 @@ exports.createProcedure = async (req, res) => {
             procedureName,
             description,
             procedureCost,
-            doctorId,
-            patientId,
-            procedureDate,
-            procedureTime
         });
 
         const savedProcedure = await newProcedure.save();
@@ -62,7 +72,7 @@ exports.createProcedure = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании процедуры' });
     }
-};
+}];
 
 exports.editProcedure = async (req, res) => {
     try {

@@ -15,7 +15,8 @@ const SpecializationPage = () => {
     }, []);
 
     return (
-        <>
+        <div className="specializations-page">
+            <h2>Наши врачи обладают следующими специализациями: </h2>
             <div className="specializations">
                 {specializations.map((spec) => {
                     return (
@@ -25,7 +26,7 @@ const SpecializationPage = () => {
                     );
                 })}
             </div>
-        </>
+        </div>
     );
 };
 

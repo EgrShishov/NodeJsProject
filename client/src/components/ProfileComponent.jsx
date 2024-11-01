@@ -1,21 +1,6 @@
-import CommonProfileInfo from "./CommonProfileInfo";
-import {useAuth} from "../context/AuthContext";
-import {profile} from "../services/authService";
-import {useEffect, useState} from "react";
+import CommonProfileInfo from "./CommonProfileInfo.jsx";
 
-const ProfileComponent = () => {
-    const [ profileData, setProfile ] = useState(null);
-
-    useEffect(() => {
-        const fetchProfile = async () => {
-            const data = await profile();
-            setProfile(data);
-            console.log(data);
-        };
-
-        fetchProfile();
-    }, []);
-
+const ProfileComponent = ({ profileData }) => {
     return (
         <div className="profile">
             {profileData ? (
@@ -25,7 +10,7 @@ const ProfileComponent = () => {
                     middle_name={profileData.MiddleName}
                     date_of_birth={profileData.DateOfBirth} />
             ) : (
-                <p>Loading profile info</p>
+                <p>Загружаем информацию о профиле...</p>
             )}
         </div>
     );

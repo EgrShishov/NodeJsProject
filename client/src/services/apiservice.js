@@ -6,14 +6,13 @@ const API_URL = 'http://localhost:5000';
 const getToken = () => Cookies.get('access');
 
 export const apiRequest = async (method, endpoint, data = {}, tokenRequired = false) => {
-    const headers = tokenRequired ? { Authorization: `bearer ${getToken()}` } : {};
+    //const headers = tokenRequired ? { Authorization: `Bearer ${getToken()}` } : {};
 
     try {
         const response = await axios({
             method,
             url: `${API_URL}${endpoint}`,
             data,
-            headers,
             withCredentials: true
         });
         return response.data;

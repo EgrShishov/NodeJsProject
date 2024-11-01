@@ -7,14 +7,14 @@ const PatientsPage = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
 
-    useEffect(() => {
-        fetchPatients();
-    }, []);
-
     const fetchPatients = async () => {
         const patients = await getAllPatients();
         setPatients(patients);
     };
+
+    useEffect(() => {
+        fetchPatients();
+    }, []);
 
     const handleSearch = (e) => {
         setSearchQuery(e.target.value);
@@ -62,7 +62,7 @@ const PatientsPage = () => {
                 {filteredPatients ? (
                     filteredPatients.map((patient) => {
                         return (
-                            <PatientCard profile={patient}></PatientCard>
+                            <PatientCard key={patient._id} profile={patient}></PatientCard>
                         );
                     })
                 ) : (

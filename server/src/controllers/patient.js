@@ -1,8 +1,17 @@
 const Patient = require('../models/Patient');
+const { body, validationResult } = require('express-validator');
+
+const validateCreatePatient = [
+    body('userId').notEmpty().withMessage('userId обязателен'),
+    body('firstName').isString().withMessage('firstName должен быть строкой').notEmpty().withMessage('firstName обязателен'),
+    body('lastName').isString().withMessage('lastName должен быть строкой').notEmpty().withMessage('lastName обязателен'),
+    body('middleName').optional().isString().withMessage('middleName должен быть строкой'),
+    body('dateOfBirth').isDate().withMessage('dateOfBirth должен быть датой в формате YYYY-MM-DD')
+];
 
 exports.getAllPatients = async (req, res) => {
     try {
-        const patients = await Patient.find().populate('userId', 'UserName Email');
+        const patients = await Patient.find();
         res.status(200).json(patients);
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при получении пациентов' });
@@ -12,7 +21,7 @@ exports.getAllPatients = async (req, res) => {
 exports.getPatientById = async (req, res) => {
     try {
         const patientId = req.params.id;
-        const patient = await Patient.findById(patientId).populate('userId', 'UserName Email');
+        const patient = await Patient.findById(patientId).populate('userId', 'name email');
 
         if (!patient) {
             return res.status(404).json({ error: 'Пациент не найден' });
@@ -24,7 +33,13 @@ exports.getPatientById = async (req, res) => {
     }
 };
 
-exports.createPatient = async (req, res) => {
+exports.createPatient = [validateCreatePatient,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+
     try {
         const { userId, firstName, lastName, middleName, dateOfBirth } = req.body;
         const newPatient = new Patient({
@@ -40,7 +55,7 @@ exports.createPatient = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании пациента' });
     }
-};
+}];
 
 exports.editPatient = async (req, res) => {
     try {

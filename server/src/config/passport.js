@@ -4,27 +4,28 @@ const { Strategy: JwtStrategy, ExtractJwt } = require('passport-jwt');
 const User = require('../models/User');
 const Patient = require('../models/Patient');
 const passport = require('passport');
-const Role = require("../models/Role");
+const { Types } = require('mongoose');
+const Role = require('../models/Role');
 require('dotenv').config();
 
 const options = {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+    jwtFromRequest: ExtractJwt.fromExtractors([
+        req => req.cookies.access
+    ]),
     secretOrKey: process.env.ACCESS_TOKEN_SECRET
 };
 
-passport.use(
-    new JwtStrategy(options, async (jwt_payload, done) => {
-        console.log('Payload :: '+jwt_payload);
-        try {
-            const user = await User.findById(jwt_payload._id);
-            if (user) {
-                return done(null, user);
-            }
+passport.use(new JwtStrategy(options, async (jwt_payload, done) => {
+    try {
+        const user = await User.findOne({ _id: jwt_payload._id });
+        if (!user) {
             return done(null, false);
-        } catch (err) {
-            console.error(err);
-            return done(err, false);
         }
+        return done(null, user);
+    } catch (err) {
+        console.error(err);
+        return done(err, false);
+    }
     })
 );
 

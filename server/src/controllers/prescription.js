@@ -1,6 +1,16 @@
 const Prescription = require('../models/Prescription');
 const Doctor = require('../models/Doctor');
 const Patient = require('../models/Patient');
+const { body, validationResult } = require('express-validator');
+
+const validateCreatePrescription = [
+    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('prescriptionDate').notEmpty().withMessage('prescriptionDate обязателен').isDate().withMessage('prescriptionDate должен быть датой в формате YYYY-MM-DD'),
+    body('medication').notEmpty().withMessage('medication обязателен'),
+    body('dosage').notEmpty().withMessage('dosage обязателен'),
+    body('duration').notEmpty().withMessage('duration обязателен').isInt({min: 0}).withMessage('duration должно быть целым неотрицательным числом'),
+];
 
 exports.getAllPrescriptions = async (req, res) => {
     try {
@@ -30,7 +40,13 @@ exports.getPrescriptionById = async (req, res) => {
     }
 };
 
-exports.createPrescription = async (req, res) => {
+exports.createPrescription = [
+    validateCreatePrescription,
+    async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()){
+        return res.status(400).json({errors: errors.array() });
+    }
     try {
         const { doctorId, patientId, prescriptionDate, medication, dosage, duration } = req.body;
 
@@ -55,7 +71,7 @@ exports.createPrescription = async (req, res) => {
     } catch (error) {
         res.status(500).json({ error: 'Ошибка при создании рецепта' });
     }
-};
+}];
 
 exports.editPrescription = async (req, res) => {
     try {

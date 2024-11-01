@@ -1,11 +1,17 @@
-const ReceptionistActions = ({ onCreateAppointment, onViewReceptionists, onViewPatients, onManageOffices, onManageProcedures }) => {
+const ReceptionistActions = ({ onCreateAppointment,
+                                 onViewReceptionists,
+                                 onViewPatients,
+                                 onManageOffices,
+                                 onManageProcedures,
+                                 onViewPayments }) => {
     return (
         <div className="receptionist-actions">
-            <button onClick={onCreateAppointment}>Create Appointment</button>
-            <button onClick={onViewReceptionists}>View Receptionists</button>
-            <button onClick={onViewPatients}>View Patients</button>
-            <button onClick={onManageOffices}>Manage Offices</button>
-            <button onClick={onManageProcedures}>Manage Procedures</button>
+            <button className="action-button" onClick={onCreateAppointment}>Назначить консультацию</button>
+            <button className="action-button" onClick={onViewReceptionists}>Просмотреть регистраторов</button>
+            <button className="action-button" onClick={onViewPayments}>Просмотреть платежи</button>
+            <button className="action-button" onClick={onViewPatients}>Просмотреть пациентов</button>
+            <button className="action-button" onClick={onManageOffices}>Управление оффисами</button>
+            <button className="action-button" onClick={onManageProcedures}>Управление процедурами</button>
         </div>
     );
 };

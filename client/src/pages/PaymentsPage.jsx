@@ -55,8 +55,9 @@ const PaymentsPage = () => {
             <div className="payments-list">
                 {filteredPayments ? (
                     filteredPayments.map((payment) => {
+                        console.log(payments);
                         return (
-                            <PaymentCard payment={payment}/>
+                            <PaymentCard key={payment._id} payment={payment}/>
                         )
                     })
                 ) : (
