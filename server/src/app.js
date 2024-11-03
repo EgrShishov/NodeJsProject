@@ -8,7 +8,7 @@ const swaggerDocument = require('./swagger-output.json');
 const cors = require('cors');
 const seeder = require('./db/seeder');
 const cookieParser = require('cookie-parser');
-require('dotenv').config();
+require('dotenv').config('./server/.env');
 const ORM = require('./db/orm');
 const pool = require('./db/pool');
 

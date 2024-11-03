@@ -6,7 +6,7 @@ const Patient = require('../models/Patient');
 const passport = require('passport');
 const { Types } = require('mongoose');
 const Role = require('../models/Role');
-require('dotenv').config();
+require('dotenv').config('./server/.env');
 
 const options = {
     jwtFromRequest: ExtractJwt.fromExtractors([
