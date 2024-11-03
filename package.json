@@ -10,5 +10,9 @@
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "using": "^1.0.0-alpha-1"
+  },
+"scripts": {
+  "build": "node ./server/src/app.js",
+  "build_client": "",
   }
 }
