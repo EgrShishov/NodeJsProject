@@ -23,6 +23,7 @@ import AppointmentsPage from "./pages/AppointmentsPage.jsx";
 import PaymentsPage from "./pages/PaymentsPage.jsx";
 import FooterComponent from "./components/FooterComponent.jsx";
 import AddDoctorPage from "./pages/AddDoctorPage.jsx";
+import PatientPage from "./pages/PatientPage.jsx";
 
 function App() {
     return (
@@ -46,7 +47,7 @@ function App() {
                     <Route path="/procedures/:id" element={<ProcedureDetailsPage />} />
                     <Route path="/services" element={<ServicesPage />} />
                     <Route path="/offices" element={<OfficesPage />} />
-                    <Route path="/notFound" element={<NotFoundPage />} />
+                    <Route path="*" element={<NotFoundPage />} />
                     <Route path="/forbidden" element={<ForbiddenPage />} />
                     <Route path="/about" element={<AboutUsPage />} />
                     <Route path="/receptionists" element={
@@ -59,6 +60,12 @@ function App() {
                             <PatientsPage />
                         </RequireRole>
                     }/>
+                    <Route path="/patients/:id" element={
+                        <RequireRole allowedRoles={["doctor", "receptionist"]}>
+                            <PatientPage />
+                        </RequireRole>
+                    }>
+                    </Route>
                     <Route path="/prescriptions" element={
                         <RequireRole allowedRoles={["doctor"]}>
                             <PrescriptionPage />

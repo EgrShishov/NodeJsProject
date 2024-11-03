@@ -19,6 +19,7 @@ class AddDoctorForm extends Component {
 
         this.handleChange = this.handleChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
+        this.handleSelectSpecialization = this.handleSelectSpecialization.bind(this);
     }
 
     validateForm() {
@@ -50,6 +51,15 @@ class AddDoctorForm extends Component {
     handleSubmit(e) {
         e.preventDefault();
         if (this.state.formValid) {
+            this.props.onSubmit({
+                doctors_first_name: this.state.doctors_first_name,
+                doctors_last_name: this.state.doctors_last_name,
+                doctors_middle_name: this.state.doctors_middle_name,
+                birthday_date: this.state.birthday_date,
+                email: this.state.email,
+                career_start_year: this.state.career_start_year,
+                specializationId: this.state.specializationId,
+            });
             this.setState({
                 doctors_first_name: '',
                 doctors_last_name: '',
@@ -61,6 +71,13 @@ class AddDoctorForm extends Component {
                 formValid: false
             });
         }
+    }
+
+    handleSelectSpecialization(e) {
+        const specId = e.target.value;
+        this.setState({
+            specializationId: specId || '',
+        });
     }
 
     render() {
@@ -149,8 +166,9 @@ class AddDoctorForm extends Component {
 
                     <div>
                         <label>Специализация:</label><br/>
-                        <select>
+                        <select value={specializationId} onChange={this.handleSelectSpecialization} required>
                             <option value="">Выберите специализацию</option>
+
                             {specializations.length > 0 ? (
                                 specializations.map((spec) => (
                                     <option
@@ -159,7 +177,7 @@ class AddDoctorForm extends Component {
                                     </option>
                                 ))
                             ) : (
-                                <option>Loading specializations...</option>
+                                <option>Загрузка специализаций...</option>
                             )}
                         </select>
                     </div>

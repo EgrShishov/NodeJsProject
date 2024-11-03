@@ -43,7 +43,7 @@ const FooterComponent = () => {
             </div>
             <div className="footer-bottom">
                 © 2024 Права никому не принадлежат:
-                <a href="http://localhost:5173/home">AgendaClinic.by</a>
+                <a href="http://localhost:5173/home">  AgendaClinic.by</a>
             </div>
         </footer>
     );

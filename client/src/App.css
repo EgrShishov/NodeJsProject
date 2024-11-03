@@ -1112,3 +1112,163 @@ ul {
     margin-bottom: 15px;
     line-height: 1.6;
   }
+
+.patients-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  background-color: #f9fafc;
+}
+
+.patients h2 {
+  font-size: 1.8rem;
+  color: #333;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.patients-search-bar {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  margin-bottom: 2rem;
+  width: 100%;
+}
+
+    .patients-search-bar input[type="text"] {
+      flex-grow: 1;
+      padding: 0.8rem;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+  .patients-search-bar select {
+    padding: 0.8rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+  }
+
+  .patients-search-bar button {
+    padding: 0.8rem 1rem;
+    background-color: #4a90e2;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+
+    .patients-search-bar button:hover {
+      background-color: #357ab8;
+    }
+
+.patients {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(450px, 1fr));
+  gap: 40px;
+}
+
+.patient-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+  .patient-card:hover {
+    transform: scale(1.05);
+  }
+
+.patient-card__image {
+  float: left;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+}
+
+.patient-card__info {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+  .patient_card__name:before {
+    content: "ФИО Пациента: ";
+    font-size: 1.2rem;
+    font-weight: bold;
+  }
+
+.patient_card__name {
+  font-size: 1.2rem;
+}
+
+  .patient-card__date_of_birth:before {
+    content: "День рождения: ";
+    font-size: 1rem;
+    font-weight: bold;
+    font-style: normal;
+  }
+
+.patient-card__date_of_birth {
+  font-size: 1rem;
+  font-style: italic;
+}
+
+.patient-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.receptionists-list {
+  width: 90%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.receptionist-card {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  text-align: center;
+  transition: transform 0.2s;
+}
+
+  .receptionist-card img {
+    float: left;
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+  }
+
+  .receptionist-card p {
+    font-size: 1.2rem;
+    text-align: left;
+  }
+
+  .receptionist-card:hover {
+    transform: scale(1.05);
+  }
+
+.receptionist-card__actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.receptionists-page {
+  width: 100%;
+}

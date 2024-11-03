@@ -34,7 +34,7 @@ const DoctorsPage = () => {
         setDoctorProfiles(sortedDoctors);
     };
 
-    const handleDeleteDoctor = async (id) => {
+    const handleDeleteClick = async (id) => {
         await deleteDoctor(id);
         await fetchDoctors();
     };
@@ -45,7 +45,6 @@ const DoctorsPage = () => {
 
     const handleOnProfileClick = (doctorId) =>  navigate(`/${doctorId}/`);
     const handleOnEditClick = (doctorId) => navigate(`/edit-doctor/${doctorId}`);
-    const handleDeleteClick = async (doctorId) => await deleteDoctor(doctorId);
 
     return (
         <div className="doctors-page">

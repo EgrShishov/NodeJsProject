@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
-import {getAppointments} from "../services/appointmentsService.js";
-import AppointmentCard from "../components/AppointmentCard.jsx";
+import {getAppointments} from "../services/appointmentsService";
+import AppointmentCard from "../components/AppointmentCard";
 
 const AppointmentsPage = () => {
     const [appointments, setAppointments] = useState([]);
@@ -19,7 +19,10 @@ const AppointmentsPage = () => {
             {appointments ? (
                 appointments.map((appointment) => {
                     return (
-                        <AppointmentCard key={appointment._id} appointment={appointment} />
+                        <AppointmentCard
+                            key={appointment._id} a
+                            ppointment={appointment}
+                        />
                     )
                 })
             ) : (

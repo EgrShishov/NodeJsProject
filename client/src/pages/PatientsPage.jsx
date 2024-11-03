@@ -1,11 +1,13 @@
 import {useEffect, useState} from "react";
 import PatientCard from "../components/PatientCardComponent.jsx";
 import {deletePatient, getAllPatients} from "../services/patientsService.js";
+import {useNavigate} from "react-router-dom";
 
 const PatientsPage = () => {
     const [patients, setPatients] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
+    const navigate = useNavigate();
 
     const fetchPatients = async () => {
         const patients = await getAllPatients();
@@ -39,8 +41,11 @@ const PatientsPage = () => {
         patient.LastName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    const handlePatientEdit = (patientId) => navigate(`edit/${patientId}`);
+    const handleViewProfile = (patientId) => navigate(`${patientId}`);
+
     return (
-        <div>
+        <div className="patients-page">
             <h2>Список пациентов клиники: </h2>
 
             <div className="patients-search-bar">
@@ -62,7 +67,13 @@ const PatientsPage = () => {
                 {filteredPatients ? (
                     filteredPatients.map((patient) => {
                         return (
-                            <PatientCard key={patient._id} profile={patient}></PatientCard>
+                            <PatientCard
+                                key={patient._id}
+                                profile={patient}
+                                onDeleteClick={handlePatientDelete}
+                                onEditClick={handlePatientEdit}
+                                onViewProfileClick={handleViewProfile}
+                            />
                         );
                     })
                 ) : (
