@@ -20,7 +20,7 @@ jobs:
 
       - name: initial modules
         run: npm install
-      - name: build project
+      - name: build server project
         run: npm run build
 
       - name: Run a multi-line script
