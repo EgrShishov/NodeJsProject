@@ -23,6 +23,11 @@ jobs:
 
       - name: initial modules
         run: npm install
+	env:
+          ACCESS_TOKEN_SECRET=supersecret
+	  REFRESH_TOKEN_SECRET=superpupersecret
+          ACCESS_TOKEN_EXPIRY=1h
+          REFRESH_TOKEN_EXPIRY=7d
         working-directory: server
       - name: build server
         run: npm run build
