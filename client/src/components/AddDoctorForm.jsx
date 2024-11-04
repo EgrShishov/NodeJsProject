@@ -24,7 +24,8 @@ class AddDoctorForm extends Component {
 
     validateForm() {
         const { doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, email, career_start_year, specializationId } = this.state;
-        return doctors_first_name && doctors_last_name && doctors_middle_name && birthday_date && email && career_start_year && specializationId;
+        /*return doctors_first_name && doctors_last_name && doctors_middle_name && birthday_date && email && career_start_year && specializationId;*/
+        return true;
     }
 
     componentDidMount() {
@@ -84,7 +85,7 @@ class AddDoctorForm extends Component {
         const {
             doctors_first_name,
             doctors_last_name,
-            doctors_second_name,
+            doctors_middle_name,
             birthday_date,
             email,
             career_start_year,
@@ -99,17 +100,6 @@ class AddDoctorForm extends Component {
                     <h2>Создать аккаунт врача</h2>
 
                     <div>
-                        <label>Имя врача:</label><br/>
-                        <input
-                            type="text"
-                            name="doctors_first_name"
-                            value={doctors_first_name}
-                            onChange={this.handleChange}
-                            required
-                        />
-                    </div>
-
-                    <div>
                         <label>Фамилия врача:</label><br/>
                         <input
                             type="text"
@@ -121,11 +111,22 @@ class AddDoctorForm extends Component {
                     </div>
 
                     <div>
+                        <label>Имя врача:</label><br/>
+                        <input
+                            type="text"
+                            name="doctors_first_name"
+                            value={doctors_first_name}
+                            onChange={this.handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div>
                         <label>Отчество врача:</label><br/>
                         <input
                             type="text"
                             name="doctors_middle_name"
-                            value={doctors_second_name}
+                            value={doctors_middle_name}
                             onChange={this.handleChange}
                             required
                         />
@@ -168,17 +169,13 @@ class AddDoctorForm extends Component {
                         <label>Специализация:</label><br/>
                         <select value={specializationId} onChange={this.handleSelectSpecialization} required>
                             <option value="">Выберите специализацию</option>
-
-                            {specializations.length > 0 ? (
+                            {specializations.length > 0 &&
                                 specializations.map((spec) => (
                                     <option
                                         value={spec._id}
                                         key={spec._id}>{spec.SpecializationName}
                                     </option>
-                                ))
-                            ) : (
-                                <option>Загрузка специализаций...</option>
-                            )}
+                                ))}
                         </select>
                     </div>
 

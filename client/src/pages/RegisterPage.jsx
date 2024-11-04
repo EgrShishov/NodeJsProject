@@ -44,7 +44,7 @@ const RegisterPage = () => {
                 first_name: firstName,
                 last_name: lastName,
                 middle_name: middleName,
-                birthday_date: birthdayDate
+                date_of_birth: birthdayDate
             };
 
             const registerResult = await userRegister(registerData);

@@ -5,7 +5,7 @@ import {useAuth} from "../context/AuthContext.jsx";
 const DoctorCard = ({ profile, onProfileClick, onEditClick, onDeleteClick }) => {
     const [ name, setName ] = useState('');
     const [ experience, setExperience ] = useState(0);
-    const {user} = useAuth();
+    const { user } = useAuth();
 
     useEffect(() => {
         setName(`${profile.FirstName} ${profile.MiddleName} ${profile.LastName}`);
@@ -32,7 +32,7 @@ const DoctorCard = ({ profile, onProfileClick, onEditClick, onDeleteClick }) => 
                 </button>
                 <button className="doctor-card__button doctor-card__button--primary">Назначить консультацию
                 </button>
-                {user.role.includes('receptionist') ? (
+                {user && user.role.includes('receptionist') ? (
                     <div className="doctor-card__actions">
                         <button onClick={() => onEditClick(profile._id)}>Редактировать</button>
                         <button onClick={() => onDeleteClick(profile._id)}>Удалить</button>

@@ -96,15 +96,18 @@ exports.getAppointmentsSchedule = async (req, res) => {
 
         res.status(200).json(appointments);
     } catch (error) {
-        res.status(500).json({error: 'Ошибка при получении расписания'});
+        res.status(500).json({error: 'Error fetching appointments'});
     }
 };
 
 exports.getPatientAppointment = async (req, res) => {
+    console.log('im here');
     try {
         const appointments = await Appointment.find({ PatientId: req.patientId });
+        if (!appointments) return res.status(404).json({ error: `No founded appointments` });
+        console.log(appointments)
         res.status(200).json(appointments);
     } catch (err) {
-        res.status(500).json({ error: 'Error fetching appointments' });
+        res.status(500).json({ error: `Error fetching appointments: ${err.message}`});
     }
 };

@@ -1,13 +1,14 @@
 import {useEffect, useState} from "react";
 import PatientCard from "../components/PatientCardComponent.jsx";
 import {deletePatient, getAllPatients} from "../services/patientsService.js";
-import {useNavigate} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 
 const PatientsPage = () => {
     const [patients, setPatients] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
     const navigate = useNavigate();
+    const {doctorId} = useParams();
 
     const fetchPatients = async () => {
         const patients = await getAllPatients();
@@ -34,19 +35,24 @@ const PatientsPage = () => {
 
     const handlePatientDelete = async (id) => {
         await deletePatient(id);
-        fetchPatients();
+        await fetchPatients();
     };
 
     const filteredPatients = patients.filter(patient =>
+    /*        (!doctorId || patient.DoctorId === doctorId) &&*/
         patient.LastName.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
-    const handlePatientEdit = (patientId) => navigate(`edit/${patientId}`);
-    const handleViewProfile = (patientId) => navigate(`${patientId}`);
+    const handlePatientEdit = (patientId) => navigate(`/patients/${patientId}/edit`);
+    const handleViewProfile = (patientId) => navigate(`/patients/${patientId}`);
 
     return (
         <div className="patients-page">
-            <h2>Список пациентов клиники: </h2>
+            {doctorId ? (
+                <h2>Список ваших пациентов: </h2>
+            ) : (
+                <h2>Список пациентов клиники: </h2>
+            )}
 
             <div className="patients-search-bar">
                 <input
@@ -65,19 +71,23 @@ const PatientsPage = () => {
 
             <div className="patients">
                 {filteredPatients ? (
-                    filteredPatients.map((patient) => {
-                        return (
-                            <PatientCard
-                                key={patient._id}
-                                profile={patient}
-                                onDeleteClick={handlePatientDelete}
-                                onEditClick={handlePatientEdit}
-                                onViewProfileClick={handleViewProfile}
-                            />
-                        );
-                    })
+                    filteredPatients.length > 0 ? (
+                        filteredPatients.map((patient) => {
+                            return (
+                                <PatientCard
+                                    key={patient._id}
+                                    profile={patient}
+                                    onDeleteClick={handlePatientDelete}
+                                    onEditClick={handlePatientEdit}
+                                    onViewProfileClick={handleViewProfile}
+                                />
+                            );
+                        })
+                    ) : (
+                        <h3>Не найдено ни одного пациента :(</h3>
+                    )
                 ) : (
-                    <p>Loading patients...</p>
+                    <p>Загружаем пациентов...</p>
                 )}
             </div>
         </div>

@@ -6,18 +6,20 @@ const Role = require('../models/Role');
 const jwt = require('jsonwebtoken');
 const {verify} = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const {ApiError} = require('../errors');
 
 const accessTokenSecret = process.env.ACCESS_TOKEN_SECRET;
 const refreshTokenSecret = process.env.REFRESH_TOKEN_SECRET;
 const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY;
 const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 
-exports.registerUser = async (req, res) => {
-    const { name, email, password, first_name, last_name, middle_name, date_of_birth } = req.body;
+exports.registerUser = async (req, res, next) => {
+    const { email, password, first_name, last_name, middle_name, date_of_birth } = req.body;
+    const name = `${first_name} ${last_name} ${middle_name}`;
 
     try {
         let user = await User.findOne({ email: email });
-        if (user) return res.status(400).json({ message: 'User already exist' });
+        if (user) return next(new ApiError('User already exists', 400));
 
         let patientRole = await Role.findOne( {RoleName: 'patient' });
 
@@ -41,16 +43,16 @@ exports.registerUser = async (req, res) => {
         await patientProfile.save();
         res.status(201).json({ message: 'User created' });
     } catch (err) {
-        res.status(500).json({ message: `Server error: ${err.message}` });
+        next(new ApiError(`Error in user creation: ${err.message}`, 500));
     }
 };
 
-exports.googleRegister = async (req, res) => {
+exports.googleRegister = async (req, res, next) => {
     const { email, googleId, first_name, last_name, middle_name } = req.body
 
     try {
         let user = await User.findOne({ email: email });
-        if (user) return res.status(400).json({ message: 'User already exist' });
+        if (user) return next(new ApiError('User already exists', 400));
 
         let patientRole = await Role.findOne({ RoleName: 'patient' });
 
@@ -74,16 +76,16 @@ exports.googleRegister = async (req, res) => {
         await patientProfile.save();
         res.status(201).json({ message: 'User created' });
     } catch (err) {
-        res.status(500).json({ message: `Server error: ${err.message}` });
+        next(new ApiError(`Server error: ${err.message}`, 500));
     }
 };
 
-exports.facebookRegister = async (req, res) => {
+exports.facebookRegister = async (req, res, next) => {
     const { email, facebookId, first_name, last_name, middle_name } = req.body
 
     try {
         let user = await User.findOne({ email: email });
-        if (user) return res.status(400).json({ message: 'User already exist' });
+        if (user) return next(new ApiError('User already exists', 400));
 
         let patientRole = await Role.findOne({ RoleName: 'patient' });
 
@@ -107,19 +109,19 @@ exports.facebookRegister = async (req, res) => {
         await patientProfile.save();
         res.status(201).json({ message: 'User created' });
     } catch (err) {
-        res.status(500).json({ message: `Server error: ${err.message}` });
+        next(new ApiError(`Server error: ${err.message}`, 500));
     }
 };
 
-exports.loginUser = async (req, res) => {
+exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email: email });
-        if (!user) return res.status(404).json({ message: 'User not found' });
+        if (!user) return next(new ApiError('User not found', 404));
 
         const isMatch = await user.comparePassword(password);
-        if (!isMatch) return res.status(400).json({ message: 'Invalid credentials' });
+        if (!isMatch) return next(new ApiError('Invalid credentials', 401));
 
         const role = await Role.findOne({ _id: user.roleId });
 
@@ -148,26 +150,26 @@ exports.loginUser = async (req, res) => {
 
         res.status(200).json({ accessToken, refreshToken });
     } catch (err) {
-        res.status(500).json({ message: `Server error: ${err}` });
+        next(new ApiError(`Server error: ${err.message}`, 500));
     }
 };
 
-exports.logout = async (req, res) => {
+exports.logout = async (req, res, next) => {
     req.logout(() => {
         res.redirect('/');
     });
 };
 
-exports.refreshToken = async (req, res) => {
+exports.refreshToken = async (req, res, next) => {
     const { refreshToken } = req.body;
-    if (!refreshToken) return res.status(403).json({ message: 'Refresh token required' });
+    if (!refreshToken) return next(new ApiError('Refresh token required', 403));
 
     try {
         const user = await User.findOne({ refreshToken });
-        if (!user) return res.status(403).json({ message: 'Invalid refresh token' });
+        if (!user) return next(new ApiError('Invalid refresh token', 403));
 
         jwt.verify(refreshToken, refreshTokenSecret, (err, decoded) => {
-            if (err) return res.status(403).json({ message: 'Invalid refresh token' });
+            if (err) return next(new ApiError('Invalid refresh token signature', 403));
             const accessToken = jwt.sign(
                 { _id: user._id },
                 accessTokenSecret,
@@ -185,14 +187,14 @@ exports.refreshToken = async (req, res) => {
             res.status(200).json({ accessToken });
         });
     } catch (err) {
-        res.status(500).json({ message: 'Server error' });
+        next(new ApiError(`Server error: ${err.message}`, 500));
     }
 };
 
-exports.profileInfo = async (req, res) => {
+exports.profileInfo = async (req, res, next) => {
     const accessToken = req.cookies.access;
     if (!accessToken) {
-        return res.status(500).json({ message: 'Access token required' });
+        return next(new ApiError('Access token required', 500));
     }
 
     try {
@@ -200,14 +202,11 @@ exports.profileInfo = async (req, res) => {
         const userId = decoded._id;
 
         const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
+        if (!user) return next(new ApiError('User not found', 404));
 
         const role = await Role.findById(user.roleId);
-        if (!role) {
-            return res.status(404).json({ message: 'Role not found' });
-        }
+        if (!role) return next(new ApiError('Role not found', 400));
+
 
         let profile = null;
         if (role.RoleName === 'receptionist') {
@@ -234,11 +233,11 @@ exports.profileInfo = async (req, res) => {
         }
 
         if (!profile) {
-            return res.status(404).json({ message: 'Profile not created' });
+            return next(new ApiError('Profile not created', 500));
         }
 
         return res.status(200).json(profile);
     } catch (err) {
-        return res.status(500).json({ message: `Server error: ${err.message}` });
+        next(new ApiError(`Server error: ${err.message}`, 500));
     }
 };

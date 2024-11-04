@@ -13,12 +13,13 @@ const LoginPage = () => {
 
     const handleLogin = async (e) => {
         e.preventDefault();
+        setError(null);
+
         try {
-            const result = await userLogin({ email: email, password: password });
+            await userLogin({ email: email, password: password });
             navigate('/home');
         } catch (error) {
-            setError(`Login failed, please check your credentials: ${error.message}`);
-            console.log(error);
+            setError(error.message);
         }
     };
 
@@ -26,7 +27,7 @@ const LoginPage = () => {
         try {
             await googleLogin();
         } catch (error) {
-            setError(`Google login failed: ${error.message}`);
+            setError(error.message);
         }
     };
 
@@ -34,7 +35,7 @@ const LoginPage = () => {
         try {
             await facebookLogin();
         } catch (error) {
-            setError(`Facebook login failed: ${error.message}`);
+            setError(error.message);
         }
     };
 
@@ -44,6 +45,7 @@ const LoginPage = () => {
             <div className="login-wrapper">
                 <form className="login-form" onSubmit={handleLogin}>
                     <h1 className="login-title">С возвращением!</h1>
+                    {error && <div className="error">{error}</div>}
                     <input
                         type="email"
                         placeholder="Электронная почта"

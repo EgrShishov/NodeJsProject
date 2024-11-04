@@ -20,11 +20,10 @@ class DoctorActions extends Component {
     render() {
         return (
             <div className="doctors-actions">
-                <button className="submit-btn" onClick={this.handleViewPatients}>Просмотр пациентов</button>
-                <button className="submit-btn" onClick={this.handleAddPrescription}>Назначить рецепт</button>
-                <button className="submit-btn" onClick={this.handleAddResults}>Добавить результаты</button>
-                <button className="submit-btn" onClick={this.handleAddResults}>Просмотр результатов</button>
-                <button className="submit-btn" onClick={this.handleShowSchedule}>Расписание</button>
+                <button className="action-button" onClick={this.handleViewPatients}>Просмотр пациентов</button>
+                <button className="action-button" onClick={this.handleAddPrescription}>Назначить рецепт</button>
+                <button className="action-button" onClick={this.handleAddResults}>Добавить результаты</button>
+                <button className="action-button" onClick={this.handleShowSchedule}>Расписание</button>
             </div>
         );
     }

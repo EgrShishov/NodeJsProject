@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Office = require('../models/Office');
 const Appointment = require('../models/Appointment');
 const Doctor = require('../models/Doctor');
+const Receptionist = require('../models/Receptionist');
 const Patient = require('../models/Patient');
 const Service = require('../models/Service');
 const Payment = require('../models/Payment');

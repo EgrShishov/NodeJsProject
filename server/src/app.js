@@ -11,6 +11,7 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config({ path: './server/.env' });
 const ORM = require('./db/orm');
 const pool = require('./db/pool');
+const { errorHandler } = require('./middleware/errors');
 
 const app = express();
 const sess = {
@@ -29,6 +30,7 @@ var corsOptions = {
 };
 
 app.use(cors(corsOptions));
+app.use(errorHandler);
 
 mongoose.connect(process.env.MONGO_URI,
     { useNewUrlParser: true, useUnifiedTopology: true })
@@ -46,8 +48,7 @@ orm.define('users', {
 
 orm.migrate();
 
-/*seeder.insertMockData();
-seeder.seedDatabase();*/
+seeder.seedDatabase();
 
 app.use('/swagger/index', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

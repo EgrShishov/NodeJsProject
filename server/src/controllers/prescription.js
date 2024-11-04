@@ -27,8 +27,8 @@ exports.getAllPrescriptions = async (req, res) => {
 exports.getPrescriptionById = async (req, res) => {
     try {
         const prescription = await Prescription.findById(req.params.id)
-            .populate('doctorId', 'firstName lastName')
-            .populate('patientId', 'firstName lastName');
+            .populate('DoctorId', 'FirstName LastName')
+            .populate('PatientId', 'FirstName LastName');
 
         if (!prescription) {
             return res.status(404).json({ error: 'Рецепт не найден' });

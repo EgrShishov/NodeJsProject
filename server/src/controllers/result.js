@@ -43,15 +43,23 @@ exports.createResult = [
         return res.status(400).json({ errors: errors.array() });
     }
     try {
-        const { patientId, doctorId, appointmentId, documentId, complaints, recommendations, conclusion } = req.body;
+        const { PatientId, DoctorId, AppointmentId, DocumentId, Complaints, Recommendations, Conclusion } = req.body;
+        const resultFile = req.file ? req.file.path : null;
+
+        const newDocument = new Document({
+
+        });
+
+        const savedDocument = newDocument.save();
+
         const newResult = new Result({
-            patientId,
-            doctorId,
-            appointmentId,
-            documentId,
-            complaints,
-            recommendations,
-            conclusion
+            PatientId,
+            DoctorId,
+            AppointmentId,
+            DocumentId: newDocument._id,
+            Complaints,
+            Recommendations,
+            Conclusion
         });
 
         const savedResult = await newResult.save();
@@ -96,7 +104,7 @@ exports.getResultByPatient = async (req, res) => {
     try {
         const patientId = req.params.patientId;
         const result = await Result.find({ PatientId: patientId })
-            .populate('patientId doctorId appointmentId documentId');
+            .populate('PatientId DoctorId AppointmentId DocumentId');
 
         if (!result) {
             return res.status(404).json({ error: 'Result not found' });

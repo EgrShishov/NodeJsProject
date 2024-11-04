@@ -23,9 +23,8 @@ export const AuthProvider = ({ children }) => {
                     setUser(profileData);
                     setIsAuthenticated(true);
                 } catch (refreshError) {
-                    console.error("Failed to refresh token:", refreshError);
                     setIsAuthenticated(false);
-/*                    navigate('/login');*/
+                    navigate('/login');
                 }
             }
         };

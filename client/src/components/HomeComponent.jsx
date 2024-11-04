@@ -3,14 +3,20 @@ import {getRickAndMortyRandomInfo} from "../api/rickandmorty";
 import {useEffect, useState} from "react";
 
 const HomeComponent = () => {
-    const [ position, setPosition ] = useState(null);
-    const [ weather, setWeather ] = useState(null);
-    const [ rickAndMortyFact, setRickAndMortyFact ] = useState(null);
+    const [position, setPosition] = useState(null);
+    const [weather, setWeather] = useState(null);
+    const [rickAndMortyFact, setRickAndMortyFact] = useState(null);
     const [scrollY, setScrollY] = useState(0);
 
-    const scaleValue = 1 + scrollY / 500;
+    const scaleValue = 1 + scrollY / 500
 
-    window.addEventListener('scroll',() => {
+    useEffect(() => {
+        const handleScroll = () => setScrollY(window.scrollY);
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
+
+    useEffect(() => {
         const left_doctor = document.getElementById('doctor_left');
         const right_doctor = document.getElementById('doctor_right');
         const text = document.getElementById('text');
@@ -21,7 +27,7 @@ const HomeComponent = () => {
         text.style.bottom = `-${scrollY}px`;
         bgText.style.scale = `${scaleValue}`;
         bgText.style.right = `${scrollY/scaleValue/0.7}px`;
-    });
+    }, [scrollY, scaleValue])
 
     useEffect(() => {
         const handleScroll = () => {

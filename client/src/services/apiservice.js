@@ -3,11 +3,7 @@ import Cookies from "js-cookie";
 
 const API_URL = 'http://localhost:5000';
 
-const getToken = () => Cookies.get('access');
-
 export const apiRequest = async (method, endpoint, data = {}, tokenRequired = false) => {
-    //const headers = tokenRequired ? { Authorization: `Bearer ${getToken()}` } : {};
-
     try {
         const response = await axios({
             method,
@@ -17,7 +13,16 @@ export const apiRequest = async (method, endpoint, data = {}, tokenRequired = fa
         });
         return response.data;
     } catch (error) {
-        console.error('API request error:', error);
-        throw error.response ? error.response.data : error;
+        console.log('error', error);
+        if (error.response) {
+            console.error('Server Error:', error.response);
+            throw new Error(error.response.data.message || 'Server Error');
+        } else if (error.request) {
+            console.error('Network Error:', error.request);
+            throw new Error('Network error, please try again later');
+        } else {
+            console.error('Error:', error.message);
+            throw new Error(error.message || 'Unexpected error');
+        }
     }
 };

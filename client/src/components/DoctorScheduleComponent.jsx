@@ -1,20 +1,7 @@
 import { useEffect, useState } from "react";
 import { getDoctorsSchedule } from "../services/appointmentsService.js";
 
-const DoctorScheduleComponent = ({ doctorId }) => {
-    const [ slots, setSlots ] = useState([]);
-
-    useEffect(() => {
-        const fetchSchedule = async (doctorId) => {
-            const scheduleData = await getDoctorsSchedule(doctorId);
-            if (scheduleData) {
-                setSlots(scheduleData);
-            }
-        };
-
-        fetchSchedule(doctorId);
-    }, []);
-
+const DoctorScheduleComponent = ({ slots }) => {
     return (
         <div className="schedule-element">
             { slots ? (

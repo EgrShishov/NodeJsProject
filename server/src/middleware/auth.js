@@ -7,16 +7,35 @@ module.exports = {
         res.redirect('/login');
     },
     ensurePatinet: (req, res, next) => {
-        if (req.isAuthenticated && req.body.role === 'patient') return next();
-        res.redirect('/');
+        passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+            if (err) return next(err);
+            if (!user) return res.redirect('/auth/login');
+
+            let role = await Role.findById(user.roleId);
+            console.log(role, role.RoleName === 'patient', role.RoleName);
+            if (role && role.RoleName === 'patient') return next();
+            res.redirect('/auth/login');
+        })(req, res, next);
     },
     ensureDoctor: (req, res, next) => {
-        if (req.isAuthenticated && req.user.role === 'doctor') return next();
-        res.redirect('/');
+        passport.authenticate('jwt', { session: false }, async (err, user, info) => {
+            if (err) return next(err);
+            if (!user) return res.redirect('/auth/login');
+
+            let role = await Role.findById(user.roleId);
+            if (role && role.RoleName === 'doctor') return next();
+            res.redirect('/auth/login');
+        })(req, res, next);
     },
     ensureReceptionist: (req, res, next) => {
-        if (req.isAuthenticated() && req.user.role === 'receptionist') return next();
-        res.status(403).json({ message: 'Access denied' });
+        passport.authenticate('jwt', { session: false }, async(err, user, info) => {
+            if (err) return next(err);
+            if (!user) return res.redirect('/auth/login');
+
+            let role = await Role.findById(user.roleId);
+            if (role && role.RoleName === 'receptionist') return next();
+            res.redirect('/auth/login');
+        })(req, res, next);
     },
     ensureRole: (...roles) => {
         return async (req, res, next) => {

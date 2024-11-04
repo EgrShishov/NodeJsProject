@@ -62,7 +62,7 @@ const DoctorsPage = () => {
                     <option value="name">Имя</option>
                     <option value="experience">Стаж</option>
                 </select>
-                {user.role.includes('receptionist') ? (
+                {user && user.role.includes('receptionist') ? (
                     <button onClick={() => navigate('add')}>Добавить врача</button>
                 ) : (<></>)}
             </div>

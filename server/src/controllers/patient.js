@@ -1,8 +1,9 @@
 const Patient = require('../models/Patient');
+const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 
 const validateCreatePatient = [
-    body('userId').notEmpty().withMessage('userId обязателен'),
+    body('userId').notEmpty().withMessage('userId обязателен'), //change according body params name
     body('firstName').isString().withMessage('firstName должен быть строкой').notEmpty().withMessage('firstName обязателен'),
     body('lastName').isString().withMessage('lastName должен быть строкой').notEmpty().withMessage('lastName обязателен'),
     body('middleName').optional().isString().withMessage('middleName должен быть строкой'),
@@ -14,14 +15,15 @@ exports.getAllPatients = async (req, res) => {
         const patients = await Patient.find();
         res.status(200).json(patients);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении пациентов' });
+        res.status(500).json({ error: `Ошибка при получении пациентов: ${error.message}` });
     }
 };
 
 exports.getPatientById = async (req, res) => {
     try {
         const patientId = req.params.id;
-        const patient = await Patient.findById(patientId).populate('userId', 'name email');
+        const patient = await Patient.findById(patientId)
+            .populate('UserId', 'Email');
 
         if (!patient) {
             return res.status(404).json({ error: 'Пациент не найден' });
@@ -29,7 +31,7 @@ exports.getPatientById = async (req, res) => {
 
         res.status(200).json(patient);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении данных пациента' });
+        res.status(500).json({ error: `Ошибка при получении данных пациента: ${error.message}` });
     }
 };
 
@@ -53,7 +55,7 @@ exports.createPatient = [validateCreatePatient,
         const savedPatient = await newPatient.save();
         res.status(201).json(savedPatient);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании пациента' });
+        res.status(500).json({ error: `Ошибка при создании пациента: ${error.message}` });
     }
 }];
 
@@ -69,7 +71,7 @@ exports.editPatient = async (req, res) => {
 
         res.status(200).json(patient);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при обновлении данных пациента' });
+        res.status(500).json({ error: `Ошибка при обновлении данных пациента: ${error.message}` });
     }
 };
 
@@ -82,8 +84,15 @@ exports.deletePatient = async (req, res) => {
             return res.status(404).json({ error: 'Пациент не найден' });
         }
 
+        const user = await User.findById(patient.UserId);
+        if (user) {
+
+        }
+
+        await user.deleteOne();
+
         res.status(200).json({ message: 'Пациент успешно удалён' });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при удалении пациента' });
+        res.status(500).json({ error: `Ошибка при удалении пациента: ${error.message}` });
     }
 };

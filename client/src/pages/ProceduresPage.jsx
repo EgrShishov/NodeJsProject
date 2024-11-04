@@ -73,7 +73,7 @@ const ProceduresPages = () => {
                     <option value="name">Название</option>
                     <option value="cost">Стоимость</option>
                 </select>
-                {user.role === 'receptionist' && (
+                {user && user.role === 'receptionist' && (
                     <button onClick={toggleForm}>Добавить процедуру</button>
                 )}
             </div>

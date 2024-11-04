@@ -24,6 +24,7 @@ import PaymentsPage from "./pages/PaymentsPage.jsx";
 import FooterComponent from "./components/FooterComponent.jsx";
 import AddDoctorPage from "./pages/AddDoctorPage.jsx";
 import PatientPage from "./pages/PatientPage.jsx";
+import ResultsPage from "./pages/ResultsPage.jsx";
 
 function App() {
     return (
@@ -36,11 +37,7 @@ function App() {
                     <Route path="/profile" element={<ProfilePage />} />
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />}/>
-                    <Route path="/doctors" element={
-                        <RequireRole allowedRoles={["receptionist"]}>
-                            <DoctorsPage />
-                        </RequireRole>
-                    }/>
+                    <Route path="/doctors" element={<DoctorsPage />} />
                     <Route path="/doctors/:id" element={<DoctorDetailsPage />} />
                     <Route path="/doctors/add" element={<AddDoctorPage />} />
                     <Route path="/procedures" element={<ProceduresPages />} />
@@ -64,15 +61,24 @@ function App() {
                         <RequireRole allowedRoles={["doctor", "receptionist"]}>
                             <PatientPage />
                         </RequireRole>
-                    }>
-                    </Route>
-                    <Route path="/prescriptions" element={
+                    }/>
+                    <Route path="/doctors/:doctorId/patients" element={
                         <RequireRole allowedRoles={["doctor"]}>
+                            <PatientsPage />
+                        </RequireRole>
+                    }/>
+                    <Route path="/prescriptions/:patientId" element={
+                        <RequireRole allowedRoles={["doctor", "patient"]}>
                             <PrescriptionPage />
                         </RequireRole>
                     }/>
-                    <Route path="/appointments" element={
-                        <RequireRole allowedRoles={["doctor", "patient", "receptionist"]}>
+                    <Route path="/appointments/" element={
+                        <RequireRole allowedRoles={["receptionist"]}>
+                            <AppointmentsPage />
+                        </RequireRole>
+                    }/>
+                    <Route path="/appointments/:patientId" element={
+                        <RequireRole allowedRoles={["patient", "receptionist"]}>
                             <AppointmentsPage />
                         </RequireRole>
                     }/>
@@ -80,9 +86,28 @@ function App() {
                         <RequireRole allowedRoles={["receptionist"]}>
                             <PaymentsPage />
                         </RequireRole>
-                    }>
-                    </Route>
-                    <Route path="/specializations" element={<SpecializationPage />}></Route>
+                    }/>
+                    <Route path="/payments/:patientId" element={
+                        <RequireRole allowedRoles={["receptionist", "patients"]}>
+                            <PaymentsPage />
+                        </RequireRole>
+                    }/>
+                    <Route path="/invoices/:patientId" element={
+                        <RequireRole allowedRoles={["receptionist", "patient"]}>
+                            <PaymentsPage />
+                        </RequireRole>
+                    }/>
+                    <Route path="/specializations" element={<SpecializationPage />} />
+                    <Route path="/results/:patientId" element={
+                        <RequireRole allowedRoles={["doctor", "patient"]}>
+                            <ResultsPage />
+                        </RequireRole>
+                    } />
+                    <Route path="/results" element={
+                        <RequireRole allowedRoles={["doctor", "receptionist"]}>
+                            <ResultsPage />
+                        </RequireRole>
+                    } />
                 </Routes>
             </AuthProvider>
             <FooterComponent/>

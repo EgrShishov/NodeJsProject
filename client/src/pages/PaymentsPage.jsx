@@ -1,20 +1,27 @@
 import {useEffect, useState} from "react";
 import {getAllPayments} from "../services/paymentsService.js";
 import PaymentCard from "../components/PaymentCard.jsx";
+import {useParams} from "react-router-dom";
 
 const PaymentsPage = () => {
     const [payments, setPayments] = useState([]);
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
+    const [error, setError] = useState(null);
+    const {patientId} = useParams();
 
     useEffect(() => {
         fetchPayments();
     }, []);
 
     const fetchPayments = async () => {
-        const data = await getAllPayments();
-        if (data) {
-            setPayments(data);
+        try {
+            const data = await getAllPayments();
+            if (data) {
+                setPayments(data);
+            }
+        } catch (error) {
+            setError(error);
         }
     };
 
