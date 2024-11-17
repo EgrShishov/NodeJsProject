@@ -54,8 +54,8 @@ passport.use(new GoogleStrategy({
 
     const newPatient = new Patient({
         UserId: savedUser.id,
-        FirstName: firstName,
-        LastName: lastName,
+        FirstName: firstName || '',
+        LastName: lastName || '',
         DateOfBirth: dateOfBirth || Date.now(),
     });
 

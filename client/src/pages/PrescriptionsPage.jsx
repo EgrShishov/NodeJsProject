@@ -2,15 +2,16 @@ import {useEffect, useState} from "react";
 import {useParams} from "react-router-dom";
 import {getAllPrescriptions, getPatientPrescriptions} from "../services/prescriptionsService.js";
 import PrescriptionCard from "../components/PrescriptionCard.jsx";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 
 const PrescriptionPage = () => {
     const [prescriptions, setPrescriptions] = useState([]);
-    const [error, setError] = useState(null);
     const {patientId} = useParams();
 
     const fetchPrescriptions = async (patientId) => {
         try {
-            setError(null);
             if (patientId) {
                 const data = await getPatientPrescriptions(patientId);
                 if (data) setPrescriptions(data);
@@ -19,7 +20,7 @@ const PrescriptionPage = () => {
                 if (data) setPrescriptions(data);
             }
         } catch (error) {
-            setError(error.message);
+            toast.error(`Ошибка получения рецептов: ${error.message}`)
         }
     };
 
@@ -29,23 +30,25 @@ const PrescriptionPage = () => {
 
     return (
         <div className="prescriptions-page">
+            <ToastContainer />
             <h2>Ваши рецепты: </h2>
-            {error ?? (<div className="error">{error}</div>)}
-            {prescriptions ? (
-                prescriptions.length > 0 ? (
-                    prescriptions.map((pres) => {
-                        return (
-                            <PrescriptionCard key={pres._id} prescription={pres}/>
-                        )
-                    })
+            <div className="prescriptions-list">
+                {prescriptions ? (
+                    prescriptions.length > 0 ? (
+                        prescriptions.map((pres) => {
+                            return (
+                                <PrescriptionCard key={pres._id} prescription={pres}/>
+                            )
+                        })
+                    ) : (
+                        <p>
+                            У вас пока нет назначенных рецептов
+                        </p>
+                    )
                 ) : (
-                    <div>
-                        У вас пока нет назначенных рецептов
-                    </div>
-                )
-            ) : (
-                <div>Загружаем рецепты...</div>
-            )}
+                    <div className="loader"></div>
+                )}
+            </div>
         </div>
     );
 };

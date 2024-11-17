@@ -2,12 +2,12 @@ const Appointment = require('../models/Appointment');
 const { body, validationResult } = require('express-validator');
 
 const validateCreateAppointment = [
-    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('officeId').notEmpty().withMessage('officeId обязателен').isMongoId().withMessage('officeId должен быть действительным ID'),
-    body('serviceId').notEmpty().withMessage('serviceId обязателен').isMongoId().withMessage('serviceId должен быть действительным ID'),
-    body('appointmentDate').notEmpty().withMessage('appointmentDate обязателен').isDate().withMessage('appointmentDate должен быть датой в формате YYYY-MM-DD'),
-    body('appointmentTime').notEmpty().withMessage('appointmentTime обязателен').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('appointmentTime должен быть временем в формате HH:mm')
+    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('OfficeId').notEmpty().withMessage('officeId обязателен').isMongoId().withMessage('officeId должен быть действительным ID'),
+    body('ServiceId').notEmpty().withMessage('serviceId обязателен').isMongoId().withMessage('serviceId должен быть действительным ID'),
+    body('AppointmentDate').notEmpty().withMessage('appointmentDate обязателен').isDate().withMessage('appointmentDate должен быть датой в формате YYYY-MM-DD'),
+    body('AppointmentTime').notEmpty().withMessage('appointmentTime обязателен').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('appointmentTime должен быть временем в формате HH:mm')
 ];
 
 exports.getAllAppointments = async (req, res) => {
@@ -33,21 +33,22 @@ exports.createAppointment = [
     }
 
     try {
-        const { patientId, doctorId, officeId, serviceId, appointmentDate, appointmentTime } = req.body;
+        const { PatientId, DoctorId, OfficeId, ServiceId, AppointmentDate, AppointmentTime } = req.body;
 
         const newAppointment = new Appointment({
-            patientId,
-            doctorId,
-            officeId,
-            serviceId,
-            appointmentDate,
-            appointmentTime
+            PatientId,
+            DoctorId,
+            OfficeId,
+            ServiceId,
+            AppointmentDate,
+            AppointmentTime
         });
 
         const savedAppointment = await newAppointment.save();
+        console.log(savedAppointment);
         res.status(201).json(savedAppointment);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании приёма' });
+        res.status(500).json({ error: `Ошибка при создании приёма: ${error.message}` });
     }
 }];
 
@@ -64,7 +65,7 @@ exports.approveAppointment = async (req, res) => {
         await appointment.save();
         res.status(200).json({ message: 'Приём подтверждён', appointment });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при подтверждении приёма' });
+        res.status(500).json({ error: `Ошибка при подтверждении приёма: ${error.message}` });
     }
 };
 
@@ -81,33 +82,27 @@ exports.cancelAppointment = async (req, res) => {
         await appointment.save();
         res.status(200).json({ message: 'Приём отменен', appointment })
     } catch (error) {
-        res.status(500).json({error: 'Ошибка при отмене приёма' })
+        res.status(500).json({error: `Ошибка при отмене приёма: ${error.message}` })
     }
 };
 
 exports.getAppointmentsSchedule = async (req, res) => {
-    try{
+    try {
         const doctorId = req.params.doctorId;
-        const appointments = Appointment.find({ DoctorId: doctorId });
-
-        if (!appointments) {
-            return res.status(404).json({ error: 'У врача нет расписания' });
-        }
+        const appointments = await Appointment.find({ DoctorId: doctorId });
 
         res.status(200).json(appointments);
     } catch (error) {
-        res.status(500).json({error: 'Error fetching appointments'});
+        res.status(500).json({error: `Ошибка в получении расписания: ${error.message}`});
     }
 };
 
 exports.getPatientAppointment = async (req, res) => {
-    console.log('im here');
     try {
         const appointments = await Appointment.find({ PatientId: req.patientId });
         if (!appointments) return res.status(404).json({ error: `No founded appointments` });
-        console.log(appointments)
         res.status(200).json(appointments);
     } catch (err) {
-        res.status(500).json({ error: `Error fetching appointments: ${err.message}`});
+        res.status(500).json({ error: `Ошибка получения консультаций: ${err.message}`});
     }
 };

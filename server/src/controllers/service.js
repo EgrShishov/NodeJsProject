@@ -28,9 +28,9 @@ exports.createService = [
         const { serviceCategoryId, serviceName, isActive } = req.body;
 
         const newService = new Service({
-            serviceCategoryId,
-            serviceName,
-            isActive
+            ServiceCategoryId: serviceCategoryId,
+            ServiceName: serviceName,
+            IsActive: isActive
         });
 
         const savedService = await newService.save();

@@ -4,19 +4,19 @@ const Patient = require('../models/Patient');
 const { body, validationResult } = require('express-validator');
 
 const validateCreatePrescription = [
-    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('prescriptionDate').notEmpty().withMessage('prescriptionDate обязателен').isDate().withMessage('prescriptionDate должен быть датой в формате YYYY-MM-DD'),
-    body('medication').notEmpty().withMessage('medication обязателен'),
-    body('dosage').notEmpty().withMessage('dosage обязателен'),
-    body('duration').notEmpty().withMessage('duration обязателен').isInt({min: 0}).withMessage('duration должно быть целым неотрицательным числом'),
+    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('PrescriptionDate').notEmpty().withMessage('prescriptionDate обязателен').isDate().withMessage('prescriptionDate должен быть датой в формате YYYY-MM-DD'),
+    body('Medication').notEmpty().withMessage('medication обязателен'),
+    body('Dosage').notEmpty().withMessage('dosage обязателен'),
+    body('Duration').notEmpty().withMessage('duration обязателен').isInt({min: 0}).withMessage('duration должно быть целым неотрицательным числом'),
 ];
 
 exports.getAllPrescriptions = async (req, res) => {
     try {
         const prescriptions = await Prescription.find()
-            .populate('doctorId', 'firstName lastName')
-            .populate('patientId', 'firstName lastName');
+            .populate('DoctorId', 'FirstName MiddleName LastName')
+            .populate('PatientId', 'FirstName MiddleName LastName');
 
         res.status(200).json(prescriptions);
     } catch (error) {
@@ -48,22 +48,22 @@ exports.createPrescription = [
         return res.status(400).json({errors: errors.array() });
     }
     try {
-        const { doctorId, patientId, prescriptionDate, medication, dosage, duration } = req.body;
+        const { DoctorId, PatientId, PrescriptionDate, Medication, Dosage, Duration } = req.body;
 
-        const doctor = await Doctor.findById(doctorId);
-        const patient = await Patient.findById(patientId);
+        const doctor = await Doctor.findById(DoctorId);
+        const patient = await Patient.findById(PatientId);
 
         if (!doctor || !patient) {
             return res.status(400).json({ error: 'Доктор или пациент не найдены' });
         }
 
         const newPrescription = new Prescription({
-            doctorId,
-            patientId,
-            prescriptionDate,
-            medication,
-            dosage,
-            duration
+            DoctorId,
+            PatientId,
+            PrescriptionDate,
+            Medication,
+            Dosage,
+            Duration
         });
 
         const savedPrescription = await newPrescription.save();
@@ -107,8 +107,8 @@ exports.deletePrescription = async (req, res) => {
 exports.getPatientPrescriptions = async (req, res) => {
     try {
         const prescription = await Prescription.find({ PatientId: req.params.patientId })
-            .populate('doctorId', 'firstName lastName')
-            .populate('patientId', 'firstName lastName');
+            .populate('DoctorId', 'FirstName MiddleName LastName')
+            .populate('PatientId', 'FirstName MiddleName LastName');
 
         if (!prescription) {
             return res.status(404).json({ error: 'Рецепт не найден' });
@@ -116,6 +116,6 @@ exports.getPatientPrescriptions = async (req, res) => {
 
         res.status(200).json(prescription);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении рецепта' });
+        res.status(500).json({ error: `Ошибка при получении рецепта: ${error.message}` });
     }
 };

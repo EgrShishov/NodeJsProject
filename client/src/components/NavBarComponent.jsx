@@ -2,7 +2,7 @@ import {Link} from "react-router-dom";
 import {useAuth} from "../context/AuthContext.jsx";
 
 const NavBarComponent = () => {
-    const { isAuthenticated } = useAuth();
+    const { isAuthenticated, userLogout } = useAuth();
 
     return (
         <div className="navbar">
@@ -33,7 +33,7 @@ const NavBarComponent = () => {
                             </li>
 
                             <li>
-                                <Link to="/logout">Logout</Link>
+                                <a onClick={async () => await userLogout()}>Logout</a>
                             </li>
                         </>
                     ) : (

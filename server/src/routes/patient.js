@@ -5,7 +5,7 @@ const patientController = require('../controllers/patient');
 const { auth, ensureRole, ensureReceptionist} = require('../middleware/auth');
 
 router.get('/all', auth, ensureRole('doctor', 'receptionist'), patientController.getAllPatients);
-router.get('/:id', auth, ensureRole('doctor', 'receptionist'), patientController.getPatientById);
+router.get('/:id', auth, ensureRole('doctor', 'receptionist', 'patient'), patientController.getPatientById);
 router.post('/', auth, ensureReceptionist, patientController.createPatient);
 router.put('/:id', auth, ensureReceptionist, patientController.editPatient);
 router.delete('/:id', auth, ensureReceptionist, patientController.deletePatient);

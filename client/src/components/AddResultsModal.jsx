@@ -4,6 +4,7 @@ import {getAllDoctors} from "../services/doctorsService.js";
 import {getAppointments} from "../services/appointmentsService.js";
 import {createResult} from "../services/resultsService.js";
 import Modal from "react-modal";
+import {toast, ToastContainer} from "react-toastify";
 
 const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
     const [doctors, setDoctors] = useState([]);
@@ -17,8 +18,6 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
     const [recommendations, setRecommendations] = useState('');
     const [conclusion, setConclusion] = useState('');
     const [resultFile, setResultFile] = useState(null);
-
-    const [error, setError] = useState(null);
 
     useEffect(() => {
         fetchData();
@@ -34,11 +33,11 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
             setDoctors(doctorsData);
             setAppointments(appointmentsData);
         } catch (error) {
-            setError(`Ошибка загрузки данных: ${error.message}`);
+            toast.error(`Ошибка загрузки данных: ${error.message}`);
         }
     };
 
-    const handlePatientChange = (e) => {
+  /*  const handlePatientChange = (e) => {
         const patientId = e.target.value;
         setSelectedPatientId(patientId);
 
@@ -80,7 +79,7 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
             setSelectedAppointmentId('');
             setSelectedPatientId('');
         }
-    };
+    };*/
 
     const handleFileChange = (e) => {
         setResultFile(e.target.files[0]);
@@ -88,7 +87,6 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError(null);
 
         const formData = new FormData();
         formData.append('PatientId', selectedPatientId);
@@ -98,101 +96,106 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
         formData.append('Recommendations', recommendations);
         formData.append('Conclusion', conclusion);
         if (resultFile) {
-            formData.append('resultFile', resultFile);
+            formData.append('file', resultFile);
         }
 
-        try {
+        onSubmit(formData);
+/*        try {
             const response = await createResult(formData);
             if (response) {
                 onClose();
+                toast.success('Результаты обследования успешно созданы!');
             }
         } catch (error) {
-            setError(`Error creating result: ${error.message}`);
-        }
+            toast.error(`Ошибка создания результата обследования: ${error.message}`);
+        }*/
     };
 
     return (
-        <Modal
-            isOpen={isOpen}
-            onRequestClose={onClose}
-            contentLabel="Добавить рецепт"
-            className="modal"
-            overlayClassName="modal-overlay"
-            ariaHideApp={false}
-        >
-            {error && <div className="error">{error}</div>}
-            <h2>Добавить результат</h2>
-            <form onSubmit={handleSubmit}>
-                <label>Пациент:</label>
-                <select value={selectedPatientId} onChange={handlePatientChange} required>
-                    <option value="">Выберите пациента</option>
-                    {patients.map(patient => (
-                        <option key={patient._id} value={patient._id}>
-                            {patient.firstName} {patient.lastName}
-                        </option>
-                    ))}
-                </select>
+        <>
+            <ToastContainer />
+            <Modal
+                isOpen={isOpen}
+                onRequestClose={onClose}
+                contentLabel="Добавить рецепт"
+                className="modal"
+                overlayClassName="modal-overlay"
+                ariaHideApp={false}
+            >
+                <h2>Добавить результат</h2>
+                <form onSubmit={handleSubmit}>
+                    <label>Пациент:</label>
+                    <select value={selectedPatientId} onChange={(e) => setSelectedPatientId(e.target.value)} required>
+                        <option value="">Выберите пациента</option>
+                        {patients.map(patient => (
+                            <option key={patient._id} value={patient._id}>
+                                {patient.LastName} {patient.FirstName} {patient.MiddleName}
+                            </option>
+                        ))}
+                    </select>
 
-                <label>Врач:</label>
-                <select value={selectedDoctorId} onChange={handleDoctorChange} required>
-                    <option value="">Выберите врача</option>
-                    {doctors.map(doctor => (
-                        <option key={doctor._id} value={doctor._id}>
-                            {doctor.firstName} {doctor.lastName}
-                        </option>
-                    ))}
-                </select>
+                    <label>Врач:</label>
+                    <select value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)} required>
+                        <option value="">Выберите врача</option>
+                        {doctors.map(doctor => (
+                            <option key={doctor._id} value={doctor._id}>
+                                {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
+                            </option>
+                        ))}
+                    </select>
 
-                <label>Встреча:</label>
-                <select value={selectedAppointmentId} onChange={handleAppointmentChange} required>
-                    <option value="">Выберите встречу</option>
-                    {appointments.map(app => (
-                        <option key={app._id} value={app._id}>
-                            {new Date(app.date).toLocaleDateString()} — {app.time}
-                        </option>
-                    ))}
-                </select>
+                    <label>Встреча:</label>
+                    <select value={selectedAppointmentId} onChange={(e) => setSelectedAppointmentId(e.target.value)} required>
+                        <option value="">Выберите встречу</option>
+                        {appointments.map(app => (
+                            <option key={app._id} value={app._id}>
+                                {new Date(app.AppointmentDate).toLocaleDateString()} — {app.AppointmentTime}
+                            </option>
+                        ))}
+                    </select>
 
-                <label>Жалобы:</label>
-                <input
-                    type="text"
-                    className="input-field"
-                    value={complaints}
-                    onChange={(e) => setComplaints(e.target.value)}
-                    required
-                />
+                    <label>Жалобы:</label>
+                    <input
+                        type="text"
+                        className="input-field"
+                        value={complaints}
+                        onChange={(e) => setComplaints(e.target.value)}
+                        required
+                    />
 
-                <label>Рекомендации:</label>
-                <input
-                    type="text"
-                    className="input-field"
-                    value={recommendations}
-                    onChange={(e) => setRecommendations(e.target.value)}
-                    required/>
+                    <label>Рекомендации:</label>
+                    <input
+                        type="text"
+                        className="input-field"
+                        value={recommendations}
+                        onChange={(e) => setRecommendations(e.target.value)}
+                        required/>
 
-                <label>Заключение:</label>
-                <input
-                    type="text"
-                    className="input-field"
-                    value={conclusion}
-                    onChange={(e) => setConclusion(e.target.value)}
-                    required
-                />
+                    <label>Заключение:</label>
+                    <input
+                        type="text"
+                        className="input-field"
+                        value={conclusion}
+                        onChange={(e) => setConclusion(e.target.value)}
+                        required
+                    />
 
-                <label>Загрузить файл:</label>
-                <input
-                    type="file"
-                    className="input-field"
-                    onChange={handleFileChange}
-                />
+                    <label>Загрузить файл:</label>
+                    <input
+                        type="file"
+                        name="resultFile"
+                        className="input-field"
+                        onChange={handleFileChange}
+                    />
 
-                <div className="modal-btns">
-                    <button className="submit-btn" type="submit">Добавить результат</button>
-                    <button className="cancel-btn" type="button" onClick={onClose}>Отмена</button>
-                </div>
-            </form>
-        </Modal>
-);
+                    <div className="modal-btns">
+                        <button className="submit-btn" type="submit">Добавить результат</button>
+                        <button className="cancel-btn" type="button" onClick={onClose}>Отмена</button>
+                    </div>
+                </form>
+            </Modal>
+        </>
+    );
 };
 
 export default AddResultModal;

@@ -10,6 +10,9 @@ class AddProcedureForm extends Component {
             procedure_cost: 0,
             formValid: false
         };
+
+        this.handleChange = this.handleChange.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
     validateForm() {
@@ -31,9 +34,9 @@ class AddProcedureForm extends Component {
         e.preventDefault();
         if (this.state.formValid) {
             this.props.onSubmit({
-                procedure_name: this.state.procedure_name,
+                procedureName: this.state.procedure_name,
                 description: this.state.description,
-                procedure_cost: this.state.procedure_cost
+                procedureCost: this.state.procedure_cost
             });
             this.setState({
                 procedure_name: '',
@@ -46,9 +49,9 @@ class AddProcedureForm extends Component {
 
     render() {
         const {
-            procedure_name,
+            procedure_name: procedureName,
             description,
-            procedure_cost,
+            procedure_cost: procedureCost,
             formValid
         } = this.state;
 
@@ -61,7 +64,7 @@ class AddProcedureForm extends Component {
                             type="text"
                             className="input-field"
                             name="procedure_name"
-                            value={procedure_name}
+                            value={procedureName}
                             onChange={this.handleChange}
                             required
                         />
@@ -85,7 +88,7 @@ class AddProcedureForm extends Component {
                             type="number"
                             className="input-field"
                             name="procedure_cost"
-                            value={procedure_cost}
+                            value={procedureCost}
                             onChange={this.handleChange}
                             required
                         />

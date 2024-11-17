@@ -1,29 +1,32 @@
-import {useEffect, useState} from "react";
-import {getAppointments, getPatientAppointments} from "../services/appointmentsService";
+import { useEffect, useState } from "react";
+import { getAppointments, getPatientAppointments } from "../services/appointmentsService";
 import AppointmentCard from "../components/AppointmentCard";
+import { useNavigate, useParams } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 import {useAuth} from "../context/AuthContext.jsx";
-import {useNavigate, useParams} from "react-router-dom";
-import app from "../App.jsx";
 
 const AppointmentsPage = () => {
     const [appointments, setAppointments] = useState([]);
-    const [error, setError] = useState(null);
-    const {patientId} = useParams();
+    const [searchTerm, setSearchTerm] = useState("");
+    const [filteredAppointments, setFilteredAppointments] = useState([]);
+    const {patientId } = useParams();
     const navigate = useNavigate();
+    const { user } = useAuth();
 
     const fetchAppointments = async () => {
         try {
-            setError(null);
-
-            if (patientId) {
-                const data = await getPatientAppointments(patientId);
-                if (data) setAppointments(data);
+            let data;
+            if (user.role === "patient") {
+                data = await getPatientAppointments(patientId);
             } else {
-                const data = await getAppointments();
-                if (data) setAppointments(data)
+                data = await getAppointments();
+            }
+            if (data) {
+                setAppointments(data);
+                setFilteredAppointments(data);
             }
         } catch (error) {
-            setError(error.message);
+            toast.error(`Произошла ошибка в получении ваших встреч: ${error.message}`);
         }
     };
 
@@ -31,32 +34,70 @@ const AppointmentsPage = () => {
         fetchAppointments();
     }, []);
 
-    const handleNewAppointment = () => navigate('/doctors/');
+    const handleNewAppointment = () => navigate("/doctors/");
+
+    const handleSearch = (e) => {
+        const term = e.target.value.toLowerCase();
+        setSearchTerm(term);
+        const filtered = appointments.filter((appointment) =>
+            appointment.title.toLowerCase().includes(term) ||
+            appointment.date.includes(term)
+        );
+        setFilteredAppointments(filtered);
+    };
+
+    const handleDateFilter = (e) => {
+        const selectedDate = e.target.value;
+        const filtered = appointments.filter((appointment) => appointment.date === selectedDate);
+        setFilteredAppointments(filtered);
+    };
 
     return (
-        <div className="appointments-list">
-            {error && <div className="error">{error}</div>}
-            {appointments ? (
-                appointments.length === 0 ? (
-                        <div>
+        <div className="appointments-page">
+            <h2>
+                {user.role === "receptionist" ? "Ближайшие встречи" : "Ваши назначенные встречи:"}
+            </h2>
+            <ToastContainer />
+            <div className="filter-container">
+                <input
+                    type="text"
+                    value={searchTerm}
+                    onChange={handleSearch}
+                    placeholder="Поиск встреч..."
+                    className="search-bar"
+                />
+                <input
+                    type="date"
+                    onChange={handleDateFilter}
+                    className="date-filter"
+                />
+            </div>
+            <div className="appointments-list">
+                {filteredAppointments ? (
+                    filteredAppointments.length === 0 ? (
+                        <div className="empty-state">
                             <div>Нет назначенных консультаций</div>
-                            <button
-                                onClick={handleNewAppointment}
-                                className="action-button"
-                            >Назначить консультацию</button>
+                            {user.role === "patient" && (
+                                <button
+                                    onClick={handleNewAppointment}
+                                    className="action-button"
+                                >
+                                    Назначить консультацию
+                                </button>
+                            )}
                         </div>
                     ) : (
-                    appointments.map((appointment) => {
-                            return (
-                                <AppointmentCard
-                                    key={appointment._id} a
-                                    ppointment={appointment}
-                                />
-                            )
-                        }))
-            ) : (
-                <div>Загрузка консультаций...</div>
-            )}
+                        filteredAppointments.map((appointment) => (
+                            <AppointmentCard
+                                key={appointment._id}
+                                appointment={appointment}
+                            />
+                        ))
+                    )
+                ) : (
+                    <div className="loader"></div>
+                )}
+            </div>
         </div>
     );
 };

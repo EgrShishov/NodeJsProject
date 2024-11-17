@@ -1,8 +1,10 @@
 import {useEffect, useState} from "react";
 import {getAllSpecializations} from "../services/specializationsService";
+import {useNavigate} from "react-router-dom";
 
 const SpecializationPage = () => {
     const [ specializations, setSpecializations ] = useState([]);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchSpecializations = async () => {
@@ -20,7 +22,10 @@ const SpecializationPage = () => {
             <div className="specializations">
                 {specializations.map((spec) => {
                     return (
-                        <div key={spec._id} className="specialization-item">
+                        <div
+                            key={spec._id}
+                            onClick={() => navigate(`/doctors?filter=specializationId&value=${spec._id}`)}
+                             className="specialization-item">
                             <p>{spec.SpecializationName}</p>
                         </div>
                     );

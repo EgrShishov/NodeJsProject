@@ -39,7 +39,7 @@ exports.createServiceCategory = [
     try {
         const { categoryName } = req.body;
         const newCategory = new ServiceCategory({
-            categoryName
+            CategoryName: categoryName
         });
 
         const savedCategory = await newCategory.save();

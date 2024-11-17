@@ -1,29 +1,39 @@
 const Result = require('../models/Result');
+const Document = require('../models/Document');
 const { body, validationResult } = require('express-validator');
+const error = require("multer/lib/multer-error");
 
 const validateCreateResult = [
-    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('doctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('appointmentId').notEmpty().withMessage('appointmentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('documentId').notEmpty().withMessage('documentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('complaints').notEmpty().withMessage('complaints обязателен'),
-    body('recommendations').notEmpty().withMessage('recommendations обязателен'),
-    body('conclusion').notEmpty().withMessage('conclusion обязателен'),
+    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('AppointmentId').notEmpty().withMessage('appointmentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('Complaints').notEmpty().withMessage('complaints обязателен'),
+    body('Recommendations').notEmpty().withMessage('recommendations обязателен'),
+    body('Conclusion').notEmpty().withMessage('conclusion обязателен'),
 ];
 
 exports.getAllResults = async (req, res) => {
     try {
-        const results = await Result.find().populate('patientId doctorId appointmentId documentId');
+        const results = await Result.find()
+            .populate('PatientId', 'FirstName LastName MiddleName')
+            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
+            .populate('DocumentId', 'FilePath DocumentType')
+            .populate('DoctorId', 'FirstName LastName MiddleName');
+
         res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching results' });
+        res.status(500).json({ error: `Error fetching results: ${error.message}` });
     }
 };
 
 exports.getResultById = async (req, res) => {
     try {
         const resultId = req.params.id;
-        const result = await Result.findById(resultId).populate('patientId doctorId appointmentId documentId');
+        const results = await Result.find()
+            .populate('PatientId', 'FirstName LastName MiddleName')
+            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
+            .populate('DocumentId', 'FilePath DocumentType')
+            .populate('DoctorId', 'FirstName LastName MiddleName');
 
         if (!result) {
             return res.status(404).json({ error: 'Result not found' });
@@ -31,7 +41,7 @@ exports.getResultById = async (req, res) => {
 
         res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching result' });
+        res.status(500).json({ error: `Error fetching result: ${error.message}` });
     }
 };
 
@@ -47,10 +57,12 @@ exports.createResult = [
         const resultFile = req.file ? req.file.path : null;
 
         const newDocument = new Document({
-
+            FilePath: resultFile,
+            DocumentType: req.file.mimetype
         });
-
         const savedDocument = newDocument.save();
+
+        if (!savedDocument) return res.status(500).json({ error: `Error creating document: ${error.message}` });
 
         const newResult = new Result({
             PatientId,
@@ -104,7 +116,10 @@ exports.getResultByPatient = async (req, res) => {
     try {
         const patientId = req.params.patientId;
         const result = await Result.find({ PatientId: patientId })
-            .populate('PatientId DoctorId AppointmentId DocumentId');
+            .populate('PatientId', 'FirstName LastName MiddleName')
+            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
+            .populate('DocumentId', 'FilePath DocumentType')
+            .populate('DoctorId', 'FirstName LastName MiddleName');
 
         if (!result) {
             return res.status(404).json({ error: 'Result not found' });
@@ -112,6 +127,6 @@ exports.getResultByPatient = async (req, res) => {
 
         res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching result' });
+        res.status(500).json({ error: `Error fetching result: ${error.message}` });
     }
 };

@@ -40,7 +40,7 @@ exports.createSpecialization = [
     try {
         const { specializationName } = req.body;
         const newSpecialization = new Specialization({
-            specializationName
+            SpecializationName: specializationName
         });
 
         const savedSpecialization = await newSpecialization.save();

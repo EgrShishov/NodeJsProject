@@ -1,59 +1,60 @@
-import {useEffect, useState} from "react";
-import {useParams} from "react-router-dom";
-import {getAllResults, getResultsByPatient} from "../services/resultsService.js";
-import ResultCard from "../components/ResultCard.jsx";
+import { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+import { getAllResults, getResultsByPatient } from '../services/resultsService.js';
+import ResultCard from '../components/ResultCard.jsx';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const ResultsPage = () => {
-    const [result, setResults] = useState([]);
-    const [error, setError] = useState(null);
-    const {patientId} = useParams();
+    const [results, setResults] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const { patientId } = useParams();
 
-    const fetchResults = async (patientId) => {
+    const fetchResults = async () => {
+        setLoading(true);
         try {
-            setError(null);
-
+            let data;
             if (patientId) {
-                const data = await getResultsByPatient(patientId);
-                if (data) setResults(data);
-                setError('There are no results');
+                data = await getResultsByPatient(patientId);
             } else {
-                const data = await getAllResults();
-                if (data) setResults(data);
-                setError('There are no results');
+                data = await getAllResults();
+            }
+
+            if (data && data.length > 0) {
+                setResults(data);
+            } else {
+                toast.warn('У вас пока нет результатов обследований.');
             }
         } catch (error) {
-            setError(error);
+            toast.error(`Ошибка в получении результатов: ${error.message}`);
+        } finally {
+            setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchResults(patientId);
-    }, [])
-
-    const handleDownloadPDF = async (resultId) => {
-        // todo downloading pdf
-    };
+        fetchResults();
+    }, [patientId]);
 
     return (
         <div className="results-page">
-            {error && (<div className="error">{error}</div>)}
-            <div className="results-list">
-                {result ? (
-                    result.length > 0 ? (
-                        result.map((res) => {
-                            return (
-                                <ResultCard key={res._id} result={res}/>
-                            )
-                        })
+            <ToastContainer />
+            <h2>Результаты обследований</h2>
+            {loading ? (
+                <div className="loader">Загрузка...</div>
+            ) : (
+                <div className="results-list">
+                    {results.length > 0 ? (
+                        results.map((res) => (
+                            <ResultCard key={res._id} result={res}/>
+                        ))
                     ) : (
-                        <div>У вас пока нет результатов обследований</div>
-                        )
-                ) : (
-                    <div>Загружаем данные...</div>
-                )}
-            </div>
+                        <p>Нет данных для отображения</p>
+                    )}
+                </div>
+            )}
         </div>
     );
 };
 
-export default ResultsPage;
+export default ResultsPage

@@ -46,10 +46,12 @@ export const AuthProvider = ({ children }) => {
 
     const googleLogin = async () => {
         try {
-            await google();
+            google();
             const profileData = await profile();
-            setUser(profileData);
-            setIsAuthenticated(true);
+            if (profileData) {
+                setUser(profileData);
+                setIsAuthenticated(true);
+            }
         } catch (error) {
             console.error('Google login failed:', error);
             navigate('/login');
@@ -58,10 +60,12 @@ export const AuthProvider = ({ children }) => {
 
     const facebookLogin = async () => {
         try {
-            await facebook();
+            facebook();
             const profileData = await profile();
-            setUser(profileData);
-            setIsAuthenticated(true);
+            if (profileData) {
+                setUser(profileData);
+                setIsAuthenticated(true);
+            }
         } catch (error) {
             console.error('Facebook login failed:', error);
             navigate('/login');
@@ -80,8 +84,10 @@ export const AuthProvider = ({ children }) => {
 
     const userLogout = async () => {
         try {
-            setIsAuthenticated(false);
+/*
             await logout();
+*/
+            setIsAuthenticated(false);
             navigate('/home');
         } catch (error) {
             console.error(`Logout error: ${error}`);

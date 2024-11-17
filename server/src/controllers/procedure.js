@@ -1,11 +1,7 @@
 const MedicalProcedure = require('../models/MedicalProcedures');
-const Doctor = require('../models/Doctor');
-const Patient = require('../models/Patient');
-const Payment = require('../models/Payment');
 const { body, validationResult } = require('express-validator');
 
 const validateCreateProcedure = [
-    body('patientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
     body('procedureName').notEmpty().withMessage('procedureName обязателен'),
     body('description').notEmpty().withMessage('description обязателен'),
     body('procedureCost').notEmpty().withMessage('procedureCost обязателен').isFloat({min: 0.0001}).withMessage('procedureCost не может быть отрицательной')
@@ -43,34 +39,18 @@ exports.createProcedure = [
         return res.status(400).json({ errors: errors.array() });
     }
     try {
-        const { procedureName, description, procedureCost, patientId } = req.body;
-
-        const doctor = await Doctor.findById(doctorId);
-        const patient = await Patient.findById(patientId);
-
-        if (!doctor || !patient) {
-            return res.status(400).json({ error: 'Доктор или пациент не найдены' });
-        }
+        const { procedureName, description, procedureCost } = req.body;
 
         const newProcedure = new MedicalProcedure({
-            procedureName,
-            description,
-            procedureCost,
+            ProcedureName: procedureName,
+            Description: description,
+            ProcedureCost: procedureCost,
         });
 
         const savedProcedure = await newProcedure.save();
-
-        const newPayment = new Payment({
-            AppointmentId: null,
-            Amount: procedureCost,
-            UserId: patientId,
-            PaymentDate: new Date(),
-        });
-        const savedPayment = await newPayment.save();
-
         res.status(201).json(savedProcedure);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании процедуры' });
+        res.status(500).json({ error: `Ошибка при создании процедуры: ${error.message}` });
     }
 }];
 

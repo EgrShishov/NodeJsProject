@@ -26,23 +26,21 @@ const PatientPage = () => {
 
     return (
         <div className="patient-page">
-            {error && (<div className="error">{error}</div>)}
-            {profileData ? (
-                <PatientCard
+            <div className="patient-profile-wrapper">
+                {error && (<div className="error">{error}</div>)}
+                {profileData ? (
+                    <PatientCard
+                        profile={profileData}
+                    />
+                ) : (<div className="loader"></div>)}
+                <PatientHistory
                     profile={profileData}
+                    appointments={{}}
+                    results={{}}
+                    payments={{}}
+                    invoices={{}}
                 />
-                ) : (
-                    <div>Загружаем данные профиля...</div>
-                )
-            }
-            {}
-            <PatientHistory
-                profile={profileData}
-                appointments={{}}
-                results={{}}
-                payments={{}}
-                invoices={{}}
-            />
+            </div>
         </div>
     )
 };

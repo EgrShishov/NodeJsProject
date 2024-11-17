@@ -1,5 +1,4 @@
 import {Component} from "react";
-import {getAllSpecializations} from "../services/specializationsService.js";
 
 class AddAppointmentForm extends Component {
     constructor(props) {

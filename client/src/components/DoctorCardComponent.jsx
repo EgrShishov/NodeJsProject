@@ -24,13 +24,11 @@ const DoctorCard = ({ profile, onProfileClick, onEditClick, onDeleteClick }) => 
             <div className="doctor-card__info">
                 <h3 className="doctor-card__name">{name}</h3>
                 <p className="doctor-card__specialization">{profile.SpecializationName}</p>
-                <p className="doctor-card__experience">{experience} years of experience</p>
+                <p className="doctor-card__experience">{experience} лет опыта</p>
             </div>
             <div className="doctor-card__actions">
                 <button className="doctor-card__button"
                         onClick={() => onProfileClick(profile._id)}>Профиль
-                </button>
-                <button className="doctor-card__button doctor-card__button--primary">Назначить консультацию
                 </button>
                 {user && user.role.includes('receptionist') ? (
                     <div className="doctor-card__actions">

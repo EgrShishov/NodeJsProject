@@ -45,11 +45,11 @@ exports.createPatient = [validateCreatePatient,
     try {
         const { userId, firstName, lastName, middleName, dateOfBirth } = req.body;
         const newPatient = new Patient({
-            userId,
-            firstName,
-            lastName,
-            middleName,
-            dateOfBirth
+            UserId: userId,
+            FirstName: firstName,
+            LastName: lastName,
+            MiddleName: middleName,
+            DateOfBirth: dateOfBirth
         });
 
         const savedPatient = await newPatient.save();
@@ -86,10 +86,8 @@ exports.deletePatient = async (req, res) => {
 
         const user = await User.findById(patient.UserId);
         if (user) {
-
+            await user.deleteOne();
         }
-
-        await user.deleteOne();
 
         res.status(200).json({ message: 'Пациент успешно удалён' });
     } catch (error) {

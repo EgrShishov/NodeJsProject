@@ -198,9 +198,6 @@
           "200": {
             "description": "OK"
           },
-          "404": {
-            "description": "Not Found"
-          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -294,18 +291,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "role": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -330,18 +315,6 @@
             "in": "path",
             "required": true,
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "role": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -400,9 +373,6 @@
           "400": {
             "description": "Bad Request"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -423,9 +393,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -451,9 +418,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -477,9 +441,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -513,25 +474,25 @@
             "schema": {
               "type": "object",
               "properties": {
-                "userId": {
+                "email": {
                   "example": "any"
                 },
-                "firstName": {
+                "doctors_first_name": {
                   "example": "any"
                 },
-                "lastName": {
+                "doctors_last_name": {
                   "example": "any"
                 },
-                "middleName": {
+                "doctors_middle_name": {
                   "example": "any"
                 },
-                "dateOfBirth": {
+                "birthday_date": {
                   "example": "any"
                 },
                 "specializationId": {
                   "example": "any"
                 },
-                "careerStartYear": {
+                "career_start_year": {
                   "example": "any"
                 }
               }
@@ -544,9 +505,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -591,9 +549,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -615,9 +570,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -693,9 +645,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -717,9 +666,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -766,9 +712,6 @@
           "400": {
             "description": "Bad Request"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -781,9 +724,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -805,9 +745,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -831,9 +768,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -855,9 +789,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -903,9 +834,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -963,9 +891,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -987,9 +912,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1041,9 +963,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1101,9 +1020,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -1125,9 +1041,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1161,9 +1074,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1221,9 +1131,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -1245,9 +1152,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1281,9 +1185,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"
@@ -1427,25 +1328,25 @@
             "schema": {
               "type": "object",
               "properties": {
-                "patientId": {
+                "PatientId": {
                   "example": "any"
                 },
-                "doctorId": {
+                "DoctorId": {
                   "example": "any"
                 },
-                "appointmentId": {
+                "AppointmentId": {
                   "example": "any"
                 },
-                "documentId": {
+                "DocumentId": {
                   "example": "any"
                 },
-                "complaints": {
+                "Complaints": {
                   "example": "any"
                 },
-                "recommendations": {
+                "Recommendations": {
                   "example": "any"
                 },
-                "conclusion": {
+                "Conclusion": {
                   "example": "any"
                 }
               }
@@ -1576,9 +1477,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1599,9 +1497,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1705,9 +1600,6 @@
           "400": {
             "description": "Bad Request"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "500": {
             "description": "Internal Server Error"
           }
@@ -1717,6 +1609,36 @@
     "/prescriptions/all": {
       "get": {
         "description": "",
+        "responses": {
+          "200": {
+            "description": "OK"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Not Found"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+    "/prescriptions/by-patient/{patientId}": {
+      "get": {
+        "description": "",
+        "parameters": [
+          {
+            "name": "patientId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -1800,36 +1722,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "404": {
-            "description": "Not Found"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/prescriptions/{patientId}": {
-      "get": {
-        "description": "",
-        "parameters": [
-          {
-            "name": "patientId",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1935,9 +1827,6 @@
           "200": {
             "description": "OK"
           },
-          "403": {
-            "description": "Forbidden"
-          },
           "404": {
             "description": "Not Found"
           },
@@ -1959,9 +1848,6 @@
         "responses": {
           "200": {
             "description": "OK"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "404": {
             "description": "Not Found"
@@ -1990,9 +1876,6 @@
                 },
                 "procedureCost": {
                   "example": "any"
-                },
-                "patientId": {
-                  "example": "any"
                 }
               }
             }
@@ -2004,9 +1887,6 @@
           },
           "400": {
             "description": "Bad Request"
-          },
-          "403": {
-            "description": "Forbidden"
           },
           "500": {
             "description": "Internal Server Error"

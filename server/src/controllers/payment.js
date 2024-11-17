@@ -39,10 +39,10 @@ exports.createPayment = async (req, res) => {
         }
 
         const newPayment = new Payment({
-            appointmentId,
-            amount,
-            userId,
-            paymentDate
+            AppointmentId: appointmentId,
+            Amount: amount,
+            UserId: userId,
+            PaymentDate: paymentDate
         });
 
         const savedPayment = await newPayment.save();

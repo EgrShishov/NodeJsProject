@@ -48,13 +48,13 @@ exports.createOffice = [
     try {
         const { country, region, city, street, streetNumber, officeNumber, phoneNumber } = req.body;
         const newOffice = new Office({
-            country,
-            region,
-            city,
-            street,
-            streetNumber,
-            officeNumber,
-            phoneNumber
+            Country: country,
+            Region: region,
+            City: city,
+            Street: street,
+            StreetNumber: streetNumber,
+            OfficeNumber: officeNumber,
+            PhoneNumber: phoneNumber
         });
 
         const savedOffice = await newOffice.save();

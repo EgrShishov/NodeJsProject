@@ -10,7 +10,7 @@ const ProfileComponent = ({ profileData }) => {
                     middle_name={profileData.MiddleName}
                     date_of_birth={profileData.DateOfBirth} />
             ) : (
-                <p>Загружаем информацию о профиле...</p>
+                <div className="loader"></div>
             )}
         </div>
     );

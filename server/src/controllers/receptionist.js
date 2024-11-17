@@ -43,11 +43,11 @@ exports.createReceptionist = [
     try {
         const { userId, firstName, lastName, middleName, dateOfBirth } = req.body;
         const newReceptionist = new Receptionist({
-            userId,
-            firstName,
-            lastName,
-            middleName,
-            dateOfBirth
+            UserId: userId,
+            FirstName: firstName,
+            LastName: lastName,
+            MiddleName: middleName,
+            DateOfBirth: dateOfBirth
         });
 
         const savedReceptionist = await newReceptionist.save();

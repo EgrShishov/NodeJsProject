@@ -10,8 +10,10 @@ import AddPrescriptionModal from "../components/AddPrescriptionModal.jsx";
 import {createPrescription} from "../services/prescriptionsService.js";
 import {createResult} from "../services/resultsService.js";
 import AddResultsModal from "../components/AddResultsModal.jsx";
-import DoctorScheduleComponent from "../components/DoctorScheduleComponent.jsx";
 import {getDoctorsSchedule} from "../services/appointmentsService.js";
+import DoctorsPersonalScheduleComponent from "../components/DoctorsPersonalScheduleComponent.jsx";
+import {toast, ToastContainer} from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const ProfilePage = () => {
     const [profileData, setProfile] = useState(null);
@@ -19,35 +21,31 @@ const ProfilePage = () => {
     const [resultsModalOpened, setResultsModalOpened] = useState(false);
     const [prescriptionsModalOpened, setPrescriptionsModalOpened] = useState(false);
     const [scheduleSlots, setScheduleSlots] = useState([]);
-    const [error, setError] = useState('');
     const navigate = useNavigate();
     const { user } = useAuth();
 
     const fetchProfile = async () => {
         try {
-            setError(null);
             const data = await profile();
             if (data) setProfile(data);
-            else setError('Error in fetching profile data');
+            else toast.error(`Ошибка в получении данных о профиле`);
         } catch (error) {
-            setError(error.message);
+            toast.error(`Ошибка в получении данных о профиле: ${error.message}`);
             navigate('/login');
         }
     };
 
     const fetchScheduleSlots = async () => {
         try {
-            setError(null);
             const data = await getDoctorsSchedule();
-            if (data) setScheduleSlots(data);
-            else setError('Error in fetching doctors slots');
+            setScheduleSlots(data);
         } catch (error) {
-            setError(error.message);
+            toast.error(`Ошибка в получении расписания: ${error.message}`);
         }
     };
 
     useEffect(() => {
-        fetchScheduleSlots()
+        if (user && user.role === 'doctor') fetchScheduleSlots()
         fetchProfile();
     }, []);
 
@@ -80,38 +78,42 @@ const ProfilePage = () => {
 
     const handleAddingPrescription = async (data) => {
         try {
-            setError(null);
             const response = await createPrescription(data);
+            console.log(response);
             if (response) {
                 closePrescriptionModal();
+                toast.success('Рецепт успешно добавлен!');
             }
         } catch (error){
-            setError(error.message);
+            toast.error(`Рецепт не добавлен. Возникла ошибка: ${error.message}`);
         }
     }
 
     const handleAddingResults = async (data) => {
         try {
-            setError(null);
-            await createResult(data);
+            const response = await createResult(data);
+            if (response) {
+                toast.success(`Результаты успешно добавлены!.`);
+                closeResultsModal();
+            }
         } catch (error) {
-            setError(error.message);
+            toast.error(`Результаты не добавлены. Возникла ошибка: ${error.message}`);
         }
     }
 
     return (
         <div className="profile-page">
-            {error && <div className="error">{error}</div>}
+            <ToastContainer />
             {prescriptionsModalOpened &&  <AddPrescriptionModal
                     isOpen={prescriptionsModalOpened}
                     onClose={closePrescriptionModal}
-                    onSubmit={handleAddPrescription}
+                    onSubmit={handleAddingPrescription}
                     doctor={profileData}
             />}
             {resultsModalOpened && <AddResultsModal
                 isOpen={resultsModalOpened}
                 onClose={closeResultsModal}
-                onSubmit={handleAddResults}
+                onSubmit={handleAddingResults}
             />}
             <ProfileComponent profileData={profileData}/>
             {user && user.role === 'receptionist' && (
@@ -130,16 +132,16 @@ const ProfilePage = () => {
                         onViewSchedule={handleViewSchedule}
                         onAddResults={handleAddResults}
                     />
-                    {scheduleOpened && <DoctorScheduleComponent slots={scheduleSlots}/>}
+                    {scheduleOpened && <DoctorsPersonalScheduleComponent/>}
                 </>
             )}
             {user && user.role === 'patient' && (
                 <PatientActions
-                onMyAppointments={handleMyAppointments}
-                onMyResults={handleMyResults}
-                onMyPrescriptions={handleMyPrescriptions}
-                onMyInvoices={handleMyInvoices}
-                onMyPayments={handleMyPayments}
+                    onMyAppointments={handleMyAppointments}
+                    onMyResults={handleMyResults}
+                    onMyPrescriptions={handleMyPrescriptions}
+                    onMyInvoices={handleMyInvoices}
+                    onMyPayments={handleMyPayments}
                 />
             )}
         </div>

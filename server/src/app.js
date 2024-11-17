@@ -11,7 +11,8 @@ const cookieParser = require('cookie-parser');
 require('dotenv').config({ path: './server/.env' });
 const ORM = require('./db/orm');
 const pool = require('./db/pool');
-const { errorHandler } = require('./middleware/errors');
+const {errorHandler} = require('./middleware/errors');
+const {upload} = require('./middleware/fileUploads');
 
 const app = express();
 const sess = {
