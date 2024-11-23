@@ -16,10 +16,7 @@ const validateCreateDoctor = [
 
 exports.getAllDoctors = async (req, res) => {
     try {
-        const doctors = await Doctor.find()
-            .populate('SpecializationId', 'SpecializationName')
-            .populate('UserId', 'email urlPhoto');
-
+        const doctors = await Doctor.getAllDoctors();
         res.status(200).json(doctors);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при получении врачей: ${error}` });
@@ -30,9 +27,7 @@ exports.getDoctorById = async (req, res) => {
     try {
         const doctorId = req.params.id;
 
-        const doctor = await Doctor.findById(doctorId)
-            .populate('SpecializationId', 'SpecializationName')
-            .populate('UserId', 'email urlPhoto');
+        const doctor = await Doctor.getDoctorById(doctorId);
         if (!doctor) {
             return res.status(404).json({ message: 'Врач не найден' });
         }
@@ -48,7 +43,7 @@ exports.editDoctor = async (req, res) => {
         const doctorId = req.params.id;
         const updates = req.body;
 
-        const doctor = await Doctor.findByIdAndUpdate(doctorId, updates, { new: true });
+        const doctor = await Doctor.editDoctor(doctorId, updates);
 
         if (!doctor) {
             return res.status(404).json({ message: 'Врач не найден' });
@@ -68,33 +63,23 @@ exports.createDoctor = [
         return res.status(400).json({ message: errors.array() });
     }
     try {
-        const { email, doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, specializationId, career_start_year } = req.body;
+        const { email, doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, specializationId, career_start_year, phone_number } = req.body;
 
         const generatedPassword = Math.random().toString(36).slice(-8)
 
         const name = `${doctors_first_name} ${doctors_middle_name || ''} ${doctors_last_name} `;
-        const doctorsRole = await Role.findOne({ RoleName: 'doctor'});
-        const newUser = new User({
-            name,
-            email,
+
+        const savedDoctor = await Doctor.createDoctor({
+            email: email,
             password: generatedPassword,
-            roleId: doctorsRole
+            first_name: doctors_first_name,
+            last_name: doctors_last_name,
+            middle_name: doctors_middle_name,
+            phone_number: phone_number,
+            date_of_birth: birthday_date,
+            specialization_id: specializationId,
+            career_start_year: career_start_year
         });
-        console.log(newUser);
-
-        const savedUser = await newUser.save();
-
-        const newDoctor = new Doctor({
-            UserId: savedUser._id,
-            FirstName: doctors_first_name,
-            LastName: doctors_last_name,
-            MiddleName: doctors_middle_name,
-            DateOfBirth: birthday_date,
-            SpecializationId: specializationId,
-            CareerStartYear: career_start_year,
-        });
-
-        const savedDoctor = await newDoctor.save();
 
         const mailOptions = {
             from: `"AgendaClinic" <${process.env.EMAIL_USER}>`,
@@ -123,13 +108,13 @@ exports.createDoctor = [
 exports.deleteDoctor = async (req, res) => {
     try {
         const doctorId = req.params.id;
-        const doctor = await Doctor.findByIdAndDelete(doctorId);
+        const doctor = await Doctor.deleteDoctor(doctorId);
 
         if (!doctor) {
             return res.status(404).json({ message: 'Врач не найден' });
         }
 
-        await User.findByIdAndDelete(doctor.UserId);
+        await User.deleteAccount(doctor.UserId);
         res.status(200).json({ message: 'Врач успешно удалён' });
     } catch (error) {
         res.status(500).json({ message: `Ошибка при удалении врача: ${error.message}` });

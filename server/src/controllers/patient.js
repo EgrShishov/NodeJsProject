@@ -14,8 +14,7 @@ const validateCreatePatient = [
 
 exports.getAllPatients = async (req, res) => {
     try {
-        const patients = await Patient.find()
-            .populate('UserId', 'urlPhoto');
+        const patients = await Patient.getAllPatients();
         res.status(200).json(patients);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при получении пациентов: ${error.message}` });
@@ -25,8 +24,7 @@ exports.getAllPatients = async (req, res) => {
 exports.getPatientById = async (req, res) => {
     try {
         const patientId = req.params.id;
-        const patient = await Patient.findById(patientId)
-            .populate('UserId', 'Email urlPhoto');
+        const patient = await Patient.getPatientById(patientId);
 
         if (!patient) {
             return res.status(404).json({ message: 'Пациент не найден' });
@@ -42,22 +40,7 @@ exports.getDoctorsPatients = async (req, res) => {
     try {
         const { doctorId } = req.params;
 
-        const doctor = await Doctor.findById(doctorId);
-        if (!doctor) {
-            return res.status(404).json({ message: `Doctor not found` });
-        }
-
-        const appointments = await Appointment.find({ DoctorId: doctorId }).select('PatientId');
-
-        if (appointments.length === 0) {
-            return res.status(200).json([]);
-        }
-
-        const uniquePatientIds = [
-            ...new Set(appointments.map((appointment) => appointment.PatientId.toString()))
-        ];
-        const patients = await Patient.find({ _id: { $in: uniquePatientIds } });
-
+        const patients = await Doctor.getDoctorsPatients(doctorId); // TODO
         res.status(200).json(patients);
     } catch (error) {
         res.status(500).json({ message: `Ошибка в получении пациентов для врача: ${error.message}` });
@@ -72,17 +55,20 @@ exports.createPatient = [validateCreatePatient,
     }
 
     try {
-        const { userId, firstName, lastName, middleName, dateOfBirth } = req.body;
-        const newPatient = new Patient({
-            UserId: userId,
-            FirstName: firstName,
-            LastName: lastName,
-            MiddleName: middleName,
-            DateOfBirth: dateOfBirth
+        const generatedPassword = Math.random().toString(36).slice(-8)
+
+        const { email, phoneNumber, firstName, lastName, middleName, dateOfBirth } = req.body;
+        const newPatient = await Patient.createPatient({
+            email,
+            generatedPassword,
+            first_name: firstName,
+            last_name: lastName,
+            middle_name: middleName,
+            phone_number: phoneNumber,
+            date_of_birth: dateOfBirth
         });
 
-        const savedPatient = await newPatient.save();
-        res.status(201).json(savedPatient);
+        res.status(201).json(newPatient);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при создании пациента: ${error.message}` });
     }
@@ -92,7 +78,7 @@ exports.editPatient = async (req, res) => {
     try {
         const patientId = req.params.id;
         const updates = req.body;
-        const patient = await Patient.findByIdAndUpdate(patientId, updates, { new: true });
+        const patient = await Patient.editPatient(patientId, updates);
 
         if (!patient) {
             return res.status(404).json({ message: 'Пациент не найден' });
@@ -108,11 +94,11 @@ exports.deletePatient = async (req, res) => {
     try {
         const patientId = req.params.id;
         if (!patientId) return res.status(500).json({message: "patient id not provided"});
-        const patient = await Patient.findByIdAndDelete(patientId);
+        const patient = await Patient.deletePatient(patientId);
 
         if (!patient) return res.status(404).json({ error: 'Пациент не найден' });
 
-        await User.findByIdAndDelete(patient.UserId);
+        await User.deleteAccount(patient.UserId);
 
         res.status(200).json({ message: 'Пациент успешно удалён' });
     } catch (error) {

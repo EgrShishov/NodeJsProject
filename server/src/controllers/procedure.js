@@ -9,19 +9,26 @@ const validateCreateProcedure = [
 
 exports.getAllProcedures = async (req, res) => {
     try {
-        const procedures = await MedicalProcedure.find()
-            .populate('ServiceId', 'ServiceName');
-
+        const procedures = await MedicalProcedure.getAllProcedures();
         res.status(200).json(procedures);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при получении процедур' });
+        res.status(500).json({ message: `Ошибка при получении процедур: ${error.message}` });
+    }
+};
+
+exports.getProceduresByPatient = async (req, res) => {
+    try {
+        const patientId = req.params.patientId;
+        const procedures = await MedicalProcedure.getPatientsProcedures(patientId);
+        res.status(200).json(procedures);
+    } catch (error) {
+        res.status(500).json({ message: `Ошибка при получении процедур: ${error.message}` });
     }
 };
 
 exports.getProcedureById = async (req, res) => {
     try {
-        const procedure = await MedicalProcedure.findById(req.params.id)
-            .populate('ServiceId', 'ServiceName');
+        const procedure = await MedicalProcedure.getProcedureById(req.params.id);
 
         if (!procedure) {
             return res.status(404).json({ message: 'Процедура не найдена' });
@@ -41,15 +48,14 @@ exports.createProcedure = [
         return res.status(400).json({ message: errors.array() });
     }
     try {
-        const { procedureName, description, procedureCost } = req.body;
+        const { procedureName, description, procedureCost, serviceId } = req.body;
 
-        const newProcedure = new MedicalProcedure({
-            ProcedureName: procedureName,
-            Description: description,
-            ProcedureCost: procedureCost,
+        const savedProcedure = await MedicalProcedure.createProcedure({
+            procedure_name: procedureName,
+            procedure_description: description,
+            procedure_cost: procedureCost,
+            service_id: serviceId
         });
-
-        const savedProcedure = await newProcedure.save();
         res.status(201).json(savedProcedure);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при создании процедуры: ${error.message}` });
@@ -60,7 +66,7 @@ exports.editProcedure = async (req, res) => {
     try {
         const procedureId = req.params.id;
         const updates = req.body;
-        const updatedProcedure = await MedicalProcedure.findByIdAndUpdate(procedureId, updates, { new: true });
+        const updatedProcedure = await MedicalProcedure.editProcedure(procedureId, updates);
 
         if (!updatedProcedure) {
             return res.status(404).json({ message: 'Процедура не найдена' });
@@ -75,7 +81,7 @@ exports.editProcedure = async (req, res) => {
 exports.deleteProcedure = async (req, res) => {
     try {
         const procedureId = req.params.id;
-        const procedure = await MedicalProcedure.findByIdAndDelete(procedureId);
+        const procedure = await MedicalProcedure.deleteProcedure(procedureId);
 
         if (!procedure) {
             return res.status(404).json({ message: 'Процедура не найдена' });

@@ -14,42 +14,32 @@ const accessTokenExpiry = process.env.ACCESS_TOKEN_EXPIRY;
 const refreshTokenExpiry = process.env.REFRESH_TOKEN_EXPIRY;
 
 exports.registerUser = async (req, res, next) => {
-    const { email, password, first_name, last_name, middle_name, date_of_birth } = req.body;
-    const name = `${first_name} ${last_name} ${middle_name}`;
+    const { email, password, first_name, last_name, middle_name, date_of_birth, phone_number } = req.body;
 
     try {
-        let user = await User.findOne({ email: email });
+        let user = await User.getUserByEmail(email);
         if (user) return res.status(400).json({message: `User already exists`});
 
-        let patientRole = await Role.findOne( {RoleName: 'patient' });
+        let patientRole = await Role.getRoleByName('patient');
 
-        user = new User({
-            name: name,
-            email: email,
-            password: password,
-            roleId: patientRole._id
-        });
-
-        await user.save();
-
-        let patientProfile = new Patient({
-            UserId: user._id,
-            FirstName: first_name,
-            LastName: last_name,
-            MiddleName: middle_name,
-            DateOfBirth: date_of_birth
-        });
-
-        await patientProfile.save();
+        const [userId, patientId] = await Patient.createPatient({
+            email,
+            password,
+            first_name,
+            last_name,
+            middle_name,
+            phone_number,
+            date_of_birth
+        })
 
         const accessToken = jwt.sign(
-            { _id: user._id, role: patientRole.RoleName },
+            { id: userId, role: patientRole.RoleName },
             accessTokenSecret,
             { expiresIn: accessTokenExpiry }
         );
 
         const refreshToken = jwt.sign(
-            { _id: user._id },
+            { id: userId },
             refreshTokenSecret,
             { expiresIn: refreshTokenExpiry }
         );
@@ -70,8 +60,7 @@ exports.registerUser = async (req, res, next) => {
             sameSite: 'None',
         });
 
-        user.refreshToken = refreshToken;
-        await user.save();
+        await User.setRefreshToken(userId, refreshToken);
 
         res.status(201).json({ message: 'User created' });
     } catch (err) {
@@ -83,22 +72,22 @@ exports.loginUser = async (req, res, next) => {
     const { email, password } = req.body;
 
     try {
-        const user = await User.findOne({ email: email });
+        const user = await User.getUserByEmail({ email: email });
         if (!user) return res.status(404).json({message:'User not found'});
 
         const isMatch = await user.comparePassword(password);
         if (!isMatch) return res.status(401).json({message: 'Invalid credentials'});
 
-        const role = await Role.findOne({ _id: user.roleId });
+        const role = await Role.getRoleById(user.roleId);
 
         const accessToken = jwt.sign(
-            { _id: user._id, role: role.RoleName },
+            { id: user.id, role: role.RoleName },
             accessTokenSecret,
             { expiresIn: accessTokenExpiry }
         );
 
         const refreshToken = jwt.sign(
-            { _id: user._id },
+            { id: user.id },
             refreshTokenSecret,
             { expiresIn: refreshTokenExpiry }
         );
@@ -119,8 +108,7 @@ exports.loginUser = async (req, res, next) => {
             sameSite: 'None',
         });
 
-        user.refreshToken = refreshToken;
-        await user.save();
+        await User.setRefreshToken(user.id, refreshToken);
 
         res.status(200).json({ accessToken, refreshToken });
     } catch (err) {
@@ -132,19 +120,19 @@ exports.oauthLogin = async (req, res, next) => {
     const user = req.user;
 
     try {
-        const role = await Role.findOne({ _id: user.roleId });
+        const role = await Role.getRoleById(user.roleId);
         if (!role) {
             return res.status(404).json({message: `Role not found`});
         }
 
         const accessToken = jwt.sign(
-            { _id: user._id, role: role.RoleName },
+            { _id: user.id, role: role.RoleName },
             accessTokenSecret,
             { expiresIn: accessTokenExpiry }
         );
 
         const refreshToken = jwt.sign(
-            { _id: user._id },
+            { _id: user.id },
             refreshTokenSecret,
             { expiresIn: refreshTokenExpiry }
         );
@@ -165,8 +153,7 @@ exports.oauthLogin = async (req, res, next) => {
             sameSite: 'None',
         });
 
-        user.refreshToken = refreshToken;
-        await user.save();
+        await User.setRefreshToken(user.id, refreshToken);
         res.redirect(`http://localhost:5173/home`);
     } catch (err) {
         return res.status(500).json({message: `Unexpected server error: ${err.message}`});
@@ -204,25 +191,24 @@ exports.refreshToken = async (req, res, next) => {
     if (!refresh) return res.status(403).json({message: `Refresh token required`});
 
     try {
-        const user = await User.findOne({ refresh });
+        const user = await User.getUserByToken(refresh);
         if (!user) return res.status(403).json({message: `Invalid refresh token`});
 
         jwt.verify(refresh, refreshTokenSecret, (err, decoded) => {
             if (err) return res.status(403).json({message: `Invalid refresh token signature`});
             const accessToken = jwt.sign(
-                { _id: user._id },
+                { id: user.id },
                 accessTokenSecret,
                 { expiresIn: accessTokenExpiry }
             );
 
             const newRefreshToken = jwt.sign(
-                { _id: user._id },
+                { id: user.id },
                 refreshTokenSecret,
                 { expiresIn: refreshTokenExpiry }
             );
 
-            user.refreshToken = newRefreshToken;
-            user.save();
+            User.setRefreshToken(user.id, newRefreshToken);
 
             res.cookie('access', accessToken, {
                 httpOnly: true,
@@ -255,17 +241,17 @@ exports.profileInfo = async (req, res, next) => {
 
     try {
         const decoded = jwt.verify(accessToken, accessTokenSecret);
-        const userId = decoded._id;
+        const userId = decoded.id;
 
-        const user = await User.findById(userId);
+        const user = await User.getUserById(userId);
         if (!user) return res.status(404).json({message: `User not found`});
 
-        const role = await Role.findById(user.roleId);
+        const role = await Role.getRoleById(user.roleId);
         if (!role) return res.status(404).json({message: `Role not found`});
 
         let profile = null;
         if (role.RoleName === 'receptionist') {
-            const receptionist = await Receptionist.findOne({ UserId: userId })
+            const receptionist = await Receptionist.getReceptionistByUserId(userId)
                 .populate('UserId', 'urlPhoto email');
 
             if (receptionist) {

@@ -1,20 +1,31 @@
+require('dotenv').config({ path: './server/.env' });
+
 const express = require('express');
-const mongoose = require('mongoose');
-const passport = require('passport');
-const bodyParser = require('body-parser');
 const session = require('express-session');
+const cors = require('cors');
+const cookieParser = require('cookie-parser');
+const bodyParser = require('body-parser');
+
+const passport = require('passport');
+
 const swaggerUi = require('swagger-ui-express');
 const swaggerDocument = require('./swagger-output.json');
-const cors = require('cors');
-const seeder = require('./db/seeder');
-const cookieParser = require('cookie-parser');
-require('dotenv').config({ path: './server/.env' });
-const ORM = require('./db/orm');
-const pool = require('./db/pool');
+
 const {errorHandler} = require('./middleware/errors');
-const nodemailer = require("nodemailer");
 const path = require("node:path");
 const upload = require("./middleware/fileUploads");
+
+const {sequelize, testConnection, syncDatabase } = require('./db/connection');
+const {seedDatabase} = require('./db/seeder');
+
+//testConnection();
+/*seedDatabase()
+    .then(() => {
+        console.log('Database seeded successfully.');
+    })
+    .catch((error) => {
+        console.error('Error during seeding:', error);
+    });*/
 
 const app = express();
 const sess = {
@@ -41,24 +52,6 @@ var corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(errorHandler);
-
-mongoose.connect(process.env.MONGO_URI,
-    { useNewUrlParser: true, useUnifiedTopology: true })
-    .then(() => console.log('MongoDB connected'))
-    .catch(err => console.log(err));
-
-
-const orm = new ORM(pool);
-
-orm.define('users', {
-    id: 'SERIAL PRIMARY KEY',
-    firstName: 'TEXT',
-    lastName: 'TEXT'
-});
-
-orm.migrate();
-
-seeder.seedDatabase();
 
 app.use('/swagger/index', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 

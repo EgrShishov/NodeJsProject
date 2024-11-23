@@ -14,12 +14,7 @@ const validateCreateResult = [
 
 exports.getAllResults = async (req, res) => {
     try {
-        const results = await Result.find()
-            .populate('PatientId', 'FirstName LastName MiddleName')
-            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
-            .populate('DocumentId', 'FilePath DocumentType')
-            .populate('DoctorId', 'FirstName LastName MiddleName');
-
+        const results = await Result.getAllResults();
         res.status(200).json(results);
     } catch (error) {
         res.status(500).json({ message: `Error fetching results: ${error.message}` });
@@ -29,12 +24,7 @@ exports.getAllResults = async (req, res) => {
 exports.getResultById = async (req, res) => {
     try {
         const resultId = req.params.id;
-        const results = await Result.find()
-            .populate('PatientId', 'FirstName LastName MiddleName')
-            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
-            .populate('DocumentId', 'FilePath DocumentType')
-            .populate('DoctorId', 'FirstName LastName MiddleName');
-
+        const results = await Result.getResultById(resultId);
         if (!result) {
             return res.status(404).json({ message: 'Result not found' });
         }
@@ -56,25 +46,16 @@ exports.createResult = [
         const { PatientId, DoctorId, AppointmentId, DocumentId, Complaints, Recommendations, Conclusion } = req.body;
         const resultFile = req.file ? req.file.path : null;
 
-        const newDocument = new Document({
-            FilePath: resultFile,
-            DocumentType: req.file.mimetype
+        const savedResult = await Result.createResult({
+            patient_id: PatientId,
+            doctor_id: DoctorId,
+            appointment_id: AppointmentId,
+            document_type: req.file.mimetype || ' ',
+            document_path: resultFile,
+            complaints: Complaints,
+            recommendations: Recommendations,
+            conclusion: Conclusion
         });
-        const savedDocument = newDocument.save();
-
-        if (!savedDocument) return res.status(500).json({ message: `Error creating document: ${error.message}` });
-
-        const newResult = new Result({
-            PatientId,
-            DoctorId,
-            AppointmentId,
-            DocumentId: newDocument._id,
-            Complaints,
-            Recommendations,
-            Conclusion
-        });
-
-        const savedResult = await newResult.save();
         res.status(201).json(savedResult);
     } catch (error) {
         res.status(500).json({ message: 'Error creating result' });
@@ -85,7 +66,7 @@ exports.editResult = async (req, res) => {
     try {
         const resultId = req.params.id;
         const updates = req.body;
-        const updatedResult = await Result.findByIdAndUpdate(resultId, updates, { new: true });
+        const updatedResult = await Result.editResult(resultId, updates);
 
         if (!updatedResult) {
             return res.status(404).json({ message: 'Result not found' });
@@ -100,7 +81,7 @@ exports.editResult = async (req, res) => {
 exports.deleteResult = async (req, res) => {
     try {
         const resultId = req.params.id;
-        const result = await Result.findByIdAndDelete(resultId);
+        const result = await Result.deleteResult(resultId);
 
         if (!result) {
             return res.status(404).json({ message: 'Result not found' });
@@ -115,11 +96,7 @@ exports.deleteResult = async (req, res) => {
 exports.getResultByPatient = async (req, res) => {
     try {
         const patientId = req.params.patientId;
-        const result = await Result.find({ PatientId: patientId })
-            .populate('PatientId', 'FirstName LastName MiddleName')
-            .populate('AppointmentId', 'AppointmentDate AppointmentTime IsApproved')
-            .populate('DocumentId', 'FilePath DocumentType')
-            .populate('DoctorId', 'FirstName LastName MiddleName');
+        const result = await Result.getResultsByPatient(patientId);
 
         if (!result) {
             return res.status(404).json({ message: 'Result not found' });

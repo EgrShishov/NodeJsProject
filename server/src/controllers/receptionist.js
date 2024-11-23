@@ -1,8 +1,6 @@
 const Receptionist = require('../models/Receptionist');
-const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const transporter = require("../config/emailsender");
-const Role = require("../models/Role");
 
 const validateCreateReceptionist = [
     body('firstName').isString().withMessage('firstName должен быть строкой').notEmpty().withMessage('firstName обязателен'),
@@ -14,8 +12,7 @@ const validateCreateReceptionist = [
 
 exports.getAllReceptionists = async (req, res) => {
     try {
-        const receptionists = await Receptionist.find()
-            .populate('UserId', 'name email urlPhoto');
+        const receptionists = await Receptionist.getAllReceptionists();
         res.status(200).json(receptionists);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при получении регистраторов: ${error.message}` });
@@ -25,8 +22,7 @@ exports.getAllReceptionists = async (req, res) => {
 exports.getReceptionistById = async (req, res) => {
     try {
         const receptionistId = req.params.id;
-        const receptionist = await Receptionist.findById(receptionistId)
-            .populate('UserId', 'name email urlPhoto');
+        const receptionist = await Receptionist.getReceptionistById(receptionistId);
 
         if (!receptionist) {
             return res.status(404).json({ message: 'Регистратор не найден' });
@@ -48,29 +44,18 @@ exports.createReceptionist = [
     try {
         console.log(req.body);
 
-        const { email, firstName, lastName, middleName, dateOfBirth } = req.body;
+        const { email, firstName, lastName, middleName, dateOfBirth, phoneNumber } = req.body;
 
         const generatedPassword = Math.random().toString(36).slice(-8)
-
         const name = `${firstName} ${lastName} ${middleName}`;
-        const receptionistRole = await Role.findOne({RoleName: 'receptionist'});
-        const newUser = new User({
-            name,
+        const savedReceptionist = await Receptionist.createReceptionist({
             email,
             password: generatedPassword,
-            roleId: receptionistRole
-        });
-
-        console.log(newUser);
-
-        const savedUser = await newUser.save();
-
-        const newReceptionist = new Receptionist({
-            UserId: savedUser._id,
-            FirstName: firstName,
-            LastName: lastName,
-            MiddleName: middleName,
-            DateOfBirth: dateOfBirth
+            first_name: firstName,
+            last_name: lastName,
+            middle_name: middleName,
+            phone_umber: phoneNumber,
+            date_of_birth: dateOfBirth
         });
 
         const mailOptions = {
@@ -85,8 +70,6 @@ exports.createReceptionist = [
             <p>Please keep this information safe.</p>
         `,
         };
-
-        const savedReceptionist = await newReceptionist.save();
 
         try {
             await transporter.sendMail(mailOptions);
@@ -103,7 +86,7 @@ exports.editReceptionist = async (req, res) => {
     try {
         const receptionistId = req.params.id;
         const updates = req.body;
-        const receptionist = await Receptionist.findByIdAndUpdate(receptionistId, updates, { new: true });
+        const receptionist = await Receptionist.editReceptionist(receptionistId, updates);
 
         if (!receptionist) {
             return res.status(404).json({ message: 'Регистратор не найден' });
@@ -118,14 +101,12 @@ exports.editReceptionist = async (req, res) => {
 exports.deleteReceptionist = async (req, res) => {
     try {
         const receptionistId = req.params.id;
-        const receptionist = await Receptionist.findByIdAndDelete(receptionistId);
+        const receptionist = await Receptionist.deleteReceptionist(receptionistId);
 
         if (!receptionist) {
             return res.status(404).json({ message: 'Регистратор не найден' });
         }
-
-        await User.findByIdAndDelete(receptionist.UserId);
-
+        await User.deleteAccount(receptionist.UserId);
         res.status(200).json({ message: 'Регистратор успешно удалён' });
     } catch (error) {
         res.status(500).json({ message: `Ошибка при удалении регистратора: ${error.message}` });

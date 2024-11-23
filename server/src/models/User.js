@@ -1,28 +1,60 @@
-const mongoose = require('mongoose');
-const bcrypt = require('bcryptjs');
-const path = require("node:path");
+const {sequelize} = require('../db/connection');
+const {QueryTypes} = require("sequelize");
 
-const UserSchema = new mongoose.Schema({
-    googleId: { type: String },
-    facebookId: { type: String },
-    name: { type: String, required: true },
-    email: { type: String, required: true, unique: true },
-    password: { type: String },
-    createdAt: { type: Date, required: true, default: Date.now },
-    updatedAt: { type: Date },
-    roleId: { type: mongoose.Schema.Types.ObjectId, ref: 'Roles' },
-    urlPhoto: { type: String, default: `http://localhost:${process.env.PORT || 5000}/uploads/default-profile-image.png` },
-});
+exports.getUserById = async (id) => {
+    const [results, metadata] = await sequelize.query(`
+        SELECT * 
+        FROM users WHERE id=?`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+    return results;
+}
 
-UserSchema.pre('save', async function(next) {
-   if (!this.isModified('password')) return next();
-   const salt = await bcrypt.genSalt(10);
-   this.password = await bcrypt.hash(this.password, salt);
-   next();
-});
-
-UserSchema.methods.comparePassword = async function(enteredPassword) {
-    return bcrypt.compare(enteredPassword, this.password);
+exports.getUserByEmail = async (email) => {
+    const [results, metadata] = await sequelize.query(`
+        SELECT * 
+        FROM users WHERE email=?`,
+        {
+            replacements: [email],
+            type: QueryTypes.SELECT
+        });
+    return results;
 };
 
-module.exports = mongoose.model('User', UserSchema);
+exports.setRefreshToken = async (id, token) => {
+    const [results, metadata] = await sequelize.query(`
+        UPDATE users 
+        SET refresh_token = ? WHERE id=?`,
+        {
+            replacements: [token, id],
+            type: QueryTypes.UPDATE
+        });
+
+    return results;
+};
+
+exports.deleteAccount = async (id) => {
+    const [results, metadata] = await sequelize.query(`
+        DELETE FROM users 
+        WHERE id=?`,
+        {
+            replacements: [id],
+            type: QueryTypes.DELETE
+        });
+
+    return results;
+}
+
+exports.getUserByToken = async (token) => {
+    const [results, metadata] = await sequelize.query(`
+        DELETE FROM users 
+        WHERE refresh_token=?`,
+        {
+            replacements: [token],
+            type: QueryTypes.SELECT
+        });
+
+    return results;
+}

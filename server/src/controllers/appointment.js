@@ -12,11 +12,7 @@ const validateCreateAppointment = [
 
 exports.getAllAppointments = async (req, res) => {
     try {
-        const appointments = await Appointment.find()
-            .populate('PatientId', 'FirstName LastName MiddleName')
-            .populate('DoctorId', 'FirstName LastName MiddleName')
-            .populate('ServiceId', 'ServiceName')
-            .populate('OfficeId', 'City Street');
+        const appointments = await Appointment.getAllAppointments();
         console.log(appointments);
         res.status(200).json(appointments);
     } catch (error) {
@@ -33,18 +29,18 @@ exports.createAppointment = [
     }
 
     try {
-        const { PatientId, DoctorId, OfficeId, ServiceId, AppointmentDate, AppointmentTime } = req.body;
+        const { PatientId, DoctorId, OfficeId, ServiceId, AppointmentDate, ProcedureId, AppointmentTime } = req.body;
 
-        const newAppointment = new Appointment({
-            PatientId,
-            DoctorId,
-            OfficeId,
-            ServiceId,
-            AppointmentDate,
-            AppointmentTime
+        const savedAppointment = await Appointment.createAppointment({
+            patient_id: PatientId,
+            doctor_id: DoctorId,
+            office_id: OfficeId,
+            service_id: ServiceId,
+            appointment_date: AppointmentDate,
+            appointment_time: AppointmentTime,
+            procedure_id: ProcedureId
         });
 
-        const savedAppointment = await newAppointment.save();
         console.log(savedAppointment);
         res.status(201).json(savedAppointment);
     } catch (error) {
@@ -55,7 +51,7 @@ exports.createAppointment = [
 exports.approveAppointment = async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const appointment = await Appointment.findById(appointmentId);
+        const appointment = await Appointment.getAppointmentById(appointmentId);
 
         if (!appointment) {
             return res.status(404).json({ message: 'Приём не найден' });
@@ -72,14 +68,11 @@ exports.approveAppointment = async (req, res) => {
 exports.cancelAppointment = async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const appointment = await Appointment.findById(appointmentId);
+        const appointment = await Appointment.cancelAppointment(appointmentId);
 
         if (!appointment) {
             return res.status(404).json({ error: 'Приём не найден' });
         }
-
-        appointment.IsApproved = false;
-        await appointment.save();
         res.status(200).json({ message: 'Приём отменен', appointment })
     } catch (error) {
         res.status(500).json({ message: `Ошибка при отмене приёма: ${error.message}` })
@@ -89,11 +82,7 @@ exports.cancelAppointment = async (req, res) => {
 exports.getAppointmentsSchedule = async (req, res) => {
     try {
         const doctorId = req.params.doctorId;
-        const appointments = await Appointment.find({ DoctorId: doctorId })
-            .populate('PatientId', 'FirstName LastName')
-            .populate('ServiceId', 'ServiceName')
-            .populate('OfficeId', 'Country City Street StreetNumber PhoneNumber');
-
+        const appointments = await Appointment.getDoctorsSchedule(doctorId);
         res.status(200).json(appointments);
     } catch (error) {
         res.status(500).json({message: `Ошибка в получении расписания: ${error.message}`});
@@ -102,12 +91,8 @@ exports.getAppointmentsSchedule = async (req, res) => {
 
 exports.getPatientAppointment = async (req, res) => {
     try {
-        const appointments = await Appointment.find({ PatientId: req.params.patientId })
-            .populate('PatientId', 'FirstName LastName MiddleName')
-            .populate('ServiceId', 'ServiceName')
-            .populate('DoctorId', 'FirstName LastName MiddleName')
-            .populate('OfficeId', 'Country City Street StreetNumber PhoneNumber');
-
+        const patientId = req.params.patientId;
+        const appointments = await Appointment.getPatientAppointments(patientId);
         console.log(appointments);
         if (!appointments) return res.status(404).json({ message: `No founded appointments` });
         res.status(200).json(appointments);
