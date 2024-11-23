@@ -1,8 +1,8 @@
 const Doctor = require('../models/Doctor');
 const User = require('../models/User');
 const Role = require('../models/Role');
-const {SchemaTypes} = require("mongoose");
 const { body, validationResult } = require('express-validator');
+const transporter = require('../config/emailsender');
 
 const validateCreateDoctor = [
     body('email').isString().withMessage('email должен быть строкой').notEmpty().withMessage('email обязателен'),
@@ -17,11 +17,12 @@ const validateCreateDoctor = [
 exports.getAllDoctors = async (req, res) => {
     try {
         const doctors = await Doctor.find()
-            .populate('SpecializationId', 'SpecializationName');
+            .populate('SpecializationId', 'SpecializationName')
+            .populate('UserId', 'email urlPhoto');
 
         res.status(200).json(doctors);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении врачей: ${error}` });
+        res.status(500).json({ message: `Ошибка при получении врачей: ${error}` });
     }
 };
 
@@ -30,15 +31,15 @@ exports.getDoctorById = async (req, res) => {
         const doctorId = req.params.id;
 
         const doctor = await Doctor.findById(doctorId)
-            .populate('SpecializationId', 'SpecializationName');
-
+            .populate('SpecializationId', 'SpecializationName')
+            .populate('UserId', 'email urlPhoto');
         if (!doctor) {
-            return res.status(404).json({ error: 'Врач не найден' });
+            return res.status(404).json({ message: 'Врач не найден' });
         }
 
         res.status(200).json(doctor);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении данных врача: ${error}` });
+        res.status(500).json({ message: `Ошибка при получении данных врача: ${error}` });
     }
 };
 
@@ -50,12 +51,12 @@ exports.editDoctor = async (req, res) => {
         const doctor = await Doctor.findByIdAndUpdate(doctorId, updates, { new: true });
 
         if (!doctor) {
-            return res.status(404).json({ error: 'Врач не найден' });
+            return res.status(404).json({ message: 'Врач не найден' });
         }
 
         res.status(200).json(doctor);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при обновлении данных врача: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при обновлении данных врача: ${error.message}` });
     }
 };
 
@@ -64,19 +65,22 @@ exports.createDoctor = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
     try {
-        console.log(req.body);
-        const {email, doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, specializationId, career_start_year } = req.body;
+        const { email, doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, specializationId, career_start_year } = req.body;
 
-        const doctorsRole = await Role.findOne({RoleName: 'doctor'});
+        const generatedPassword = Math.random().toString(36).slice(-8)
+
+        const name = `${doctors_first_name} ${doctors_middle_name || ''} ${doctors_last_name} `;
+        const doctorsRole = await Role.findOne({ RoleName: 'doctor'});
         const newUser = new User({
-            name: `${doctors_first_name} ${doctors_last_name} ${doctors_middle_name}`,
-            email: email,
-            password: 'doctor123',
+            name,
+            email,
+            password: generatedPassword,
             roleId: doctorsRole
         });
+        console.log(newUser);
 
         const savedUser = await newUser.save();
 
@@ -91,9 +95,28 @@ exports.createDoctor = [
         });
 
         const savedDoctor = await newDoctor.save();
-        res.status(201).json(savedDoctor);
+
+        const mailOptions = {
+            from: `"AgendaClinic" <${process.env.EMAIL_USER}>`,
+            to: email,
+            subject: "Welcome to AgendaClinic - Your Credentials",
+            html: `
+            <h1>Welcome, ${name}!</h1>
+            <p>Thank you for registering on our platform. Here are your login credentials:</p>
+            <p><strong>Email:</strong> ${email}</p>
+            <p><strong>Password:</strong> ${generatedPassword}</p>
+            <p>Please keep this information safe.</p>
+        `,
+        };
+
+        try {
+            await transporter.sendMail(mailOptions);
+            res.status(200).json(savedDoctor);
+        } catch (error) {
+            res.status(500).json({ message: "Registration successful, but email could not be sent." });
+        }
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при создании нового врача: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при создании нового врача: ${error.message}` });
     }
 }];
 
@@ -103,16 +126,12 @@ exports.deleteDoctor = async (req, res) => {
         const doctor = await Doctor.findByIdAndDelete(doctorId);
 
         if (!doctor) {
-            return res.status(404).json({ error: 'Врач не найден' });
+            return res.status(404).json({ message: 'Врач не найден' });
         }
 
-        const user = await User.findById(doctor.UserId);
-        if (user) {
-            await user.deleteOne();
-        }
-
+        await User.findByIdAndDelete(doctor.UserId);
         res.status(200).json({ message: 'Врач успешно удалён' });
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при удалении врача: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при удалении врача: ${error.message}` });
     }
 };

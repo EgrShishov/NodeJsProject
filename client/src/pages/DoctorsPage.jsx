@@ -1,7 +1,7 @@
 import DoctorCard from '../components/DoctorCardComponent.jsx';
 import {deleteDoctor, getAllDoctors} from "../services/doctorsService.js";
 import {useEffect, useState} from "react";
-import {useLocation, useNavigate, useParams} from "react-router-dom";
+import {useLocation, useNavigate} from "react-router-dom";
 import {useAuth} from "../context/AuthContext.jsx";
 import {getSpecializationById} from "../services/specializationsService.js";
 
@@ -25,7 +25,6 @@ const DoctorsPage = () => {
 
     const fetchDoctors = async () => {
         const profiles = await getAllDoctors();
-        console.table(profiles);
         if (filter && value) {
             if (filter === 'specializationId') {
                 const filteredDoctors = profiles.filter(doctor => {
@@ -78,7 +77,9 @@ const DoctorsPage = () => {
     };
 
     const filteredDoctors = doctorProfiles.filter(doctor =>
-        doctor.LastName.toLowerCase().includes(searchQuery.toLowerCase())
+        doctor.LastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doctor.FirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                doctor.MiddleName?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleOnProfileClick = (doctorId) =>  navigate(`/doctors/${doctorId}/`);

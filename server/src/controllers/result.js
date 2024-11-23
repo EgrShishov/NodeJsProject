@@ -22,7 +22,7 @@ exports.getAllResults = async (req, res) => {
 
         res.status(200).json(results);
     } catch (error) {
-        res.status(500).json({ error: `Error fetching results: ${error.message}` });
+        res.status(500).json({ message: `Error fetching results: ${error.message}` });
     }
 };
 
@@ -36,12 +36,12 @@ exports.getResultById = async (req, res) => {
             .populate('DoctorId', 'FirstName LastName MiddleName');
 
         if (!result) {
-            return res.status(404).json({ error: 'Result not found' });
+            return res.status(404).json({ message: 'Result not found' });
         }
 
         res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: `Error fetching result: ${error.message}` });
+        res.status(500).json({ message: `Error fetching result: ${error.message}` });
     }
 };
 
@@ -50,7 +50,7 @@ exports.createResult = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()){
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
     try {
         const { PatientId, DoctorId, AppointmentId, DocumentId, Complaints, Recommendations, Conclusion } = req.body;
@@ -62,7 +62,7 @@ exports.createResult = [
         });
         const savedDocument = newDocument.save();
 
-        if (!savedDocument) return res.status(500).json({ error: `Error creating document: ${error.message}` });
+        if (!savedDocument) return res.status(500).json({ message: `Error creating document: ${error.message}` });
 
         const newResult = new Result({
             PatientId,
@@ -77,7 +77,7 @@ exports.createResult = [
         const savedResult = await newResult.save();
         res.status(201).json(savedResult);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating result' });
+        res.status(500).json({ message: 'Error creating result' });
     }
 }];
 
@@ -88,12 +88,12 @@ exports.editResult = async (req, res) => {
         const updatedResult = await Result.findByIdAndUpdate(resultId, updates, { new: true });
 
         if (!updatedResult) {
-            return res.status(404).json({ error: 'Result not found' });
+            return res.status(404).json({ message: 'Result not found' });
         }
 
         res.status(200).json(updatedResult);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating result' });
+        res.status(500).json({ message: 'Error updating result' });
     }
 };
 
@@ -103,12 +103,12 @@ exports.deleteResult = async (req, res) => {
         const result = await Result.findByIdAndDelete(resultId);
 
         if (!result) {
-            return res.status(404).json({ error: 'Result not found' });
+            return res.status(404).json({ message: 'Result not found' });
         }
 
         res.status(200).json({ message: 'Result deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting result' });
+        res.status(500).json({ message: 'Error deleting result' });
     }
 };
 
@@ -122,11 +122,11 @@ exports.getResultByPatient = async (req, res) => {
             .populate('DoctorId', 'FirstName LastName MiddleName');
 
         if (!result) {
-            return res.status(404).json({ error: 'Result not found' });
+            return res.status(404).json({ message: 'Result not found' });
         }
 
         res.status(200).json(result);
     } catch (error) {
-        res.status(500).json({ error: `Error fetching result: ${error.message}` });
+        res.status(500).json({ message: `Error fetching result: ${error.message}` });
     }
 };

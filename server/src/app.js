@@ -12,13 +12,22 @@ require('dotenv').config({ path: './server/.env' });
 const ORM = require('./db/orm');
 const pool = require('./db/pool');
 const {errorHandler} = require('./middleware/errors');
-const {upload} = require('./middleware/fileUploads');
+const nodemailer = require("nodemailer");
+const path = require("node:path");
+const upload = require("./middleware/fileUploads");
 
 const app = express();
 const sess = {
     secret: 'secret',
     cookie: {}
 };
+
+app.use('/uploads', express.static(path.join(__dirname, '../', 'uploads'), {
+    setHeaders: (res, path) => {
+        res.setHeader('Cache-Control', 'no-store');
+    },
+    fallthrough: false
+}));
 
 app.use(bodyParser.json());
 app.use(cookieParser());
@@ -67,6 +76,23 @@ app.use('/documents', require('./routes/documents'));
 app.use('/payments', require('./routes/payment'));
 app.use('/prescriptions', require('./routes/prescription'));
 app.use('/procedures', require('./routes/procedure'));
+
+// files
+app.post('/upload', upload.single('profile_pic'), (req, res) => {
+    try {
+        const file = req.file;
+        if (!file) {
+            return res.status(400).json({ error: 'No file uploaded' });
+        }
+        res.status(200).json({
+            message: 'File uploaded successfully',
+            filePath: `http://localhost:${process.env.PORT || 5000}/uploads/${file.filename}`
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: `Error uploading file: ${error.message}` });
+    }
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

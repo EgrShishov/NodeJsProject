@@ -1,5 +1,6 @@
 import {Component} from "react";
 import {getAllSpecializations} from "../services/specializationsService.js";
+import {useNavigate} from "react-router-dom";
 
 class AddDoctorForm extends Component {
     constructor(props) {
@@ -24,7 +25,7 @@ class AddDoctorForm extends Component {
 
     validateForm() {
         const { doctors_first_name, doctors_last_name, doctors_middle_name, birthday_date, email, career_start_year, specializationId } = this.state;
-        /*return doctors_first_name && doctors_last_name && doctors_middle_name && birthday_date && email && career_start_year && specializationId;*/
+        //return doctors_first_name && doctors_last_name && doctors_middle_name && birthday_date && email && career_start_year && specializationId;
         return true;
     }
 
@@ -95,11 +96,11 @@ class AddDoctorForm extends Component {
         } = this.state;
 
         return (
-            <div>
+            <div className="add-doctor-form">
                 <form onSubmit={this.handleSubmit}>
                     <h2>Создать аккаунт врача</h2>
 
-                    <div>
+                    <div className="form-field">
                         <label>Фамилия врача:</label><br/>
                         <input
                             type="text"
@@ -110,7 +111,7 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                         <label>Имя врача:</label><br/>
                         <input
                             type="text"
@@ -121,7 +122,7 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                         <label>Отчество врача:</label><br/>
                         <input
                             type="text"
@@ -132,7 +133,7 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                         <label>День рождения:</label><br/>
                         <input
                             type="date"
@@ -143,8 +144,8 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
-                        <label>Адресс электронной почты:</label><br/>
+                    <div className="form-field">
+                        <label>Адрес электронной почты:</label><br/>
                         <input
                             type="email"
                             name="email"
@@ -154,7 +155,7 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                         <label>Год начала карьеры:</label><br/>
                         <input
                             type="number"
@@ -165,7 +166,7 @@ class AddDoctorForm extends Component {
                         />
                     </div>
 
-                    <div>
+                    <div className="form-field">
                         <label>Специализация:</label><br/>
                         <select value={specializationId} onChange={this.handleSelectSpecialization} required>
                             <option value="">Выберите специализацию</option>

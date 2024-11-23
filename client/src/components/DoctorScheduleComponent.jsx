@@ -163,7 +163,7 @@ const DoctorScheduleComponent = ({ workingHours, bookedSlots, onAppointmentBooke
                                         </div>
                                     ))
                                 ) : (
-                                    <div className="no-slots">No available slots</div>
+                                    <div className="no-slots">Нет свободных мест</div>
                                 )}
                             </div>
                         </div>

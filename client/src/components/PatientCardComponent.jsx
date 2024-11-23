@@ -6,17 +6,23 @@ const PatientCard = ({ profile, onEditClick, onDeleteClick, onViewProfileClick }
     const { user } = useAuth();
 
     useEffect(() => {
-        setName(`${profile.FirstName} ${profile.MiddleName} ${profile.LastName}`);
+        setName(`${profile.FirstName} ${profile.MiddleName || ''} ${profile.LastName}`);
     }, []);
+
+    const formatter = new Intl.DateTimeFormat('ru-RU', {
+        year: 'numeric',
+        month: 'long',
+        day: '2-digit',
+    });
 
     return (
         <div className="patient-card">
             <div className="patient-card__image">
-                <img src={profile.ProfilePicture} alt={`${name}'s profile`}/>
+                <img src={profile.UserId?.urlPhoto} alt={`${name}'s profile`}/>
             </div>
             <div className="patient-card__info">
                 <h3 className="patient-card__name">{name}</h3>
-                <p className="patient-card__date_of_birth">{profile.DateOfBirth}</p>
+                <p className="patient-card__date_of_birth">{formatter.format(new Date(profile.DateOfBirth))}</p>
             </div>
             {user.role === 'receptionist'
                 || user.role === 'doctor' && (

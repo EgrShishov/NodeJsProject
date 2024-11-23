@@ -1,25 +1,22 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useAuth } from '../context/AuthContext.jsx';
-import {Link, useNavigate} from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import CurrentTimeComponent from "../components/CurrentTimeComponent.jsx";
+import {toast, ToastContainer} from "react-toastify";
 
 const LoginPage = () => {
     const { userLogin, googleLogin, facebookLogin } = useAuth();
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const navigate = useNavigate();
 
     const handleLogin = async (e) => {
         e.preventDefault();
-        setError(null);
-
         try {
-            await userLogin({ email: email, password: password });
-            navigate('/home');
+            const error = await userLogin({ email: email, password: password });
+            if (error) toast.error(`Произошла ошибка во время авторизации: ${error}`);
         } catch (error) {
-            setError(error.message);
+            toast.error(`Произошла ошибка: ${error.message}`);
         }
     };
 
@@ -27,7 +24,7 @@ const LoginPage = () => {
         try {
             await googleLogin();
         } catch (error) {
-            setError(error.message);
+            toast.error(`Произошла ошибка во время авторизации: ${error.message}`);
         }
     };
 
@@ -35,17 +32,17 @@ const LoginPage = () => {
         try {
             await facebookLogin();
         } catch (error) {
-            setError(error.message);
+            toast.error(`Произошла ошибка: ${error.message}`);
         }
     };
 
     return (
         <div className="login-component">
+            <ToastContainer />
             <CurrentTimeComponent />
             <div className="login-wrapper">
                 <form className="login-form" onSubmit={handleLogin}>
                     <h1 className="login-title">С возвращением!</h1>
-                    {error && <div className="error">{error}</div>}
                     <input
                         type="email"
                         placeholder="Электронная почта"

@@ -13,14 +13,14 @@ const validateCreateAppointment = [
 exports.getAllAppointments = async (req, res) => {
     try {
         const appointments = await Appointment.find()
-            .populate('PatientId', 'FirstName LastName')
-            .populate('DoctorId', 'FirstName LastName')
+            .populate('PatientId', 'FirstName LastName MiddleName')
+            .populate('DoctorId', 'FirstName LastName MiddleName')
             .populate('ServiceId', 'ServiceName')
             .populate('OfficeId', 'City Street');
         console.log(appointments);
         res.status(200).json(appointments);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении приёмов: ${error}` });
+        res.status(500).json({ message: `Ошибка при получении приёмов: ${error}` });
     }
 };
 
@@ -29,7 +29,7 @@ exports.createAppointment = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
 
     try {
@@ -48,7 +48,7 @@ exports.createAppointment = [
         console.log(savedAppointment);
         res.status(201).json(savedAppointment);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при создании приёма: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при создании приёма: ${error.message}` });
     }
 }];
 
@@ -58,14 +58,14 @@ exports.approveAppointment = async (req, res) => {
         const appointment = await Appointment.findById(appointmentId);
 
         if (!appointment) {
-            return res.status(404).json({ error: 'Приём не найден' });
+            return res.status(404).json({ message: 'Приём не найден' });
         }
 
-        appointment.isApproved = true;
+        appointment.IsApproved = true;
         await appointment.save();
         res.status(200).json({ message: 'Приём подтверждён', appointment });
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при подтверждении приёма: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при подтверждении приёма: ${error.message}` });
     }
 };
 
@@ -78,31 +78,40 @@ exports.cancelAppointment = async (req, res) => {
             return res.status(404).json({ error: 'Приём не найден' });
         }
 
-        appointment.isApproved = false;
+        appointment.IsApproved = false;
         await appointment.save();
         res.status(200).json({ message: 'Приём отменен', appointment })
     } catch (error) {
-        res.status(500).json({error: `Ошибка при отмене приёма: ${error.message}` })
+        res.status(500).json({ message: `Ошибка при отмене приёма: ${error.message}` })
     }
 };
 
 exports.getAppointmentsSchedule = async (req, res) => {
     try {
         const doctorId = req.params.doctorId;
-        const appointments = await Appointment.find({ DoctorId: doctorId });
+        const appointments = await Appointment.find({ DoctorId: doctorId })
+            .populate('PatientId', 'FirstName LastName')
+            .populate('ServiceId', 'ServiceName')
+            .populate('OfficeId', 'Country City Street StreetNumber PhoneNumber');
 
         res.status(200).json(appointments);
     } catch (error) {
-        res.status(500).json({error: `Ошибка в получении расписания: ${error.message}`});
+        res.status(500).json({message: `Ошибка в получении расписания: ${error.message}`});
     }
 };
 
 exports.getPatientAppointment = async (req, res) => {
     try {
-        const appointments = await Appointment.find({ PatientId: req.patientId });
-        if (!appointments) return res.status(404).json({ error: `No founded appointments` });
+        const appointments = await Appointment.find({ PatientId: req.params.patientId })
+            .populate('PatientId', 'FirstName LastName MiddleName')
+            .populate('ServiceId', 'ServiceName')
+            .populate('DoctorId', 'FirstName LastName MiddleName')
+            .populate('OfficeId', 'Country City Street StreetNumber PhoneNumber');
+
+        console.log(appointments);
+        if (!appointments) return res.status(404).json({ message: `No founded appointments` });
         res.status(200).json(appointments);
     } catch (err) {
-        res.status(500).json({ error: `Ошибка получения консультаций: ${err.message}`});
+        res.status(500).json({ message: `Ошибка получения консультаций: ${err.message}`});
     }
 };

@@ -16,7 +16,6 @@ export const AuthProvider = ({ children }) => {
                 setUser(profileData);
                 setIsAuthenticated(true);
             } catch (error) {
-                console.error("Fetching profile failed:", error);
                 try {
                     await refresh();
                     const profileData = await profile();
@@ -30,30 +29,31 @@ export const AuthProvider = ({ children }) => {
         };
 
         fetchUserProfile();
-    }, []); // удаляется isAuthenticated если перезайти на страницу, из-за который fetch profile упадет
+    }, []);
 
     const loginAction = async (userData) => {
         try {
             await login(userData);
             setIsAuthenticated(true);
             const profileData = await profile();
-            setUser(profileData);
+            if (profileData) setUser(profileData);
+            navigate('/profile');
         } catch (error) {
-            console.error(`Error occurred in login action: ${error}`);
-            navigate('/home');
+            return new Error(error.message);
         }
     };
 
     const googleLogin = async () => {
         try {
             google();
-            const profileData = await profile();
-            if (profileData) {
-                setUser(profileData);
-                setIsAuthenticated(true);
-            }
+    /*            const profileData = await profile();
+                if (profileData) {
+                    setUser(profileData);
+                    setIsAuthenticated(true);
+                    navigate('/profile');
+                }*/
         } catch (error) {
-            console.error('Google login failed:', error);
+            console.error('Google login failed:', error.message);
             navigate('/login');
         }
     }
@@ -67,7 +67,7 @@ export const AuthProvider = ({ children }) => {
                 setIsAuthenticated(true);
             }
         } catch (error) {
-            console.error('Facebook login failed:', error);
+            console.error('Facebook login failed:', error.message);
             navigate('/login');
         }
     }
@@ -77,20 +77,18 @@ export const AuthProvider = ({ children }) => {
             await register(userData);
             navigate('/login');
         } catch (error) {
-            console.error('Registration failed:', error);
+            console.error('Registration failed:', error.message);
             navigate('/login');
         }
     }
 
     const userLogout = async () => {
         try {
-/*
-            await logout();
-*/
+            await logout()
             setIsAuthenticated(false);
             navigate('/home');
         } catch (error) {
-            console.error(`Logout error: ${error}`);
+            console.error(`Logout error: ${error.message}`);
             navigate('/home');
         }
     };

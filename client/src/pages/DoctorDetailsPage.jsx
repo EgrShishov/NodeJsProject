@@ -20,6 +20,8 @@ const DoctorDetailsPage = () => {
 
     const fetchDoctorProfile = async () => {
         const profile = await getDoctorById(doctorsId.id);
+        if (!profile) toast.error(`Ошибка в получении профиля врача`);
+
         setDoctorProfile(profile);
 
         setName(`${profile.FirstName} ${profile.MiddleName} ${profile.LastName}`);
@@ -58,7 +60,6 @@ const DoctorDetailsPage = () => {
 
     const handleNewAppointmentBooked = async (appointmentDetails) => {
         try {
-            console.log(appointmentDetails);
             const data = {
                 PatientId: user._id,
                 DoctorId: appointmentDetails.doctorId,
@@ -80,14 +81,18 @@ const DoctorDetailsPage = () => {
         }
     };
 
+    console.log(doctorProfile);
+
     return (
         <div className="doctor-details">
             { doctorProfile ? (
                 <>
                     <div className="doctor-card__info">
                         <h3 className="doctor-card__name">{name}</h3>
-                        <p className="doctor-card__specialization">{doctorProfile.SpecializationName}</p>
+                        <img className="doctor-card__image" src={doctorProfile.UserId?.urlPhoto} alt={`${name}'s profile pic`}/>
+                        <p className="doctor-card__specialization">{doctorProfile.SpecializationId?.SpecializationName}</p>
                         <p className="doctor-card__experience">{experience} лет опыта</p>
+
                     </div>
                     {
                         slots ? (

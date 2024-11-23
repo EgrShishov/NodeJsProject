@@ -20,7 +20,7 @@ exports.getAllPrescriptions = async (req, res) => {
 
         res.status(200).json(prescriptions);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении рецептов' });
+        res.status(500).json({ message: 'Ошибка при получении рецептов' });
     }
 };
 
@@ -31,12 +31,12 @@ exports.getPrescriptionById = async (req, res) => {
             .populate('PatientId', 'FirstName LastName');
 
         if (!prescription) {
-            return res.status(404).json({ error: 'Рецепт не найден' });
+            return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
         res.status(200).json(prescription);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении рецепта' });
+        res.status(500).json({ message: 'Ошибка при получении рецепта' });
     }
 };
 
@@ -45,7 +45,7 @@ exports.createPrescription = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()){
-        return res.status(400).json({errors: errors.array() });
+        return res.status(400).json({message: errors.array() });
     }
     try {
         const { DoctorId, PatientId, PrescriptionDate, Medication, Dosage, Duration } = req.body;
@@ -54,7 +54,7 @@ exports.createPrescription = [
         const patient = await Patient.findById(PatientId);
 
         if (!doctor || !patient) {
-            return res.status(400).json({ error: 'Доктор или пациент не найдены' });
+            return res.status(400).json({ message: 'Доктор или пациент не найдены' });
         }
 
         const newPrescription = new Prescription({
@@ -69,7 +69,7 @@ exports.createPrescription = [
         const savedPrescription = await newPrescription.save();
         res.status(201).json(savedPrescription);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании рецепта' });
+        res.status(500).json({ message: 'Ошибка при создании рецепта' });
     }
 }];
 
@@ -80,12 +80,12 @@ exports.editPrescription = async (req, res) => {
         const updatedPrescription = await Prescription.findByIdAndUpdate(prescriptionId, updates, { new: true });
 
         if (!updatedPrescription) {
-            return res.status(404).json({ error: 'Рецепт не найден' });
+            return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
         res.status(200).json(updatedPrescription);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при редактировании рецепта' });
+        res.status(500).json({ message: 'Ошибка при редактировании рецепта' });
     }
 };
 
@@ -95,12 +95,12 @@ exports.deletePrescription = async (req, res) => {
         const prescription = await Prescription.findByIdAndDelete(prescriptionId);
 
         if (!prescription) {
-            return res.status(404).json({ error: 'Рецепт не найден' });
+            return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
         res.status(200).json({ message: 'Рецепт успешно удалён' });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при удалении рецепта' });
+        res.status(500).json({ message: 'Ошибка при удалении рецепта' });
     }
 };
 
@@ -111,11 +111,11 @@ exports.getPatientPrescriptions = async (req, res) => {
             .populate('PatientId', 'FirstName MiddleName LastName');
 
         if (!prescription) {
-            return res.status(404).json({ error: 'Рецепт не найден' });
+            return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
         res.status(200).json(prescription);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении рецепта: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при получении рецепта: ${error.message}` });
     }
 };

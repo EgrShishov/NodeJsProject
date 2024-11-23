@@ -16,7 +16,7 @@ const AppointmentsPage = () => {
     const fetchAppointments = async () => {
         try {
             let data;
-            if (user.role === "patient") {
+            if (user && user.role === "patient") {
                 data = await getPatientAppointments(patientId);
             } else {
                 data = await getAppointments();
@@ -24,6 +24,8 @@ const AppointmentsPage = () => {
             if (data) {
                 setAppointments(data);
                 setFilteredAppointments(data);
+            } else {
+                toast.error(`Неизвестная ошибка в получении консультаций`);
             }
         } catch (error) {
             toast.error(`Произошла ошибка в получении ваших встреч: ${error.message}`);

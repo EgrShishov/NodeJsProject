@@ -43,12 +43,7 @@ const HomeComponent = () => {
     useEffect(() => {
         const getLocation = async () => {
             if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(setPosition, (error) => {
-                    console.error(error);
-                    alert("Unable to retrieve your location.");
-                });
-            } else {
-                alert("Geolocation is not supported by this browser.");
+                navigator.geolocation.getCurrentPosition(setPosition);
             }
         }
 
@@ -66,7 +61,6 @@ const HomeComponent = () => {
             if (position) {
                 const weatherData = await getWeatherByCity(position.coords);
                 setWeather(weatherData.list[0]);
-                console.log(weatherData);
             }
         };
         setWeatherData();

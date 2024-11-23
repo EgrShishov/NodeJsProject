@@ -1,14 +1,21 @@
 import {useEffect, useState} from "react";
-import {createProcedure, getAllProcedures} from "../services/proceduresService";
+import {createProcedure, deleteProcedure, editProcedure, getAllProcedures} from "../services/proceduresService";
 import ProcedureCard from "../components/ProcedureComponent.jsx";
 import {useAuth} from "../context/AuthContext.jsx";
 import AddProcedureForm from "../components/AddProcedureForm.jsx";
+import {toast} from "react-toastify";
+import ReactPaginate from "react-paginate";
 
 const ProceduresPages = () => {
-    const [ proceduresList, setProceduresList ] = useState([]);
+    const [proceduresList, setProceduresList] = useState([]);
+
     const [searchQuery, setSearchQuery] = useState('');
     const [sortField, setSortField] = useState('');
     const [formOpened, toggleFormOpened] = useState(false);
+
+    const [currentPage, setCurrentPage] = useState(0);
+    const [itemsPerPage] = useState(4);
+
     const {user} = useAuth();
 
     useEffect(() => {
@@ -17,7 +24,7 @@ const ProceduresPages = () => {
 
     const fetchProcedures = async () => {
         const procedures = await getAllProcedures();
-        setProceduresList(procedures);
+        if (procedures) setProceduresList(procedures);
     };
 
     const handleSearch = (e) => {
@@ -37,24 +44,49 @@ const ProceduresPages = () => {
     const toggleForm = () => toggleFormOpened(!formOpened);
 
     const handleProcedureDelete = async (id) => {
-        await deleteProcedure(id);
-        fetchProcedures();
+        try {
+            const response = await deleteProcedure(id);
+            await fetchProcedures();
+        } catch (error) {
+            toast.error(`Ошибка в удалении процедуры: ${error.message}`);
+        }
     };
 
     const filteredProcedures = proceduresList.filter(procedure =>
-        procedure.ProcedureName.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+        procedure.ProcedureName.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const handleAddProcedure = async (newProcedure) => {
         const response = await createProcedure(newProcedure);
-        if (response) {
-            fetchProcedures();
-        }
+        await fetchProcedures();
         toggleForm();
     }
 
-    const handlePurchase = (procedureId) => {
+    const handlePurchase = async (procedureId) => {
+        try {
+            // TODO
+        } catch (error) {
+            toast.error(`Ошибка в заказе процедуры: ${error.message}`);
+        }
+    };
 
+    const handleEdit = async (id, data) => {
+        console.log(id, data);
+        try {
+            const response = await editProcedure(id, data);
+            if (response) {
+                await fetchProcedures();
+            }
+        } catch (error) {
+            toast.error(`Ошибка редактирования процедуры: ${error.message}`);
+        }
+    };
+
+    const pageCount = Math.ceil(filteredProcedures.length / itemsPerPage);
+    const startIndex = currentPage * itemsPerPage;
+    const currentProcedures = filteredProcedures.slice(startIndex, startIndex + itemsPerPage);
+
+    const handlePageChange = (event) => {
+        setCurrentPage(event.selected);
     };
 
     return (
@@ -84,20 +116,42 @@ const ProceduresPages = () => {
 
             <div className="procedures">
                 <div className="procedures-list">
-                    {filteredProcedures.map((procedure) => {
-                        return (
-                            <ProcedureCard
-                                id={procedure._id}
-                                key={procedure._id}
-                                name={procedure.ProcedureName}
-                                description={procedure.Description}
-                                cost={procedure.ProcedureCost}
-                                handlePurchase={handlePurchase}
-                            />
-                        );
-                    })}
+                    {currentProcedures.length > 0 ? (
+                        currentProcedures.map((procedure) => {
+                                return (
+                                    <ProcedureCard
+                                        id={procedure._id}
+                                        key={procedure._id}
+                                        name={procedure.ProcedureName}
+                                        description={procedure.Description}
+                                        cost={procedure.ProcedureCost}
+                                        handlePurchase={handlePurchase}
+                                        handleDelete={handleProcedureDelete}
+                                        handleEdit={handleEdit}
+                                        role={user?.role}
+                                    />
+                                );
+                            })
+                    ) : (
+                        <div className="not-found-profiles-action">
+                            <h2>Ничего не найдено</h2>
+                        </div>
+                    )}
                 </div>
             </div>
+
+            <ReactPaginate
+                previousLabel={"← Назад"}
+                nextLabel={"Далее →"}
+                pageCount={pageCount}
+                onPageChange={handlePageChange}
+                containerClassName={"pagination"}
+                previousLinkClassName={"pagination__link"}
+                nextLinkClassName={"pagination__link"}
+                disabledClassName={"pagination__link--disabled"}
+                activeClassName={"pagination__link--active"}
+                pageClassName={"pagination_page"}
+            />
         </div>
     );
 };

@@ -5,5 +5,5 @@ export const getAppointmentById = (appointmentId) => apiRequest('get', `/appoint
 export const createAppointment = (data) => apiRequest('post', '/appointments', data, true);
 export const getDoctorsSchedule = (doctorId) => apiRequest('get', `/appointments/schedule/${doctorId}`, {}, true);
 export const getPatientAppointments = (patientId) => apiRequest('get', `/appointments/patients/${patientId}`, {}, true);
-export const approveAppointment = (appoitmentId) => apiRequest('get', `/appointments/approve/${appoitmentId}`, {}, true);
-export const cancelAppointment = (appoitmentId) => apiRequest('get', `/appointments/cancel/${appoitmentId}`, {}, true);
+export const approveAppointment = (appoitmentId) => apiRequest('post', `/appointments/approve/${appoitmentId}`, {}, true);
+export const cancelAppointment = (appoitmentId) => apiRequest('post', `/appointments/cancel/${appoitmentId}`, {}, true);

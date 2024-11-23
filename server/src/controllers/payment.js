@@ -9,7 +9,7 @@ exports.getAllPayments = async (req, res) => {
             .populate('appointmentId');
         res.status(200).json(payments);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении платежей' });
+        res.status(500).json({ message: 'Ошибка при получении платежей' });
     }
 };
 
@@ -20,12 +20,12 @@ exports.getPaymentById = async (req, res) => {
             .populate('appointmentId');
 
         if (!payment) {
-            return res.status(404).json({ error: 'Платеж не найден' });
+            return res.status(404).json({ message: 'Платеж не найден' });
         }
 
         res.status(200).json(payment);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении платежа' });
+        res.status(500).json({ message: 'Ошибка при получении платежа' });
     }
 };
 
@@ -35,7 +35,7 @@ exports.createPayment = async (req, res) => {
 
         const appointment = await Appointment.findById(appointmentId);
         if (!appointment) {
-            return res.status(400).json({ error: 'Назначение не найдено' });
+            return res.status(400).json({ message: 'Назначение не найдено' });
         }
 
         const newPayment = new Payment({
@@ -48,7 +48,7 @@ exports.createPayment = async (req, res) => {
         const savedPayment = await newPayment.save();
         res.status(201).json(savedPayment);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании платежа' });
+        res.status(500).json({ message: 'Ошибка при создании платежа' });
     }
 };
 
@@ -59,12 +59,12 @@ exports.getPaymentHistory = async (req, res) => {
             .populate('appointmentId');
 
         if (!payment) {
-            return res.status(404).json({ error: 'Платеж не найден' });
+            return res.status(404).json({ message: 'Платеж не найден' });
         }
 
         res.status(200).json(payment);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении платежа' });
+        res.status(500).json({ message: 'Ошибка при получении платежа' });
     }
 };
 
@@ -73,7 +73,7 @@ exports.getPatientPayments = async (req, res) => {
         const payments = await Payment.find({ UserId: req.user._id, IsFinished: true });
         res.status(200).json(payments);
     } catch (err) {
-        res.status(500).json({ error: 'Ошибка в получении соевршенных платежей' });
+        res.status(500).json({ message: 'Ошибка в получении соевршенных платежей' });
     }
 };
 

@@ -1,4 +1,6 @@
 const Patient = require('../models/Patient');
+const Doctor = require('../models/Doctor');
+const Appointment = require('../models/Appointment');
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 
@@ -12,10 +14,11 @@ const validateCreatePatient = [
 
 exports.getAllPatients = async (req, res) => {
     try {
-        const patients = await Patient.find();
+        const patients = await Patient.find()
+            .populate('UserId', 'urlPhoto');
         res.status(200).json(patients);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении пациентов: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при получении пациентов: ${error.message}` });
     }
 };
 
@@ -23,15 +26,41 @@ exports.getPatientById = async (req, res) => {
     try {
         const patientId = req.params.id;
         const patient = await Patient.findById(patientId)
-            .populate('UserId', 'Email');
+            .populate('UserId', 'Email urlPhoto');
 
         if (!patient) {
-            return res.status(404).json({ error: 'Пациент не найден' });
+            return res.status(404).json({ message: 'Пациент не найден' });
         }
 
         res.status(200).json(patient);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при получении данных пациента: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при получении данных пациента: ${error.message}` });
+    }
+};
+
+exports.getDoctorsPatients = async (req, res) => {
+    try {
+        const { doctorId } = req.params;
+
+        const doctor = await Doctor.findById(doctorId);
+        if (!doctor) {
+            return res.status(404).json({ message: `Doctor not found` });
+        }
+
+        const appointments = await Appointment.find({ DoctorId: doctorId }).select('PatientId');
+
+        if (appointments.length === 0) {
+            return res.status(200).json([]);
+        }
+
+        const uniquePatientIds = [
+            ...new Set(appointments.map((appointment) => appointment.PatientId.toString()))
+        ];
+        const patients = await Patient.find({ _id: { $in: uniquePatientIds } });
+
+        res.status(200).json(patients);
+    } catch (error) {
+        res.status(500).json({ message: `Ошибка в получении пациентов для врача: ${error.message}` });
     }
 };
 
@@ -39,7 +68,7 @@ exports.createPatient = [validateCreatePatient,
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
 
     try {
@@ -55,7 +84,7 @@ exports.createPatient = [validateCreatePatient,
         const savedPatient = await newPatient.save();
         res.status(201).json(savedPatient);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при создании пациента: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при создании пациента: ${error.message}` });
     }
 }];
 
@@ -66,31 +95,27 @@ exports.editPatient = async (req, res) => {
         const patient = await Patient.findByIdAndUpdate(patientId, updates, { new: true });
 
         if (!patient) {
-            return res.status(404).json({ error: 'Пациент не найден' });
+            return res.status(404).json({ message: 'Пациент не найден' });
         }
 
         res.status(200).json(patient);
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при обновлении данных пациента: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при обновлении данных пациента: ${error.message}` });
     }
 };
 
 exports.deletePatient = async (req, res) => {
     try {
         const patientId = req.params.id;
+        if (!patientId) return res.status(500).json({message: "patient id not provided"});
         const patient = await Patient.findByIdAndDelete(patientId);
 
-        if (!patient) {
-            return res.status(404).json({ error: 'Пациент не найден' });
-        }
+        if (!patient) return res.status(404).json({ error: 'Пациент не найден' });
 
-        const user = await User.findById(patient.UserId);
-        if (user) {
-            await user.deleteOne();
-        }
+        await User.findByIdAndDelete(patient.UserId);
 
         res.status(200).json({ message: 'Пациент успешно удалён' });
     } catch (error) {
-        res.status(500).json({ error: `Ошибка при удалении пациента: ${error.message}` });
+        res.status(500).json({ message: `Ошибка при удалении пациента: ${error.message}` });
     }
 };

@@ -35,19 +35,23 @@ const ProfilePage = () => {
         }
     };
 
-    const fetchScheduleSlots = async () => {
+    const fetchScheduleSlots = async (doctorId) => {
         try {
-            const data = await getDoctorsSchedule();
+            const data = await getDoctorsSchedule(doctorId);
             setScheduleSlots(data);
+            console.log(data);
         } catch (error) {
-            toast.error(`Ошибка в получении расписания: ${error.message}`);
+            toast.error(`${error.message}`);
         }
     };
 
     useEffect(() => {
-        if (user && user.role === 'doctor') fetchScheduleSlots()
         fetchProfile();
     }, []);
+
+    useEffect(() => {
+        if (profileData) fetchScheduleSlots(profileData._id);
+    }, [scheduleOpened]);
 
     //receptionists actions
     const handleOnCreateAppointment = () => navigate('/appointments/add');
@@ -115,7 +119,7 @@ const ProfilePage = () => {
                 onClose={closeResultsModal}
                 onSubmit={handleAddingResults}
             />}
-            <ProfileComponent profileData={profileData}/>
+            <ProfileComponent profileData={profileData} setProfileData={setProfile}/>
             {user && user.role === 'receptionist' && (
                 <ReceptionistActions onCreateAppointment={handleOnCreateAppointment}
                 onViewReceptionists={handleOnViewReceptionists}
@@ -132,7 +136,7 @@ const ProfilePage = () => {
                         onViewSchedule={handleViewSchedule}
                         onAddResults={handleAddResults}
                     />
-                    {scheduleOpened && <DoctorsPersonalScheduleComponent/>}
+                    {scheduleOpened && <DoctorsPersonalScheduleComponent initialSlots={scheduleSlots}/>}
                 </>
             )}
             {user && user.role === 'patient' && (

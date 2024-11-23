@@ -8,7 +8,7 @@ router.get('/all', auth, ensureRole('receptionist', 'doctor', 'patient'), appoin
 router.get('/schedule/:doctorId',  appointmentController.getAppointmentsSchedule);
 router.get('/patients/:patientId', auth, ensurePatinet, appointmentController.getPatientAppointment);
 router.post('/', auth, ensureRole('patient', 'receptionist'), appointmentController.createAppointment);
-router.post('/approve/:id', auth, ensurePatinet, appointmentController.approveAppointment);
-router.post('/cancel/:id', auth, ensurePatinet, appointmentController.cancelAppointment);
+router.post('/approve/:id', auth, ensureRole('patient', 'doctor'), appointmentController.approveAppointment);
+router.post('/cancel/:id', auth, ensureRole('patient', 'doctor'), appointmentController.cancelAppointment);
 
 module.exports = router;

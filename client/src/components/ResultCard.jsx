@@ -3,33 +3,36 @@ import {toast} from "react-toastify";
 const ResultCard = ({ result }) => {
     const { PatientId, DoctorId, Complaints, Recommendations, Conclusion, DocumentId } = result;
 
-    const handleDownload = () => {
+    const handleDownload = async (documentId) => {
         if (!DocumentId) {
             toast.error('Документ отсутствует для загрузки.');
             return;
         }
 
-        fetch(`/documents/${DocumentId}/download`, {
-            method: 'GET',
-        })
-            .then((response) => {
-                if (!response.ok) {
-                    toast.error('Ошибка при загрузке файла.');
-                }
-                return response.blob();
-            })
-            .then((blob) => {
-                const url = window.URL.createObjectURL(blob);
-                const link = document.createElement('a');
-                link.href = url;
-                link.setAttribute('download', `result_${DocumentId}.pdf`);
-                document.body.appendChild(link);
-                link.click();
-                link.remove();
-            })
-            .catch((error) => {
-                toast.error(`Ошибка загрузки PDF: ${error}`);
+        try {
+            const response = await fetch(`http://localhost:5000/documents/download/${documentId}`, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/pdf'
+                },
+                credentials: 'include'
             });
+
+            if (!response.ok) {
+                toast.error('Error downloading file');
+            }
+
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', `result_${documentId}.pdf`);
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+        } catch (error) {
+            toast.error(`Failed to download document: ${error.message}.`);
+        }
     };
 
     return (
@@ -46,7 +49,7 @@ const ResultCard = ({ result }) => {
                 <p><strong>Рекомендации:</strong> {Recommendations || 'Нет данных'}</p>
                 <p><strong>Заключение:</strong> {Conclusion || 'Нет данных'}</p>
                 <div className="actions">
-                    <button onClick={handleDownload} className="download-btn">Скачать PDF</button>
+                    <button onClick={() => handleDownload(DocumentId._id)} className="download-btn">Скачать PDF</button>
                 </div>
             </div>
         </>

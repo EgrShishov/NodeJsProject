@@ -2,6 +2,7 @@ import {useAuth} from "../context/AuthContext.jsx";
 import {useState} from "react";
 import {Link, useNavigate} from "react-router-dom";
 import CurrentTimeComponent from "../components/CurrentTimeComponent.jsx";
+import {toast} from "react-toastify";
 
 const RegisterPage = () => {
     const { userRegister } = useAuth();
@@ -13,7 +14,6 @@ const RegisterPage = () => {
     const [lastName, setLastName] = useState('');
     const [middleName, setMiddleName] = useState('');
     const [birthdayDate, setBirthdayDate] = useState(new Date().now);
-    const [error, setError] = useState('');
     const [step, setStep] = useState(1);
     const [isFading, setIsFading] = useState(false);
 
@@ -51,12 +51,11 @@ const RegisterPage = () => {
             if (registerResult) navigate('/login');
             else navigate('/register');
         } catch (error) {
-            setError(`Register failed, please check your credentials: ${error.message}`);
+            toast.error(`Register failed, please check your credentials: ${error.message}`);
             console.log(error);
         }
     };
 
-    // validation will be added later
     const validateForm = (e) => {
         e.preventDefault();
     }

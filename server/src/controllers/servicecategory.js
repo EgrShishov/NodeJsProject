@@ -10,7 +10,7 @@ exports.getAllServiceCategories = async (req, res) => {
         const categories = await ServiceCategory.find();
         res.status(200).json(categories);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении категорий услуг' });
+        res.status(500).json({ message: 'Ошибка при получении категорий услуг' });
     }
 };
 
@@ -20,12 +20,12 @@ exports.getServiceCategoryById = async (req, res) => {
         const category = await ServiceCategory.findById(categoryId);
 
         if (!category) {
-            return res.status(404).json({ error: 'Категория услуг не найдена' });
+            return res.status(404).json({ message: 'Категория услуг не найдена' });
         }
 
         res.status(200).json(category);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении категории услуг' });
+        res.status(500).json({ message: 'Ошибка при получении категории услуг' });
     }
 };
 
@@ -34,7 +34,7 @@ exports.createServiceCategory = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()){
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
     try {
         const { categoryName } = req.body;
@@ -45,7 +45,7 @@ exports.createServiceCategory = [
         const savedCategory = await newCategory.save();
         res.status(201).json(savedCategory);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании категории услуг' });
+        res.status(500).json({ message: 'Ошибка при создании категории услуг' });
     }
 }];
 
@@ -56,12 +56,12 @@ exports.editServiceCategory = async (req, res) => {
         const category = await ServiceCategory.findByIdAndUpdate(categoryId, updates, { new: true });
 
         if (!category) {
-            return res.status(404).json({ error: 'Категория услуг не найдена' });
+            return res.status(404).json({ message: 'Категория услуг не найдена' });
         }
 
         res.status(200).json(category);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при редактировании категории услуг' });
+        res.status(500).json({ message: 'Ошибка при редактировании категории услуг' });
     }
 };
 
@@ -71,11 +71,11 @@ exports.deleteServiceCategory = async (req, res) => {
         const category = await ServiceCategory.findByIdAndDelete(categoryId);
 
         if (!category) {
-            return res.status(404).json({ error: 'Категория услуг не найдена' });
+            return res.status(404).json({ message: 'Категория услуг не найдена' });
         }
 
         res.status(200).json({ message: 'Категория услуг успешно удалена' });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при удалении категории услуг' });
+        res.status(500).json({ message: 'Ошибка при удалении категории услуг' });
     }
 };

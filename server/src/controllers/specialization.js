@@ -11,7 +11,7 @@ exports.getAllSpecializations = async (req, res) => {
         const specializations = await Specialization.find();
         res.status(200).json(specializations);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении специализаций' });
+        res.status(500).json({ message: 'Ошибка при получении специализаций' });
     }
 };
 
@@ -21,12 +21,12 @@ exports.getSpecializationById = async (req, res) => {
         const specialization = await Specialization.findById(specializationId);
 
         if (!specialization) {
-            return res.status(404).json({ error: 'Специализация не найдена' });
+            return res.status(404).json({ message: 'Специализация не найдена' });
         }
 
         res.status(200).json(specialization);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при получении специализации' });
+        res.status(500).json({ message: 'Ошибка при получении специализации' });
     }
 };
 
@@ -35,7 +35,7 @@ exports.createSpecialization = [
     async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ message: errors.array() });
     }
     try {
         const { specializationName } = req.body;
@@ -46,7 +46,7 @@ exports.createSpecialization = [
         const savedSpecialization = await newSpecialization.save();
         res.status(201).json(savedSpecialization);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при создании специализации' });
+        res.status(500).json({ message: 'Ошибка при создании специализации' });
     }
 }];
 
@@ -57,12 +57,12 @@ exports.editSpecialization = async (req, res) => {
         const specialization = await Specialization.findByIdAndUpdate(specializationId, updates, { new: true });
 
         if (!specialization) {
-            return res.status(404).json({ error: 'Специализация не найдена' });
+            return res.status(404).json({ message: 'Специализация не найдена' });
         }
 
         res.status(200).json(specialization);
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при редактировании специализации' });
+        res.status(500).json({ message: 'Ошибка при редактировании специализации' });
     }
 };
 
@@ -72,11 +72,11 @@ exports.deleteSpecialization = async (req, res) => {
         const specialization = await Specialization.findByIdAndDelete(specializationId);
 
         if (!specialization) {
-            return res.status(404).json({ error: 'Специализация не найдена' });
+            return res.status(404).json({ message: 'Специализация не найдена' });
         }
 
         res.status(200).json({ message: 'Специализация успешно удалена' });
     } catch (error) {
-        res.status(500).json({ error: 'Ошибка при удалении специализации' });
+        res.status(500).json({ message: 'Ошибка при удалении специализации' });
     }
 };

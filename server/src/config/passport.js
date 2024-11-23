@@ -6,6 +6,7 @@ const Patient = require('../models/Patient');
 const passport = require('passport');
 const { Types } = require('mongoose');
 const Role = require('../models/Role');
+const jwt = require("jsonwebtoken");
 require('dotenv').config({ path: './server/.env' });
 
 const options = {
@@ -34,18 +35,22 @@ passport.use(new GoogleStrategy({
     clientSecret: process.env.GOOGLE_CLIENT_SECRET,
     callbackURL: 'http://localhost:5000/auth/google/callback'
 }, async (accessToken, refreshToken, profile, done) => {
-    const existingUser = await User.findOne({googleId: profile.id });
-    if (existingUser) return done(null, existingUser);
+    let user = await User.findOne({ googleId: profile.id })
+        .populate('roleId', ' urlPhoto email RoleName');
+    if (user) return done(null, user);
 
+    const role = await Role.findOne({RoleName: 'patient'});
     const newUser = new User({
         name: profile.displayName,
         googleId: profile.id,
-        email: profile.emails[0].value
+        email: profile.emails[0].value,
+        roleId: role._id,
+        urlPhoto: profile.photos[0].value || `http://localhost:${process.env.PORT || 5000}/uploads/default-profile-image.png`,
     });
-    const savedUser = await newUser.save();
+    user = await newUser.save();
 
-    const firstName = profile.name.givenName;
-    const lastName = profile.name.familyName;
+    const firstName = profile.name.givenName || ' ';
+    const lastName = profile.name.familyName || ' ';
 
     let dateOfBirth;
     if (profile.birthday){
@@ -53,14 +58,15 @@ passport.use(new GoogleStrategy({
     }
 
     const newPatient = new Patient({
-        UserId: savedUser.id,
+        UserId: user._id,
         FirstName: firstName || '',
         LastName: lastName || '',
         DateOfBirth: dateOfBirth || Date.now(),
     });
 
+    console.log(newPatient);
     await newPatient.save();
-    done(null, newUser);
+    done(null, user);
 }));
 
 passport.use(new FacebookStrategy({

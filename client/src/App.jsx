@@ -25,6 +25,7 @@ import FooterComponent from "./components/FooterComponent.jsx";
 import AddDoctorPage from "./pages/AddDoctorPage.jsx";
 import PatientPage from "./pages/PatientPage.jsx";
 import ResultsPage from "./pages/ResultsPage.jsx";
+import AddReceptionistPage from "./pages/AddReceptionistPage.jsx";
 
 function App() {
     return (
@@ -52,6 +53,12 @@ function App() {
                             <ReceptionistsPage />
                         </RequireRole>
                     }/>
+                    <Route path="/receptionists/add" element={
+                        <RequireRole allowedRoles={["receptionist"]}>
+                            <AddReceptionistPage />
+                        </RequireRole>
+                    }>
+                    </Route>
                     <Route path="/patients" element={
                         <RequireRole allowedRoles={["doctor", "receptionist"]}>
                             <PatientsPage />

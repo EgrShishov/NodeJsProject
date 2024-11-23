@@ -1,4 +1,5 @@
 const Document = require('../models/Document');
+const {join} = require("node:path");
 
 exports.getDocumentById = async (req, res) => {
     try {
@@ -6,12 +7,12 @@ exports.getDocumentById = async (req, res) => {
         const document = await Document.findById(documentId);
 
         if (!document) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ message: 'Document not found' });
         }
 
         res.status(200).json(document);
     } catch (error) {
-        res.status(500).json({ error: 'Error fetching document' });
+        res.status(500).json({ message: 'Error fetching document' });
     }
 };
 
@@ -26,7 +27,7 @@ exports.createDocument = async (req, res) => {
         const savedDocument = await newDocument.save();
         res.status(201).json(savedDocument);
     } catch (error) {
-        res.status(500).json({ error: 'Error creating document' });
+        res.status(500).json({ message: 'Error creating document' });
     }
 };
 
@@ -37,12 +38,12 @@ exports.editDocument = async (req, res) => {
         const updatedDocument = await Document.findByIdAndUpdate(documentId, updates, { new: true });
 
         if (!updatedDocument) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ message: 'Document not found' });
         }
 
         res.status(200).json(updatedDocument);
     } catch (error) {
-        res.status(500).json({ error: 'Error updating document' });
+        res.status(500).json({ message: 'Error updating document' });
     }
 };
 
@@ -52,11 +53,31 @@ exports.deleteDocument = async (req, res) => {
         const document = await Document.findByIdAndDelete(documentId);
 
         if (!document) {
-            return res.status(404).json({ error: 'Document not found' });
+            return res.status(404).json({ message: 'Document not found' });
         }
 
         res.status(200).json({ message: 'Document deleted successfully' });
     } catch (error) {
-        res.status(500).json({ error: 'Error deleting document' });
+        res.status(500).json({ message: 'Error deleting document' });
+    }
+};
+
+exports.downloadFile = async (req, res) => {
+    try {
+        const document = await Document.findById(req.params.id);
+        if (!document) {
+            res.status(404).json({ message: 'Document not found' });
+        }
+
+        const filePath = join(__dirname, '../../', document.FilePath);
+
+        res.setHeader('Content-Type', document.DocumentType);
+        res.sendFile(filePath, (err) => {
+            if (err) {
+                res.status(500).send('Error sending file');
+            }
+        });
+    } catch (error) {
+        res.status(500).json({ message: `Error in downloading file :${error.message}`});
     }
 };
