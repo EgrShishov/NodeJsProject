@@ -11,9 +11,8 @@ module.exports = {
             if (err) return next(err);
             if (!user) return res.redirect('/auth/login');
 
-            let role = await Role.findById(user.roleId);
-            console.log(role, role.RoleName === 'patient', role.RoleName);
-            if (role && role.RoleName === 'patient') return next();
+            let role = await Role.getRoleById(req.user.role_id);
+            if (role && role.role_name === 'patient') return next();
             res.redirect('/auth/login');
         })(req, res, next);
     },
@@ -22,8 +21,8 @@ module.exports = {
             if (err) return next(err);
             if (!user) return res.redirect('/auth/login');
 
-            let role = await Role.findById(user.roleId);
-            if (role && role.RoleName === 'doctor') return next();
+            let role = await Role.getRoleById(req.user.role_id);
+            if (role && role.role_name === 'doctor') return next();
             res.redirect('/auth/login');
         })(req, res, next);
     },
@@ -32,44 +31,51 @@ module.exports = {
             if (err) return next(err);
             if (!user) return res.redirect('/auth/login');
 
-            let role = await Role.findById(user.roleId);
-            if (role && role.RoleName === 'receptionist') return next();
+            console.log('recept', user);
+            let role = await Role.getRoleById(req.user.role_id);
+            if (role && role.role_name === 'receptionist') return next();
             res.redirect('/auth/login');
         })(req, res, next);
     },
-    ensureRole: (...roles) => {
+     ensureRole: (...roles) => {
         return async (req, res, next) => {
-            const role = await Role.findById(req.user.roleId);
+            let role = await Role.getRoleById(req.user.role_id);
             if (!role) return res.status(404).json({ message: 'Роль не найдена' });
 
             if (!req.user) {
                 return res.status(401).json({ message: 'Пользователь не авторизован' });
             }
-            if (roles.includes(role.RoleName)) {
+            if (roles.includes(role.role_name)) {
                 return next();
             } else {
                 return res.status(403).json({ message: 'Доступ запрещён: недостаточные права' });
             }
         };
     },
-    auth: (req, res, next) => {
+     auth: (req, res, next) => {
         let responseObj = {
             statusCode: 0,
             errorMsg: "",
             data: {}
         };
 
-        passport.authenticate('jwt', { session: false }, (err, user, info) => {
-            if (err) return next(err);
+        try {
+            passport.authenticate('jwt', {session: false}, (err, user, info) => {
+                console.log(err);
+                if (err) return next(err);
 
-            if (!user) {
-                responseObj.data = info ? info.message : "No user found";
-                responseObj.statusCode = 401;
-                responseObj.errorMsg = "Unauthorized";
-                return res.status(responseObj.statusCode).send(responseObj);
-            }
-            req.user = user;
-            next();
-        })(req, res, next);
+                if (!user) {
+                    responseObj.data = info ? info.message : "No user found";
+                    responseObj.statusCode = 401;
+                    responseObj.errorMsg = "Unauthorized";
+                    return res.status(responseObj.statusCode).send(responseObj);
+                }
+                console.log(user);
+                req.user = user;
+                next();
+            })(req, res, next);
+        } catch (error) {
+            console.log(`Error occurred: ${error}`);
+        }
     }
 };

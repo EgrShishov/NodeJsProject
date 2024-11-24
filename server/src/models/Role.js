@@ -2,23 +2,23 @@ const {sequelize} = require('../db/connection');
 const {QueryTypes} = require("sequelize");
 
 exports.getRoleByName = async (name) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         SELECT * 
-        FROM role WHERE role_name=?`,
+        FROM roles WHERE role_name=?`,
         {
             replacements: [name],
             type: QueryTypes.SELECT
         });
-    return results;
+    return results[0];
 }
 
 exports.getRoleById = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results= await sequelize.query(`
         SELECT * 
-        FROM role WHERE id=?`,
+        FROM roles WHERE role_id=?`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
-    return results;
+    return results[0];
 }

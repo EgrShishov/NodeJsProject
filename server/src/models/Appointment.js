@@ -84,6 +84,22 @@ exports.getPaginatedAppointments = async (pageNo, itemsPerPage) => {
     return results;
 };
 
+exports.getBusySlotsByDoctor = async (id) => {
+    const results = await sequelize.query(`
+        SELECT
+            a.appointment_id,
+            a.appointment_date,
+            a.appointment_time
+        FROM Appointments a
+        WHERE a.doctor_id = ?
+        ORDER BY a.appointment_time;`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+    });
+    return results;
+};
+
 exports.getAppointmentHistory = async (patientId) => {
     const [results, metadata] = await sequelize.query(
         `SELECT
@@ -119,7 +135,7 @@ exports.getPatientAppointments = async (patientId) => {
         FROM Appointments a
             JOIN Patients p ON a.patient_id = p.patient_id
             JOIN Doctors d ON d.doctor_id = a.doctor_id
-        WHERE a.patient_id = ?`,
+        WHERE a.patient_id = ?;`,
         {
             replacements: [patientId],
             type: QueryTypes.SELECT
@@ -150,7 +166,7 @@ exports.getDoctorsSchedule = async (doctorId) => {
             JOIN Services s ON s.service_id = a.service_id
             JOIN Offices o ON o.office_id = a.office_id
         WHERE a.doctor_id = ?
-        ORDER BY a.appointment_time`,
+        ORDER BY a.appointment_time;`,
         {
             replacements: [doctorId],
             type: QueryTypes.SELECT
@@ -171,7 +187,7 @@ exports.getDoctorsUpcomingAppointments = async (doctorId) => {
     FROM Appointments a
         JOIN Patients p ON a.patient_id = p.patient_id
     WHERE a.doctor_id = ? AND a.appointment_date >= CURRENT_DATE
-    ORDER BY a.appointment_date, a.appointment_time`,
+    ORDER BY a.appointment_date, a.appointment_time;`,
         {
             replacements: [doctorId],
             type: QueryTypes.SELECT
@@ -197,7 +213,7 @@ exports.getProceduresForAppointments = async (patientId, appointmentDate) => {
             LEFT JOIN MedicalProcedures mp ON ap.procedure_id = mp.procedure_id
         WHERE a.patient_id = ?
         AND a.appointment_date = ?
-        ORDER BY a.appointment_time`,
+        ORDER BY a.appointment_time;`,
         {
             replacements: [patientId, appointmentDate],
             type: QueryTypes.SELECT
@@ -224,7 +240,7 @@ exports.getPreviousPatientsAppointments = async (patientId) => {
         JOIN Doctors AS d ON d.doctor_id = a.doctor_id
         WHERE a.is_approved = true
         AND a.patient_id = ?
-        ORDER BY a.appointment_date DESC`,
+        ORDER BY a.appointment_date DESC;`,
         {
             replacements: [patientId],
             type: QueryTypes.SELECT
@@ -242,7 +258,7 @@ exports.getAppointmentsPerDoctor = async () => {
             d.middle_name
         FROM Appointments AS a
         JOIN Doctors AS d ON a.doctor_id = d.doctor_id
-        GROUP BY d.doctor_id`,
+        GROUP BY d.doctor_id;`,
         {
             type: QueryTypes.SELECT
         }
@@ -260,7 +276,7 @@ exports.appointmentHistoryForPatient = async (patientId) => {
         JOIN patients p ON a.patient_id = p.patient_id
         JOIN offices o ON o.office_id = a.office_id
         WHERE p.patient_id = ?
-        ORDER BY a.appointment_date DESC, a.appointment_time DESC`,
+        ORDER BY a.appointment_date DESC, a.appointment_time DESC;`,
         {
             replacements: [patientId],
             type: QueryTypes.SELECT
@@ -270,7 +286,7 @@ exports.appointmentHistoryForPatient = async (patientId) => {
 
 exports.createAppointment = async (data) => {
     const [results, metadata] = await sequelize.query(`
-        CALL create_new_appointment(:p_patient_id, :p_doctor_id, :p_office_id, :p_service_id, :date, :p_procedure_id, :time)`,
+        CALL create_new_appointment(:p_patient_id, :p_doctor_id, :p_office_id, :p_service_id, :date, :p_procedure_id, :time);`,
         {
             replacements: [
                 data.patient_id,
@@ -291,7 +307,7 @@ exports.updateStatus = async (id, status) => {
     const [results, metadata] = await sequelize.query(`
         UPDATE Appointments
         SET is_approved = ?
-        WHERE appointment_id = ?`,
+        WHERE appointment_id = ?;`,
         {
             replacements: [id, status],
             type: QueryTypes.UPDATE
@@ -318,7 +334,7 @@ exports.updateAppointment = async (id, data) => {
         UPDATE Appointments
         SET appointment_date = ?, 
             appointment_time = ?,
-        WHERE appointment_id = ? AND is_approved = false`,
+        WHERE appointment_id = ? AND is_approved = false;`,
         {
             replacements: [data.appointment_date, data.appointment_time, id],
             type: QueryTypes.UPDATE
@@ -331,7 +347,7 @@ exports.updateAppointment = async (id, data) => {
 exports.deleteAppointment = async (id) => {
     const [results, metadata] = await sequelize.query(`
         DELETE FROM Appointments
-        WHERE appointment_id = ?`,
+        WHERE appointment_id = ?;`,
         {
             replacements: [id],
             type: QueryTypes.DELETE

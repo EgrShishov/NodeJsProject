@@ -6,8 +6,8 @@ const AppointmentsList = ({ appointments }) => (
         {appointments.length > 0 ? (
             <ul>
                 {appointments.map((appointment) => (
-                    <li key={appointment.id}>
-                        {new Date(appointment.date).toLocaleDateString()} - {appointment.doctor} at {appointment.office}
+                    <li key={appointment.appointment_id}>
+                        {new Date(appointment.appointment_date).toLocaleDateString()} - {appointment.doctors_last_name} at {appointment.office_number}
                     </li>
                 ))}
             </ul>
@@ -26,10 +26,10 @@ const ResultsList = ({ results }) => (
                     <li key={result.id} className="result-item">
                         <div className="result-date">{new Date(result.date).toLocaleDateString()}</div>
                         <div className="result-details">
-                            <strong>Заключение:</strong> {result.Conclusion}<br />
-                            <strong>Жалобы:</strong> {result.Complaints}<br />
-                            <strong>Рекомендации:</strong> {result.Recommendations}<br />
-                            <strong>Врач:</strong> <Link to={`/doctors/${result.DoctorId}`}>{result.DoctorName}</Link>
+                            <strong>Заключение:</strong> {result.conclusion}<br />
+                            <strong>Жалобы:</strong> {result.complaints}<br />
+                            <strong>Рекомендации:</strong> {result.recommendations}<br />
+                            <strong>Врач:</strong> <Link to={`/doctors/${result.doctor_id}`}>{result.doctors_name}</Link>
                         </div>
                     </li>
                 ))}
@@ -47,7 +47,7 @@ const PaymentsHistory = ({ payments }) => (
             <ul>
                 {payments.map((payment) => (
                     <li key={payment.id}>
-                        {new Date(payment.date).toLocaleDateString()} - ${payment.amount} (Invoice #{payment.invoiceId})
+                        {new Date(payment.payment_date).toLocaleDateString()} - ${payment.amount} (Invoice #{payment.invoice_id})
                     </li>
                 ))}
             </ul>
@@ -63,8 +63,8 @@ const InvoicesList = ({ invoices }) => (
         {invoices.length > 0 ? (
             <ul>
                 {invoices.map((invoice) => (
-                    <li key={invoice.id}>
-                        Invoice #{invoice.id} - ${invoice.amount} оплатить до: {new Date(invoice.dueDate).toLocaleDateString()}
+                    <li key={invoice.invoice_id}>
+                        Invoice #{invoice.invoice_id} - ${invoice.amount} оплатить до: {new Date(invoice.dueDate).toLocaleDateString()}
                     </li>
                 ))}
             </ul>

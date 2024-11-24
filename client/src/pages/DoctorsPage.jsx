@@ -26,10 +26,10 @@ const DoctorsPage = () => {
     const fetchDoctors = async () => {
         const profiles = await getAllDoctors();
         if (filter && value) {
-            if (filter === 'specializationId') {
+            if (filter === 'specialization_id') {
                 const filteredDoctors = profiles.filter(doctor => {
-                    if (doctor.SpecializationId)
-                        return doctor.SpecializationId._id === value;
+                    if (doctor.specialization_id)
+                        return doctor.specialization_id === value;
                 });
                 setDoctorProfiles(filteredDoctors);
                 const specName = await getSpecializationById(value);
@@ -61,11 +61,11 @@ const DoctorsPage = () => {
 
     const getSortLabel = (field) => {
         const labels = {
-            'FirstName': 'Имя',
-            'LastName': 'Фамилия',
-            'MiddleName': 'Отчество',
-            'CareerStartYear': 'Стаж',
-            'specializationId': 'Специализации'
+            'first_name': 'Имя',
+            'last_name': 'Фамилия',
+            'middle_mame': 'Отчество',
+            'career_start_year': 'Стаж',
+            'specialization_id': 'Специализации'
         };
         const label = labels[field] || field;
         return sortOrder === 'asc' ? `${label} ▲` : `${label} ▼`;
@@ -77,9 +77,9 @@ const DoctorsPage = () => {
     };
 
     const filteredDoctors = doctorProfiles.filter(doctor =>
-        doctor.LastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            doctor.FirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                doctor.MiddleName?.toLowerCase().includes(searchQuery.toLowerCase())
+        doctor.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            doctor.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                doctor.middle_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handleOnProfileClick = (doctorId) =>  navigate(`/doctors/${doctorId}/`);
@@ -89,8 +89,8 @@ const DoctorsPage = () => {
         <div className="doctors-page">
             <h2>
                 Эксперты медицины:
-                {filter === 'specializationId' && specializationName && specializationName.SpecializationName ? (
-                    <> {specializationName.SpecializationName} профиля </>
+                {filter === 'specialization_id' && specializationName ? (
+                    <> {specializationName} профиля </>
                 ) : (
                     <></>
                 )}
@@ -105,11 +105,11 @@ const DoctorsPage = () => {
                 />
                 <select onChange={(e) => handleSort(e.target.value)} value={sortField}>
                     <option value="">Сортировка</option>
-                    <option value="FirstName">{getSortLabel('FirstName')}</option>
-                    <option value="LastName">{getSortLabel('LastName')}</option>
-                    <option value="MiddleName">{getSortLabel('MiddleName')}</option>
-                    <option value="CareerStartYear">{getSortLabel('CareerStartYear')}</option>
-                    <option value="specializationId">{getSortLabel('specializationId')}</option>
+                    <option value="first_name">{getSortLabel('first_name')}</option>
+                    <option value="last_name">{getSortLabel('last_name')}</option>
+                    <option value="middle_name">{getSortLabel('middle_name')}</option>
+                    <option value="career_start_year">{getSortLabel('career_start_year')}</option>
+                    <option value="specialization_id">{getSortLabel('specialization_id')}</option>
                 </select>
                 {user && user.role.includes('receptionist') ? (
                     <button onClick={() => navigate('add')}>Добавить врача</button>
@@ -122,7 +122,7 @@ const DoctorsPage = () => {
                             {filteredDoctors.map((doctor) => {
                                 return (
                                     <DoctorCard
-                                        key={doctor._id}
+                                        key={doctor.doctor_id}
                                         profile={doctor}
                                         onProfileClick={handleOnProfileClick}
                                         onEditClick={handleOnEditClick}

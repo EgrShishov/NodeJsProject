@@ -2,41 +2,44 @@ const {sequelize} = require('../db/connection');
 const {QueryTypes} = require("sequelize");
 
 exports.getUserById = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    console.log('get user by od', id);
+    const results= await sequelize.query(`
         SELECT * 
-        FROM users WHERE id=?`,
+        FROM users WHERE user_id=?`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
-    return results;
+
+    console.log(results);
+    return results[0];
 }
 
 exports.getUserByEmail = async (email) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         SELECT * 
         FROM users WHERE email=?`,
         {
             replacements: [email],
             type: QueryTypes.SELECT
         });
-    return results;
+    return results[0];
 };
 
 exports.setRefreshToken = async (id, token) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         UPDATE users 
-        SET refresh_token = ? WHERE id=?`,
+        SET refresh_token=? WHERE user_id=?`,
         {
             replacements: [token, id],
             type: QueryTypes.UPDATE
         });
 
-    return results;
+    return results[0];
 };
 
 exports.deleteAccount = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         DELETE FROM users 
         WHERE id=?`,
         {
@@ -44,11 +47,11 @@ exports.deleteAccount = async (id) => {
             type: QueryTypes.DELETE
         });
 
-    return results;
-}
+    return results[0];
+};
 
 exports.getUserByToken = async (token) => {
-    const [results, metadata] = await sequelize.query(`
+    const results= await sequelize.query(`
         DELETE FROM users 
         WHERE refresh_token=?`,
         {
@@ -56,5 +59,26 @@ exports.getUserByToken = async (token) => {
             type: QueryTypes.SELECT
         });
 
-    return results;
-}
+    return results[0];
+};
+
+exports.getUserByGoogleId = async (id) => {
+    const results= await sequelize.query(`
+        SELECT * 
+        FROM users WHERE google_id=?`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+    return results[0];
+};
+
+exports.comparePassword = async (id, password) => {
+    const results= await sequelize.query(`
+        SELECT * FROM compare_passwords(?, ?) `,
+        {
+            replacements: [id, password],
+            type: QueryTypes.SELECT
+        });
+    return results[0];
+};

@@ -94,11 +94,19 @@ class AddProcedureForm extends Component {
                         />
                     </div>
 
+                    <div>
+                        <label>Серсив:</label><br/>
+                        <select>
+
+                        </select>
+                    </div>
+
                     <button
                         type="submit"
                         className="submit-btn"
                         disabled={!formValid}
-                    >Добавить процедуру</button>
+                    >Добавить процедуру
+                    </button>
                 </form>
             </div>
         )

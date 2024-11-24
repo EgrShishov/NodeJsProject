@@ -6,7 +6,7 @@ const PatientCard = ({ profile, onEditClick, onDeleteClick, onViewProfileClick }
     const { user } = useAuth();
 
     useEffect(() => {
-        setName(`${profile.FirstName} ${profile.MiddleName || ''} ${profile.LastName}`);
+        setName(`${profile.first_name} ${profile.middle_name || ''} ${profile.last_name}`);
     }, []);
 
     const formatter = new Intl.DateTimeFormat('ru-RU', {
@@ -18,24 +18,24 @@ const PatientCard = ({ profile, onEditClick, onDeleteClick, onViewProfileClick }
     return (
         <div className="patient-card">
             <div className="patient-card__image">
-                <img src={profile.UserId?.urlPhoto} alt={`${name}'s profile`}/>
+                <img src={profile.photo_url} alt={`${name}'s profile`}/>
             </div>
             <div className="patient-card__info">
                 <h3 className="patient-card__name">{name}</h3>
-                <p className="patient-card__date_of_birth">{formatter.format(new Date(profile.DateOfBirth))}</p>
+                <p className="patient-card__date_of_birth">{formatter.format(new Date(profile.date_of_birth))}</p>
             </div>
             {user.role === 'receptionist'
                 || user.role === 'doctor' && (
                 <div className="patient-card__actions">
                     {user.role === 'receptionist' && (
                         <>
-                            <button onClick={() => onEditClick(profile._id)} className="action-button">Редактировать
+                            <button onClick={() => onEditClick(profile.patient_id)} className="action-button">Редактировать
                             </button>
-                            <button onClick={() => onDeleteClick(profile._id)} className="action-button">Удалить
+                            <button onClick={() => onDeleteClick(profile.patient_id)} className="action-button">Удалить
                             </button>
                         </>
                     )}
-                    <button onClick={() => onViewProfileClick(profile._id)} className="action-button">Просмотр профиля
+                    <button onClick={() => onViewProfileClick(profile.patient_id)} className="action-button">Просмотр профиля
                     </button>
                 </div>
             )}

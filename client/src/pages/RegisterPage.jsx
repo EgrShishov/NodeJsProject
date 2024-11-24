@@ -14,6 +14,7 @@ const RegisterPage = () => {
     const [lastName, setLastName] = useState('');
     const [middleName, setMiddleName] = useState('');
     const [birthdayDate, setBirthdayDate] = useState(new Date().now);
+    const [phoneNumber, setPhonenumber] = useState('');
     const [step, setStep] = useState(1);
     const [isFading, setIsFading] = useState(false);
 
@@ -44,7 +45,8 @@ const RegisterPage = () => {
                 first_name: firstName,
                 last_name: lastName,
                 middle_name: middleName,
-                date_of_birth: birthdayDate
+                date_of_birth: birthdayDate,
+                phone_number: phoneNumber
             };
 
             const registerResult = await userRegister(registerData);
@@ -147,6 +149,14 @@ const RegisterPage = () => {
 
                     {step === 3 && (
                         <div className={`step-content ${isFading ? "fade-out" : "fade-in"}`}>
+                            <input
+                                className="input-field"
+                                type="text"
+                                placeholder="Введите номер телефона"
+                                value={phoneNumber}
+                                onChange={(e) => setPhonenumber(e.target.value)}
+                                required
+                            />
                             <input
                                 className="input-field"
                                 type="password"

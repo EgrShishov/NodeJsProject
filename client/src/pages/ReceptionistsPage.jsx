@@ -13,6 +13,7 @@ const ReceptionistsPage = () => {
 
     const fetchReceptionists = async () => {
         const data = await getAllReceptionists();
+        console.log(data);
         if (data) setReceptionists(data);
     }
 
@@ -32,9 +33,9 @@ const ReceptionistsPage = () => {
     };
 
     const filteredReceptionists = receptionists.filter(receptionist =>
-        receptionist.LastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            receptionist.FirstName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                receptionist.MiddleName?.toLowerCase().includes(searchQuery.toLowerCase())
+        receptionist.last_name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            receptionist.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                receptionist.middle_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     return (
@@ -58,7 +59,7 @@ const ReceptionistsPage = () => {
                 <div className="receptionists-list">
                     {filteredReceptionists.map((receptionist) => {
                         return (<ReceptionistCard
-                                key={receptionist._id}
+                                key={receptionist.receptionist_id}
                                 profile={receptionist}
                                 onDeleteClick={handleOnDelete}
                                 onEditClick={handleOnEdit}

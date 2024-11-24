@@ -2,43 +2,46 @@ const {sequelize} = require('../db/connection');
 const {QueryTypes} = require("sequelize");
 
 exports.getAllProcedures = async () => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         SELECT
             mp.procedure_id,
             mp.procedure_name,
             mp.procedure_cost,
             mp.description,
-            s.service_name
+            s.service_name,
+            s.service_id
         FROM MedicalProcedures mp
         JOIN Services s ON mp.service_id = s.service_id;`,
         {
             type: QueryTypes.SELECT
         });
 
+    console.log(results);
     return results;
 };
 
 exports.getProcedureById = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results= await sequelize.query(`
         SELECT
             mp.procedure_name,
             mp.procedure_cost,
             mp.description,
-            s.service_name
+            s.service_name,
+            s.service_id
         FROM MedicalProcedures mp 
-                JOIN Services s ON mp.service_id = s.service_id;\`,
+            JOIN Services s ON mp.service_id = s.service_id
         WHERE mp.procedure_id = ?;`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
 }
 
 exports.getPatientsProcedures = async (patientId) => {
     try {
-        const [results] = await sequelize.query(`
+        const results= await sequelize.query(`
         SELECT * get_patient_procedures(:id) AS result;`,
             {
                 replacements: {
@@ -55,7 +58,7 @@ exports.getPatientsProcedures = async (patientId) => {
 
 exports.createProcedure = async (data) => {
     try {
-        const [result, metadata] = await sequelize.query(`
+        const result= await sequelize.query(`
             CALL create_procedure(:);`, {
             replacements: {
 
@@ -63,7 +66,7 @@ exports.createProcedure = async (data) => {
             type: QueryTypes.INSERT
         });
 
-        return result;
+        return result[0];
     } catch (error) {
         throw new Error(`Error in creating procedure: ${error.message}`);
     }
@@ -71,8 +74,8 @@ exports.createProcedure = async (data) => {
 
 exports.editProcedure = async (id, data) => {
     try {
-        const [result, metadata] = await sequelize.query(`
-           CALL update_medical_procedure(:id, :cost, :name, :desc, :service_id)`,
+        const result= await sequelize.query(`
+           CALL update_medical_procedure(:id, :cost, :name, :desc, :service_id);`,
             {
                 replacements: {
                     id: id,
@@ -81,10 +84,10 @@ exports.editProcedure = async (id, data) => {
                     desc: data.description,
                     service_id: data.service_id,
                 },
-                type: QueryTypes.UPDATE
+                type: QueryTypes.RAW
             }
         );
-        return result;
+        return result[0];
     } catch (error) {
         throw new Error(`Error in updating procedure: ${error.message}`);
     }
@@ -92,7 +95,7 @@ exports.editProcedure = async (id, data) => {
 
 exports.deleteProcedure = async (id) => {
     try {
-        const [result, metadata] = await sequelize.query(`
+        const result = await sequelize.query(`
             DELETE FROM MedicalProcedures
             WHERE procedure_id = ?;`,
             {
@@ -100,7 +103,8 @@ exports.deleteProcedure = async (id) => {
                 type: QueryTypes.UPDATE
             }
         );
-        return result;
+
+        return result[0];
     } catch (error){
         throw new Error(`Error in deleting procedure: ${error.message}`);
     }

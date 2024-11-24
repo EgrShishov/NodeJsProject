@@ -7,7 +7,7 @@ const validateCreateServiceCategory = [
 
 exports.getAllServiceCategories = async (req, res) => {
     try {
-        const categories = await ServiceCategory.find();
+        const categories = await ServiceCategory.getAllServiceCategories();
         res.status(200).json(categories);
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при получении категорий услуг' });
@@ -17,7 +17,7 @@ exports.getAllServiceCategories = async (req, res) => {
 exports.getServiceCategoryById = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const category = await ServiceCategory.findById(categoryId);
+        const category = await ServiceCategory.getServiceCategoryById(categoryId);
 
         if (!category) {
             return res.status(404).json({ message: 'Категория услуг не найдена' });
@@ -38,8 +38,8 @@ exports.createServiceCategory = [
     }
     try {
         const { categoryName } = req.body;
-        const newCategory = new ServiceCategory({
-            CategoryName: categoryName
+        const newCategory = await ServiceCategory.createServiceCategory({
+            category_name: categoryName
         });
 
         const savedCategory = await newCategory.save();
@@ -53,7 +53,7 @@ exports.editServiceCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
         const updates = req.body;
-        const category = await ServiceCategory.findByIdAndUpdate(categoryId, updates, { new: true });
+        const category = await ServiceCategory.editServiceCategory(categoryId, updates);
 
         if (!category) {
             return res.status(404).json({ message: 'Категория услуг не найдена' });
@@ -68,7 +68,7 @@ exports.editServiceCategory = async (req, res) => {
 exports.deleteServiceCategory = async (req, res) => {
     try {
         const categoryId = req.params.id;
-        const category = await ServiceCategory.findByIdAndDelete(categoryId);
+        const category = await ServiceCategory.deleteServiceCategory(categoryId);
 
         if (!category) {
             return res.status(404).json({ message: 'Категория услуг не найдена' });

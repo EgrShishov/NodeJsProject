@@ -8,7 +8,7 @@ const validateCreateSpecialization = [
 
 exports.getAllSpecializations = async (req, res) => {
     try {
-        const specializations = await Specialization.find();
+        const specializations = await Specialization.getAllSpecializations();
         res.status(200).json(specializations);
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при получении специализаций' });
@@ -18,7 +18,7 @@ exports.getAllSpecializations = async (req, res) => {
 exports.getSpecializationById = async (req, res) => {
     try {
         const specializationId = req.params.id;
-        const specialization = await Specialization.findById(specializationId);
+        const specialization = await Specialization.getSpecializationById(specializationId);
 
         if (!specialization) {
             return res.status(404).json({ message: 'Специализация не найдена' });
@@ -39,11 +39,9 @@ exports.createSpecialization = [
     }
     try {
         const { specializationName } = req.body;
-        const newSpecialization = new Specialization({
-            SpecializationName: specializationName
+        const savedSpecialization = await Specialization.createSpecialization({
+            specialization_name: specializationName
         });
-
-        const savedSpecialization = await newSpecialization.save();
         res.status(201).json(savedSpecialization);
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при создании специализации' });
@@ -54,7 +52,7 @@ exports.editSpecialization = async (req, res) => {
     try {
         const specializationId = req.params.id;
         const updates = req.body;
-        const specialization = await Specialization.findByIdAndUpdate(specializationId, updates, { new: true });
+        const specialization = await Specialization.editSpecialization(specializationId, updates);
 
         if (!specialization) {
             return res.status(404).json({ message: 'Специализация не найдена' });
@@ -69,7 +67,7 @@ exports.editSpecialization = async (req, res) => {
 exports.deleteSpecialization = async (req, res) => {
     try {
         const specializationId = req.params.id;
-        const specialization = await Specialization.findByIdAndDelete(specializationId);
+        const specialization = await Specialization.deleteSpecialization(specializationId);
 
         if (!specialization) {
             return res.status(404).json({ message: 'Специализация не найдена' });

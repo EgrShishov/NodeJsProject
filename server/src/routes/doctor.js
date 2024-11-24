@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const doctorController = require('../controllers/doctor');
 const { ensureReceptionist, auth} = require('../middleware/auth');
+const passport = require('../config/passport');
 
 router.get('/all', doctorController.getAllDoctors);
 router.post('/', auth, ensureReceptionist, doctorController.createDoctor);

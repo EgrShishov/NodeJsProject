@@ -24,6 +24,8 @@ const ProceduresPages = () => {
 
     const fetchProcedures = async () => {
         const procedures = await getAllProcedures();
+        console.log(procedures);
+        console.log(user);
         if (procedures) setProceduresList(procedures);
     };
 
@@ -53,7 +55,7 @@ const ProceduresPages = () => {
     };
 
     const filteredProcedures = proceduresList.filter(procedure =>
-        procedure.ProcedureName.toLowerCase().includes(searchQuery.toLowerCase()));
+        procedure.procedure_name.toLowerCase().includes(searchQuery.toLowerCase()));
 
     const handleAddProcedure = async (newProcedure) => {
         const response = await createProcedure(newProcedure);
@@ -120,11 +122,13 @@ const ProceduresPages = () => {
                         currentProcedures.map((procedure) => {
                                 return (
                                     <ProcedureCard
-                                        id={procedure._id}
-                                        key={procedure._id}
-                                        name={procedure.ProcedureName}
-                                        description={procedure.Description}
-                                        cost={procedure.ProcedureCost}
+                                        id={procedure.procedure_id}
+                                        key={procedure.procedure_id}
+                                        name={procedure.procedure_name}
+                                        serviceName={procedure.service_name}
+                                        serviceId={procedure.service_id}
+                                        description={procedure.description}
+                                        cost={procedure.procedure_cost}
                                         handlePurchase={handlePurchase}
                                         handleDelete={handleProcedureDelete}
                                         handleEdit={handleEdit}

@@ -81,7 +81,7 @@ const DoctorScheduleComponent = ({ workingHours, bookedSlots, onAppointmentBooke
     useEffect(() => {
         const fetchPatientData = async () => {
             try {
-                const data = await getPatientById(user._id);
+                const data = await getPatientById(user.user_id);
                 if (data) setPatient(data);
             } catch (error) {
                 toast.error(`Ошибка в получении профиля пациента: ${error.message}`);

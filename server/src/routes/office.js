@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const officeController = require('../controllers/office');
 const { ensureReceptionist, auth} = require('../middleware/auth');
+const passport = require('../config/passport');
 
 router.get('/all', officeController.getAllOffices);
 router.get('/:id', officeController.getOfficeById);

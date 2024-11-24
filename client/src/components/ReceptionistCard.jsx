@@ -8,11 +8,11 @@ const ReceptionistCard = ({ profile, onDeleteClick, onEditClick }) => {
 
     return (
         <div className="receptionist-card">
-            <img src={profile.UserId?.urlPhoto} alt={`profile_pic`}/>
-            <p><strong>Фамилия:</strong> {profile.LastName}</p>
-            <p><strong>Имя:</strong> {profile.FirstName}</p>
-            <p><strong>Отчество:</strong> {profile.MiddleName}</p>
-            <p><strong><i>Дата рождения:</i></strong> {formatter.format(new Date(profile.DateOfBirth))}</p>
+            <img src={profile.phoro_url} alt={`profile_pic`}/>
+            <p><strong>Фамилия:</strong> {profile.last_name}</p>
+            <p><strong>Имя:</strong> {profile.first_name}</p>
+            <p><strong>Отчество:</strong> {profile.middle_name}</p>
+            <p><strong><i>Дата рождения:</i></strong> {formatter.format(new Date(profile.date_of_birth))}</p>
             <div className="receptionist-card__actions">
                 <button className="action-button" onClick={onEditClick}>Редактировать</button>
                 <button className="action-button" onClick={onDeleteClick}>Удалить</button>

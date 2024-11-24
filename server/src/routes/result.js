@@ -3,6 +3,7 @@ const router = express.Router();
 const resultController = require('../controllers/result');
 const {ensureRole, ensureDoctor, auth} = require("../middleware/auth");
 const upload = require("../middleware/fileUploads");
+const passport = require('../config/passport');
 
 router.get('/all', auth, ensureRole('doctor', 'receptionist'), resultController.getAllResults);
 router.get('/:id', auth, ensureRole('doctor', 'patient', 'receptionist'), resultController.getResultById);

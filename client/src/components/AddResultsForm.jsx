@@ -76,16 +76,16 @@ class AddResultsForm extends Component {
 
     async handleSelectDoctor(e) {
         const doctorId = e.target.value;
-        const doctorAppointments = this.state.appointments.filter(a => a.DoctorId === doctorid);
+        const doctorAppointments = this.state.appointments.filter(a => a.doctor_id === doctorid);
 
         this.setState({doctorId: doctorId, patientId: '', appointmentId: '', complaints: '', recommendations: '', formValid: false});
         if (doctorAppointments.length === 1) {
             const appointment = doctorAppointments[0];
-            const patientData = await getPatientById(appointment.patientId);
+            const patientData = await getPatientById(appointment.patient_id);
 
             this.setState({
-                appointmentId: appointment._id,
-                patientId: patientData?._id || '',
+                appointmentId: appointment.appointment_id,
+                patientId: patientData?.patient_id || '',
                 complaints: appointment.complaints || '',
                 recommendations: appointment.recommendations || '',
                 conclusion: appointment.conclusion || '',
@@ -97,17 +97,17 @@ class AddResultsForm extends Component {
 
     async handleSelectPatient(e) {
         const patientId = e.target.value;
-        const patientAppointments = this.state.appointments.filter(a => a.PatientId === patientId);
+        const patientAppointments = this.state.appointments.filter(a => a.patient_id === patientId);
 
         this.setState({ patientId: patientId, doctorId: '', appointmentId: '', complaints: '', recommendations: '', conclusion: '', formValid: false });
 
         if (patientAppointments.length === 1) {
             const appointment = patientAppointments[0];
-            const doctorData = await getDoctorById(appointment.doctorId);
+            const doctorData = await getDoctorById(appointment.doctor_id);
 
             this.setState({
-                appointmentId: appointment._id,
-                doctorId: doctorData?._id || '',
+                appointmentId: appointment.appointment_id,
+                doctorId: doctorData?.doctor_id || '',
                 complaints: appointment.complaints || '',
                 recommendations: appointment.recommendations || '',
                 conclusion: appointment.conclusion || '',
@@ -121,13 +121,13 @@ class AddResultsForm extends Component {
         const appointmentData = await getAppointmentById(appointmentId);
 
         if (appointmentData) {
-            const patientData = await getPatientById(appointmentData.patientId);
-            const doctorData = await getDoctorById(appointmentData.doctorId);
+            const patientData = await getPatientById(appointmentData.patient_id);
+            const doctorData = await getDoctorById(appointmentData.doctor_id);
 
             this.setState({
                 appointmentId,
-                patientId: patientData?._id || '',
-                doctorId: doctorData?._id || '',
+                patientId: patientData?.patient_id || '',
+                doctorId: doctorData?.doctor_id || '',
                 complaints: appointmentData.complaints || '',
                 recommendations: appointmentData.recommendations || '',
                 conclusion: appointmentData.conclusion || '',
@@ -167,11 +167,11 @@ class AddResultsForm extends Component {
                             <option value="">Выберите пациента</option>
                             {patients ? (
                                 patients.map(patient => (
-                                    <option key={patient._id} value={patient._id}>
-                                        {patient.FirstName} {patient.LastName}
+                                    <option key={patient.patient_id} value={patient.patient_id}>
+                                        {patient.first_name} {patient.middle_name} {patient.last_name}
                                     </option>
                                 ))) : (
-                                    <div>Loading patients...</div>
+                                    <div className="loader"></div>
                                 )}
                         </select>
                     </div>
@@ -182,11 +182,11 @@ class AddResultsForm extends Component {
                             <option value="">Выберите врача</option>
                             {doctors ? (
                                 doctors.map(doctor => (
-                                    <option key={doctor._id} value={doctor._id}>
-                                        {doctor.FirstName} {doctor.LastName}
+                                    <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                        {doctor.first_name} {doctor.middle_name} {doctor.last_name}
                                     </option>
-                            ))) : (
-                                <div>Loading doctors...</div>
+                                ))) : (
+                                <div className="loader"></div>
                             )}
                         </select>
                     </div>
@@ -198,11 +198,11 @@ class AddResultsForm extends Component {
                             <option value="">Выберите приём</option>
                             {appointments ? (
                                 appointments.map(app => (
-                                <option key={app._id} value={app._id}>
-                                    Прием от {app.AppointmentDate} {app.AppointmentTime}
+                                <option key={app.appointment_id} value={app.appointment_id}>
+                                    Прием от {app.appointment_date} {app.appointment_time}
                                 </option>
                             ))) : (
-                                <div>Loading appointments...</div>
+                                <div className="loader"></div>
                             )}
                         </select>
                     </div>

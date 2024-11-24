@@ -23,10 +23,10 @@ const SpecializationPage = () => {
                 {specializations.map((spec) => {
                     return (
                         <div
-                            key={spec._id}
-                            onClick={() => navigate(`/doctors?filter=specializationId&value=${spec._id}`)}
+                            key={spec.specialization_id}
+                            onClick={() => navigate(`/doctors?filter=specialization_id&value=${spec.specialization_id}`)}
                              className="specialization-item">
-                            <p>{spec.SpecializationName}</p>
+                            <p>{spec.specialization_name}</p>
                         </div>
                     );
                 })}

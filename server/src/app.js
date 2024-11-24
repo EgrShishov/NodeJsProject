@@ -18,7 +18,7 @@ const upload = require("./middleware/fileUploads");
 const {sequelize, testConnection, syncDatabase } = require('./db/connection');
 const {seedDatabase} = require('./db/seeder');
 
-//testConnection();
+testConnection();
 /*seedDatabase()
     .then(() => {
         console.log('Database seeded successfully.');

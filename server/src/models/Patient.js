@@ -2,35 +2,35 @@ const { QueryTypes } = require('sequelize');
 const {sequelize} = require('../db/connection');
 
 exports.createPatient = async (data) => {
-    const [results, metadata] = await sequelize.query(
-        'CALL create_patient_account(:email, :password, :firstName, :lastName, :middleName, :phoneNumber, :dob)',
+    const results = await sequelize.query(
+        `SELECT * FROM create_patient_account(:email, :password, :first_name, :last_name, :middle_name, :phone_number, :date_of_birth)`,
         {
             replacements: {
                 email: data.email,
                 password: data.password,
-                firstName: data.first_name,
-                lastName: data.last_name,
-                middleName: data.middle_name,
-                phoneNumber: data.phone_number,
-                dob: data.date_of_birth
+                first_name: data.first_name,
+                last_name: data.last_name,
+                middle_name: data.middle_name,
+                phone_number: data.phone_number,
+                date_of_birth: data.date_of_birth,
             },
-            type: QueryTypes.RAW
+            type : QueryTypes.SELECT
         }
     );
-    return results;
+    return results[0];
 };
 
 exports.getAllPatients = async () => {
-    const [results, metadata] = await sequelize.query(`
+    const results  = await sequelize.query(`
     SELECT
         p.first_name,
         p.last_name,
         p.middle_name,
-        p.date_of_birth
+        p.date_of_birth,
         u.photo_url,
         u.email
     FROM Patients as p
-    JOIN Users as u ON u.id = p.user_id;`,
+    JOIN Users as u ON u.user_id = p.user_id;`,
         {
             type: QueryTypes.SELECT
         });
@@ -39,27 +39,47 @@ exports.getAllPatients = async () => {
 };
 
 exports.getPatientById = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
     SELECT
         p.first_name,
         p.last_name,
         p.middle_name,
-        p.date_of_birth
+        p.date_of_birth,
         u.photo_url,
         u.email
     FROM Patients as p
-    JOIN Users as u ON u.id = p.user_id
+    JOIN Users as u ON u.user_id = p.user_id
     WHERE p.patient_id = ?;`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
+};
+
+exports.getPatientByUserId = async (id) => {
+    const results = await sequelize.query(`
+    SELECT
+        p.first_name,
+        p.last_name,
+        p.middle_name,
+        p.date_of_birth,
+        u.photo_url,
+        u.email
+    FROM Patients as p
+    JOIN Users as u ON u.user_id = p.user_id
+    WHERE p.user_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+
+    return results[0];
 };
 
 exports.editPatient = async (id, data) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         UPDATE Patients
         SET first_name = ?, last_name = ?, middle_name = ?, date_of_birth = ?
         WHERE patient_id = ?;`,
@@ -68,16 +88,16 @@ exports.editPatient = async (id, data) => {
             type: QueryTypes.UPDATE
         });
 
-    return results;
+    return results[0];
 };
 
 exports.deletePatient = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         CALL delete_patient_account(?);`,
         {
             replacements: [id],
             type: QueryTypes.DELETE
         });
 
-    return results;
+    return results[0];
 };

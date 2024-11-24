@@ -82,8 +82,8 @@ exports.cancelAppointment = async (req, res) => {
 exports.getAppointmentsSchedule = async (req, res) => {
     try {
         const doctorId = req.params.doctorId;
-        const appointments = await Appointment.getDoctorsSchedule(doctorId);
-        res.status(200).json(appointments);
+        const busySlots = await Appointment.getBusySlotsByDoctor(doctorId);
+        res.status(200).json(busySlots);
     } catch (error) {
         res.status(500).json({message: `Ошибка в получении расписания: ${error.message}`});
     }

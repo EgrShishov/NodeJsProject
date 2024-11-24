@@ -14,16 +14,17 @@ const ProfileComponent = ({ profileData, setProfileData }) => {
         }
     };
 
+    console.log(profileData);
     return (
         <div className="profile">
             {profileData ? (
                 <CommonProfileInfo
-                    first_name={profileData.FirstName}
-                    last_name={profileData.LastName}
-                    middle_name={profileData.MiddleName}
-                    date_of_birth={profileData.DateOfBirth}
-                    picture={profileData.UserId.urlPhoto}
-                    email={profileData.UserId.email}
+                    first_name={profileData.first_name}
+                    last_name={profileData.last_name}
+                    middle_name={profileData.middle_name}
+                    date_of_birth={profileData.date_of_birth}
+                    picture={profileData.photo_url}
+                    email={profileData.email}
                     onProfileUpdate={handleUpdateProfile}
                     />
             ) : (

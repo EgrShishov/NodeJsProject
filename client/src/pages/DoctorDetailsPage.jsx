@@ -6,8 +6,6 @@ import {getDoctorsSchedule} from "../services/appointmentsService.js";
 import {createAppointment} from "../services/appointmentsService.js";
 import {useAuth} from "../context/AuthContext.jsx";
 import {toast} from "react-toastify";
-import {getOfficeById} from "../services/officesService.js";
-import {getServiceById} from "../services/servicesService.js"
 
 const DoctorDetailsPage = () => {
     const [doctorProfile, setDoctorProfile] = useState(null);
@@ -24,17 +22,17 @@ const DoctorDetailsPage = () => {
 
         setDoctorProfile(profile);
 
-        setName(`${profile.FirstName} ${profile.MiddleName} ${profile.LastName}`);
+        setName(`${profile.first_name} ${profile.middle_name} ${profile.last_name}`);
 
         const currentYear = new Date().getFullYear();
-        const experience = currentYear - profile.CareerStartYear;
+        const experience = currentYear - profile.career_start_year;
 
         setExperience(experience);
         setDoctorDetails({
-            id: profile._id,
+            id: profile.doctor_id,
             name: name,
-            office: profile.officeId,
-            serviceName: profile.ServiceId,
+            office: profile.office_id,
+            serviceName: profile.service_id,
         });
     };
 
@@ -45,6 +43,7 @@ const DoctorDetailsPage = () => {
 
     useEffect(() => {
         fetchDoctorProfile();
+        console.log('doctorsId', doctorsId);
         fetchDoctorsSchedule(doctorsId.id);
     }, [doctorsId]);
 
@@ -61,10 +60,10 @@ const DoctorDetailsPage = () => {
     const handleNewAppointmentBooked = async (appointmentDetails) => {
         try {
             const data = {
-                PatientId: user._id,
-                DoctorId: appointmentDetails.doctorId,
-                OfficeId: appointmentDetails.officeId,
-                ServiceId: appointmentDetails.serviceId,
+                PatientId: user.user_id,
+                DoctorId: appointmentDetails.doctor_id,
+                OfficeId: appointmentDetails.office_id,
+                ServiceId: appointmentDetails.service_id,
                 AppointmentDate: appointmentDetails.date,
                 AppointmentTime: appointmentDetails.time,
             };
@@ -81,16 +80,14 @@ const DoctorDetailsPage = () => {
         }
     };
 
-    console.log(doctorProfile);
-
     return (
         <div className="doctor-details">
             { doctorProfile ? (
                 <>
                     <div className="doctor-card__info">
                         <h3 className="doctor-card__name">{name}</h3>
-                        <img className="doctor-card__image" src={doctorProfile.UserId?.urlPhoto} alt={`${name}'s profile pic`}/>
-                        <p className="doctor-card__specialization">{doctorProfile.SpecializationId?.SpecializationName}</p>
+                        <img className="doctor-card__image" src={doctorProfile.photo_url} alt={`${name}'s profile pic`}/>
+                        <p className="doctor-card__specialization">{doctorProfile.specialization_name}</p>
                         <p className="doctor-card__experience">{experience} лет опыта</p>
 
                     </div>

@@ -2,14 +2,14 @@ const ServiceList = ({ services, changeStatus, role }) => {
     return (
         <div className="service-list">
             {services.map(service => (
-                <div key={service._id} className={`service-item ${service.IsActive ? "active" : "inactive"}`}>
-                    <h3>{service.ServiceName}</h3>
-                    <div className="service-item__category">Category: {service.CategoryName}</div>
-                    <div className="service-item__status">Status: {service.IsActive ? "Active" : "Inactive"}</div>
+                <div key={service.service_id} className={`service-item ${service.is_active ? "active" : "inactive"}`}>
+                    <h3>{service.service_name}</h3>
+                    <div className="service-item__category">Category: {service.category_name}</div>
+                    <div className="service-item__status">Status: {service.is_active ? "Active" : "Inactive"}</div>
                     {role === 'receptionist' && (
-                        <button onClick={() => changeStatus(service._id, service.IsActive)}
+                        <button onClick={() => changeStatus(service.service_id, service.is_active)}
                         >
-                            Make {`${!service.IsActive ? "active" : "inactive"}`}
+                            Make {`${!service.is_active ? "active" : "inactive"}`}
                         </button>
                     )}
                 </div>

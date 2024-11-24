@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const passport = require('../config/passport');
 const patientController = require('../controllers/patient');
 const { auth, ensureRole, ensureReceptionist, ensureDoctor} = require('../middleware/auth');
 const upload = require("../middleware/fileUploads");
+const passport = require('../config/passport');
 
 router.get('/all', auth, ensureRole('doctor', 'receptionist'), patientController.getAllPatients);
 router.get('/by-doctor/:doctorId', auth, ensureDoctor, patientController.getDoctorsPatients);

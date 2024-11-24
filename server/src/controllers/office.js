@@ -15,17 +15,17 @@ const validateCreateOffice = [
 
 exports.getAllOffices = async (req, res) => {
     try {
-        const offices = await Office.find();
+        const offices = await Office.getAllOffices();
         res.status(200).json(offices);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при получении офисов' });
+        res.status(500).json({ message: `Ошибка при получении офисов: ${error.message}` });
     }
 };
 
 exports.getOfficeById = async (req, res) => {
     try {
         const officeId = req.params.id;
-        const office = await Office.findById(officeId);
+        const office = await Office.getOfficeById(officeId);
 
         if (!office) {
             return res.status(404).json({ message: 'Офис не найден' });
@@ -33,7 +33,7 @@ exports.getOfficeById = async (req, res) => {
 
         res.status(200).json(office);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при получении офиса' });
+        res.status(500).json({ message: `Ошибка при получении офиса: ${error.message}` });
     }
 };
 
@@ -47,20 +47,19 @@ exports.createOffice = [
 
     try {
         const { country, region, city, street, streetNumber, officeNumber, phoneNumber } = req.body;
-        const newOffice = new Office({
-            Country: country,
-            Region: region,
-            City: city,
-            Street: street,
-            StreetNumber: streetNumber,
-            OfficeNumber: officeNumber,
-            PhoneNumber: phoneNumber
+        const savedOffice = await Office.createOffice({
+            country,
+            region,
+            city,
+            street,
+            streetNumber,
+            officeNumber,
+            phoneNumber
         });
 
-        const savedOffice = await newOffice.save();
         res.status(201).json(savedOffice);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при создании офиса' });
+        res.status(500).json({ message: `Ошибка при создании офиса: ${error.message}` });
     }
 }];
 
@@ -76,7 +75,7 @@ exports.editOffice = async (req, res) => {
 
         res.status(200).json(office);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при редактировании офиса' });
+        res.status(500).json({ message: `Ошибка при редактировании офиса: ${error.message}` });
     }
 };
 
@@ -91,6 +90,6 @@ exports.deleteOffice = async (req, res) => {
 
         res.status(200).json({ message: 'Офис успешно удалён' });
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при удалении офиса' });
+        res.status(500).json({ message: `Ошибка при удалении офиса: ${error.message}` });
     }
 };

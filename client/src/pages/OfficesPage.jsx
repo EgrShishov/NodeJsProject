@@ -6,7 +6,10 @@ import { toast, ToastContainer } from "react-toastify";
 
 const OfficesPage = () => {
     const [ officesList, setOfficesList ] = useState([]);
-    const [ position, setPosition ] = useState(null);
+    const [ position, setPosition ] = useState({
+        latitude: 53.5359,
+        longitude: 27.3400
+    });
     const [ error, setError ] = useState(null);
 
     useEffect(() => {
@@ -15,19 +18,6 @@ const OfficesPage = () => {
             if (offices) setOfficesList(offices);
             else setError()
         };
-
-        const getLocation = async () => {
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(setPosition, (error) => {
-                    console.error(error);
-                    alert("Unable to retrieve your location.");
-                });
-            } else {
-                alert("Geolocation is not supported by this browser.");
-            }
-        }
-
-        getLocation();
         fetchOffices();
     }, []);
 
@@ -62,7 +52,7 @@ const OfficesPage = () => {
                 {position ? (
                     <MapContainer
                         onTileError={handleMapError}
-                        center={[position.coords.latitude, position.coords.longitude]}
+                        center={[position.latitude, position.longitude]}
                         zoom={13}
                         style={{height: '100%', width: '100%'}}
                     >

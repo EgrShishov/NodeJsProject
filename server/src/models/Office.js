@@ -1,10 +1,10 @@
 const {sequelize} = require('../db/connection');
-const {QueryType} = require('sequelize');
+const {QueryTypes} = require('sequelize');
 
 exports.getAllOffices = async () => {
     try {
-        const query = 'SELECT * FROM Offices';
-        const [results, metadata] = await sequelize.query(query, {
+        const query = 'SELECT * FROM Offices;';
+        const results = await sequelize.query(query, {
             type: sequelize.QueryTypes.SELECT
         });
 
@@ -16,8 +16,8 @@ exports.getAllOffices = async () => {
 
 exports.getOfficeById = async (id) => {
     try {
-        const query = 'SELECT * FROM Offices WHERE office_id = :office_id';
-        const [results, metadata] = await sequelize.query(query, {
+        const query = 'SELECT * FROM Offices WHERE office_id = :office_id;';
+        const results = await sequelize.query(query, {
             replacements: { office_id: id },
             type: sequelize.QueryTypes.SELECT
         });
@@ -35,21 +35,21 @@ exports.createOffice = async (data) => {
         VALUES (:country, :region, :city, :street, :street_number, :office_number, :phone_number)
         RETURNING *;
     `;
-        const [results, metadata] = await sequelize.query(query, {
+        const results = await sequelize.query(query, {
             replacements: {
                 country: data.country,
                 city: data.city,
                 street: data.street,
-                street_number: data.street_number
+                street_number: data.street_number,
                 office_number: data.office_number,
                 phone_number: data.phone_number,
             },
             type: sequelize.QueryTypes.INSERT
         });
 
-        return results[0];
+        return results;
     } catch (error) {
         throw new Error(`Error creating office: ${error.message}`);
     }
-}
+};
 

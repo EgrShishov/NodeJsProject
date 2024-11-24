@@ -2,7 +2,7 @@ const { DataTypes, QueryTypes} = require('sequelize');
 const {sequelize} = require('../db/connection');
 
 exports.createReceptionist = async (data) => {
-    const [results, metadata] = await sequelize.query(
+    const results = await sequelize.query(
         'CALL create_receptionists_account(:email, :password, :firstName, :lastName, :middleName, :phoneNumber, :dob)',
         {
             replacements: {
@@ -17,15 +17,16 @@ exports.createReceptionist = async (data) => {
             type: QueryTypes.RAW
         }
     );
-    return results;
+    return results[0];
 };
 
 exports.getAllReceptionists = async () => {
-    const [results, metadata] = await sequelize.query(`
+    const results= await sequelize.query(`
     SELECT
         r.first_name,
         r.last_name,
         r.middle_name,
+        r.date_of_birth,
         u.photo_url,
         u.email
     FROM Receptionists as r
@@ -34,49 +35,52 @@ exports.getAllReceptionists = async () => {
             type: QueryTypes.SELECT
         });
 
+    console.log('receptionists', results);
     return results;
 };
 
 exports.getReceptionistById = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
     SELECT
         r.first_name,
         r.last_name,
         r.middle_name,
+        r.date_of_birth,
         u.photo_url,
         u.email
     FROM Receptionists as r
-    JOIN Users as u ON r.user_id = u.user_id;
-    WHERE r.receptionist_id = ?`,
+    JOIN Users as u ON r.user_id = u.user_id
+    WHERE r.receptionist_id = ?;`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
 };
 
 exports.getReceptionistByUserId = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
     SELECT
         r.first_name,
         r.last_name,
         r.middle_name,
+        r.date_of_birth,
         u.photo_url,
         u.email
     FROM Receptionists as r
-    JOIN Users as u ON r.user_id = u.user_id;
-    WHERE r.user_id = ?`,
+    JOIN Users as u ON r.user_id = u.user_id
+    WHERE r.user_id = ?;`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
 }
 
 exports.editReceptionist = async (id, data) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
         UPDATE Receptionists
         SET first_name = ?, last_name = ?, middle_name = ?, date_of_birth = ?
         WHERE receptionist_id = ?;`,
@@ -85,16 +89,16 @@ exports.editReceptionist = async (id, data) => {
             type: QueryTypes.UPDATE
         });
 
-    return results;
+    return results[0];
 };
 
 exports.deleteReceptionist = async (id) => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
     CALL delete_receptionists_account(?);`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
 };

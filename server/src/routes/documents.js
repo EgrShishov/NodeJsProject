@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const documentController = require('../controllers/documents');
 const {ensureRole, ensureDoctor, auth} = require('../middleware/auth');
+const passport = require('../config/passport');
 
 router.get('/:id', auth, ensureRole('patient', 'doctor'), documentController.getDocumentById);
 router.get('/download/:id', auth, ensureRole('patient', 'doctor'), documentController.downloadFile);

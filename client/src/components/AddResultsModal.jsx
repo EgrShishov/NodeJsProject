@@ -123,33 +123,36 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
                 ariaHideApp={false}
             >
                 <h2>Добавить результат</h2>
+
                 <form onSubmit={handleSubmit}>
                     <label>Пациент:</label>
                     <select value={selectedPatientId} onChange={(e) => setSelectedPatientId(e.target.value)} required>
                         <option value="">Выберите пациента</option>
-                        {patients.map(patient => (
-                            <option key={patient._id} value={patient._id}>
-                                {patient.LastName} {patient.FirstName} {patient.MiddleName}
-                            </option>
-                        ))}
+                        {patients && (
+                            patients.map(patient => (
+                                <option key={patient.patient_id} value={patient.patient_id}>
+                                    {patient.first_name} {patient.middle_name} {patient.last_name}
+                                </option>
+                            )))}
                     </select>
 
                     <label>Врач:</label>
                     <select value={selectedDoctorId} onChange={(e) => setSelectedDoctorId(e.target.value)} required>
                         <option value="">Выберите врача</option>
-                        {doctors.map(doctor => (
-                            <option key={doctor._id} value={doctor._id}>
-                                {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
-                            </option>
-                        ))}
+                        {doctors && (
+                            doctors.map(doctor => (
+                                <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                    {doctor.first_name} {doctor.middle_name} {doctor.last_name}
+                                </option>
+                            )))}
                     </select>
 
                     <label>Встреча:</label>
                     <select value={selectedAppointmentId} onChange={(e) => setSelectedAppointmentId(e.target.value)} required>
                         <option value="">Выберите встречу</option>
                         {appointments.map(app => (
-                            <option key={app._id} value={app._id}>
-                                {new Date(app.AppointmentDate).toLocaleDateString()} — {app.AppointmentTime}
+                            <option key={app.appointment_id} value={app.appointment_id}>
+                                {new Date(app.appointment_date).toLocaleDateString()} — {app.appointment_time}
                             </option>
                         ))}
                     </select>

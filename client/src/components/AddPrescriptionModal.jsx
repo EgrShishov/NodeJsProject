@@ -37,7 +37,7 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
         if (doctor) {
             setFormData((prevData) => ({
                 ...prevData,
-                DoctorId: doctor._id,
+                DoctorId: doctor.doctor_id,
             }));
         }
     }, [doctor]);
@@ -108,8 +108,8 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
                         >
                             <option value="">Выберите пациента</option>
                             {patients.map((patient) => (
-                                <option key={patient._id} value={patient._id}>
-                                    {patient.LastName} {patient.FirstName} {patient.MiddleName}
+                                <option key={patient.patient_id} value={patient.patient_id}>
+                                    {patient.last_name} {patient.first_name} {patient.middle_name}
                                 </option>
                             ))}
                         </select>
@@ -125,15 +125,15 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
                             required
                         >
                             {doctor ? (
-                                <option key={doctor._id} value={doctor._id}>
-                                    {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
+                                <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                    {doctor.last_name} {doctor.first_name} {doctor.middle_name}
                                 </option>
                             ) : (
                                 <>
                                     <option value="">Выберите доктора</option>
                                     {doctors.map((doctor) => (
-                                        <option key={doctor._id} value={doctor._id}>
-                                            {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
+                                        <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                            {doctor.last_name} {doctor.first_name} {doctor.middle_name}
                                         </option>
                                     ))}
                                 </>

@@ -1,29 +1,60 @@
-/*
-const mongoose = require('mongoose');
-
-const SpecializationSchema = mongoose.Schema({
-    SpecializationName: { type: String, required: true }
-});
-
-module.exports = mongoose.model('Specializations', SpecializationSchema);*/
-
-const { DataTypes } = require('sequelize');
+const { QueryTypes} = require('sequelize');
 const {sequelize} = require('../db/connection');
 
-const Specialization = sequelize.define('Specialization', {
-    specialization_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    specialization_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-}, {
-    tableName: 'Specializations',
-    timestamps: false,
-});
+exports.getAllSpecializations = async () => {
+  const results = await sequelize.query(`
+    SELECT * FROM specializations;
+  `, {
+      type: QueryTypes.SELECT
+  });
 
-module.exports = Specialization;
+  return results;
+};
 
+
+exports.getSpecializationById = async (id) => {
+    const results = await sequelize.query(`
+        SELECT * FROM specializations WHERE specialization_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+
+    return results;
+};
+
+exports.createSpecialization = async (data) => {
+    const results = await sequelize.query(`
+        INSERT INTO specializations (specialization_name) VALUES(?) RETURNING specialization_id;`,
+        {
+            replacements: [data.specialization_name],
+            type: QueryTypes.INSERT
+        });
+
+    return results;
+};
+
+exports.editSpecialization = async (id, data) => {
+    const results = await sequelize.query(`
+        UPDATE specializations 
+        SET specialization_name = ? 
+        WHERE specialization_id = ?;`,
+        {
+            replacements: [data.specialization_name, id],
+            type: QueryTypes.UPDATE
+        });
+
+    return results;
+};
+
+exports.deleteSpecialization = async (id) => {
+    const results = await sequelize.query(`
+        DELETE FROM specializations 
+        WHERE specialization_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.DELETE
+        });
+
+    return results;
+};

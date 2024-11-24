@@ -12,8 +12,8 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
     const [offices, setOffices] = useState([]);
     const [services, setServices] = useState([]);
     const [formData, setFormData] = useState({
-        PatientId: patient?._id,
-        DoctorId: doctor?._id,
+        PatientId: patient?.patient_id,
+        DoctorId: doctor?.doctor_id,
         AppointmentDate: date,
         AppointmentTime: time,
         OfficeId: '',
@@ -29,11 +29,12 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
             setServices(servicesData);
             if (!patient) {
                 const patientData = await getAllPatients();
-                setPatients(patientData);
+                console.log(patientData);
+                if (patientData) setPatients(patientData);
             }
             if (!doctor) {
                 const doctorData = await getAllDoctors();
-                setDoctors(doctorData);
+                if(doctorData) setDoctors(doctorData);
             }
         } catch (error){
             toast.error(`Ошибка в получении данных для формы: ${error.message}`);
@@ -48,8 +49,8 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
         if (doctor) {
             setFormData((prevData) => ({
                 ...prevData,
-                DoctorId: doctor?._id,
-                PatientId: patient?._id,
+                DoctorId: doctor?.doctor_id,
+                PatientId: patient?.patient_id,
             }));
         }
     }, [doctor, patient]);
@@ -101,15 +102,15 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <label>Пациент:</label>
                     <select name="PatientId" value={formData.PatientId} onChange={handleChange} required>
                         {patient ? (
-                            <option key={patient._id} value={patient._id}>
-                                {patient.LastName} {patient.FirstName} {patient.MiddleName}
+                            <option key={patient.patient_id} value={patient.patient_id}>
+                                {patient.last_name} {patient.first_name} {patient?.middle_name}
                             </option>
                         ) : (
                         <>
                             <option value="">Выберите пациента</option>
                             {patients.map((patient) => (
-                                <option key={patient._id} value={patient._id}>
-                                    {patient.LastName} {patient.FirstName} {patient.MiddleName}
+                                <option key={patient.patient_id} value={patient.patient_id}>
+                                    {patient.last_name} {patient.first_name} {patient?.middle_name}
                                 </option>
                             ))}
                         </>
@@ -121,15 +122,15 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <label>Доктор:</label>
                     <select name="DoctorId" value={formData.DoctorId} onChange={handleChange} required>
                         {doctor ? (
-                            <option key={doctor._id} value={doctor._id}>
-                                {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
+                            <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                {doctor.last_name} {doctor.first_name} {doctor?.middle_name}
                             </option>
                         ) : (
                             <>
                                 <option value="">Выберите доктора</option>
                                 {doctors.map((doctor) => (
-                                    <option key={doctor._id} value={doctor._id}>
-                                        {doctor.LastName} {doctor.FirstName} {doctor.MiddleName}
+                                    <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                        {doctor.last_name} {doctor.first_name} {doctor?.middle_name}
                                     </option>
                                 ))}
                             </>
@@ -142,11 +143,11 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <select name="OfficeId" value={formData.OfficeId} onChange={handleChange} required>
                         <option value="">Выберите оффис</option>
                         {offices.map((office) => (
-                            <option key={office._id} value={office._id}>
-                                {office.Country}, {office.City},
-                                Address: {office.Street} {office.StreetNumber},
-                                OfficeBlock: {office.OfficeNumber},
-                                Phone: {office.PhoneNumber}
+                            <option key={office.office_id} value={office.office_id}>
+                                {office.country}, {office.city},
+                                Address: {office.street} {office.street_number},
+                                OfficeBlock: {office.office_number},
+                                Phone: {office.phone_number}
                             </option>
                         ))}
                     </select>
@@ -157,8 +158,8 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <select name="ServiceId" value={formData.ServiceId} onChange={handleChange} required>
                         <option value="">Выберите услугу</option>
                         {services.map((service) => (
-                            <option key={service._id} value={service._id}>
-                                {service.ServiceName}
+                            <option key={service.service_id} value={service.service_id}>
+                                {service.service_name}
                             </option>
                         ))}
                     </select>

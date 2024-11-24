@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const receptionistController = require('../controllers/receptionist');
 const {ensureReceptionist, auth} = require('../middleware/auth');
+const passport = require('../config/passport');
 
 router.get('/all', auth, ensureReceptionist, receptionistController.getAllReceptionists);
 router.get('/:id', auth, ensureReceptionist, receptionistController.getReceptionistById);

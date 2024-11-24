@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const specializationController = require('../controllers/specialization');
 const { ensureAuthenticated, ensureGuest, ensureReceptionist, auth} = require('../middleware/auth');
+const passport = require('../config/passport');
 
 router.get('/all', specializationController.getAllSpecializations);
 router.get('/:id', specializationController.getSpecializationById);

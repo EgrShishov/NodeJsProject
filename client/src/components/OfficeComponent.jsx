@@ -1,10 +1,10 @@
 const OfficeComponent = ( { office } ) => {
     return (
-        <div key={office._id} className="office-component">
-            <h3>{office.City}, {office.Street} {office.StreetNumber}</h3>
-            <p>{office.Region}, {office.Country}</p>
-            <p>Номер оффиса: {office.OfficeNumber}</p>
-            <p>Телефон: {office.PhoneNumber}</p>
+        <div key={office.office_id} className="office-component">
+            <h3>{office.city}, {office.street} {office.street_number}</h3>
+            <p>{office.region}, {office.country}</p>
+            <p>Номер оффиса: {office.office_number}</p>
+            <p>Телефон: {office.phone_number}</p>
         </div>
     );
 };

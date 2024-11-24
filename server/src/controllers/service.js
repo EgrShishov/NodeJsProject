@@ -10,8 +10,7 @@ const validateCreateService = [
 
 exports.getAllServices = async (req, res) => {
     try {
-        const services = await Service.find()
-            .populate('ServiceCategory', 'CategoryName');
+        const services = await Service.getAllServices();
         res.status(200).json(services);
     } catch (error) {
         res.status(500).json({ message: `Ошибка при получении услуг: ${error}` });
@@ -28,10 +27,10 @@ exports.createService = [
     try {
         const { serviceCategoryId, serviceName, isActive } = req.body;
 
-        const newService = new Service({
-            ServiceCategoryId: serviceCategoryId,
-            ServiceName: serviceName,
-            IsActive: isActive
+        const newService = await Service.createService({
+            service_category_id: serviceCategoryId,
+            service_name: serviceName,
+            is_active: isActive
         });
 
         const savedService = await newService.save();
@@ -44,7 +43,7 @@ exports.createService = [
 exports.makeActive = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        const service = await Service.findByIdAndUpdate(serviceId, {IsActive: true},{new: true});
+        const service = await Service.editServiceStatus(serviceId, true);
 
         if (!service) {
             return res.status(404).json({ message: 'Услуга не найдена' });
@@ -59,7 +58,7 @@ exports.makeActive = async (req, res) => {
 exports.makeInActive = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        const service = await Service.findByIdAndUpdate(serviceId, {IsActive: false}, {new: true});
+        const service = await Service.editServiceStatus(serviceId, false);
 
         if (!service) {
             return res.status(404).json({ message: 'Услуга не найдена' });
@@ -74,13 +73,11 @@ exports.makeInActive = async (req, res) => {
 exports.deleteService = async (req, res) => {
     try {
         const serviceId = req.params.id;
-        const service = await Service.findById(serviceId);
+        const service = await Service.deleteService(serviceId);
 
         if (!service) {
             return res.status(404).json({ message: 'Услуга не найдена' });
         }
-
-        await Service.findByIdAndDelete(serviceId);
         res.status(200).json({ message: 'Услуга удалена' });
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при удалении услуги' });

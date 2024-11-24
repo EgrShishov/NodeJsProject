@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const appointmentController = require('../controllers/appointment');
 const { auth, ensurePatinet, ensureRole } = require('../middleware/auth');
-const passport = require("../config/passport");
+const passport = require('../config/passport');
 
 router.get('/all', auth, ensureRole('receptionist', 'doctor', 'patient'), appointmentController.getAllAppointments);
 router.get('/schedule/:doctorId',  appointmentController.getAppointmentsSchedule);

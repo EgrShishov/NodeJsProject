@@ -1,28 +1,59 @@
-// const { Schema } = require('mongoose');
-// const  mongoose = require('mongoose');
-//
-// const ServiceCategorySchema = new Schema({
-//     CategoryName: { type: String, required: true }
-// });
-//
-// module.exports = mongoose.model('ServiceCategories', ServiceCategorySchema);
-
-const { DataTypes } = require('sequelize');
+const {QueryTypes} = require('sequelize');
 const {sequelize} = require('../db/connection');
 
-const ServiceCategory = sequelize.define('ServiceCategory', {
-    service_category_id: {
-        type: DataTypes.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-    },
-    category_name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-    },
-}, {
-    tableName: 'ServiceCategory',
-    timestamps: false,
-});
+exports.getAllServiceCategories = async () => {
+    const [results, metadata] = await sequelize.query(`
+        SELECT * FROM service_category;`,
+        {
+            type: QueryTypes.SELECT
+        });
 
-module.exports = ServiceCategory;
+    return results;
+};
+
+exports.getServiceCategoryById = async (id) => {
+    const [results, metadata] = await sequelize.query(`
+        SELECT * FROM service_category WHERE service_category_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+
+    return results;
+};
+
+exports.createServiceCategory = async (data) => {
+    const [results, metadata] = await sequelize.query(`
+        INSERT INTO service_category (category_name) VALUES(?) RETURNING service_category_id;`,
+        {
+            replacements: [data.category_name],
+            type: QueryTypes.INSERT
+        });
+
+    return results;
+};
+
+exports.editServiceCategory = async (id, data) => {
+    const [results, metadata] = await sequelize.query(`
+        UPDATE service_category 
+        SET category_name = ? 
+        WHERE service_category_id = ?;`,
+        {
+            replacements: [data.category_name, id],
+            type: QueryTypes.UPDATE
+        });
+
+    return results;
+};
+
+exports.deleteServiceCategory = async (id) => {
+    const [results, metadata] = await sequelize.query(`
+        DELETE FROM service_category 
+        WHERE service_category_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.DELETE
+        });
+
+    return results;
+};

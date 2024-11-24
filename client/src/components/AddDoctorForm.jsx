@@ -14,6 +14,7 @@ class AddDoctorForm extends Component {
             career_start_year: '',
             specializationId: '',
             email: '',
+            phone_number: '',
             specializations: [],
             formValid: false
         };
@@ -59,6 +60,7 @@ class AddDoctorForm extends Component {
                 doctors_middle_name: this.state.doctors_middle_name,
                 birthday_date: this.state.birthday_date,
                 email: this.state.email,
+                phone_number: this.phone_number,
                 career_start_year: this.state.career_start_year,
                 specializationId: this.state.specializationId,
             });
@@ -68,6 +70,7 @@ class AddDoctorForm extends Component {
                 doctors_middle_name: '',
                 birthday_date: '',
                 email: '',
+                phone_number: '',
                 career_start_year: '',
                 specializationId: '',
                 formValid: false
@@ -89,6 +92,7 @@ class AddDoctorForm extends Component {
             doctors_middle_name,
             birthday_date,
             email,
+            phone_number,
             career_start_year,
             specializationId,
             formValid,
@@ -156,6 +160,17 @@ class AddDoctorForm extends Component {
                     </div>
 
                     <div className="form-field">
+                        <label>Личниый номер телефона:</label><br/>
+                        <input
+                            type="text"
+                            name="phone_number"
+                            value={phone_number}
+                            onChange={this.handleChange}
+                            required
+                        />
+                    </div>
+
+                    <div className="form-field">
                         <label>Год начала карьеры:</label><br/>
                         <input
                             type="number"
@@ -173,8 +188,8 @@ class AddDoctorForm extends Component {
                             {specializations.length > 0 &&
                                 specializations.map((spec) => (
                                     <option
-                                        value={spec._id}
-                                        key={spec._id}>{spec.SpecializationName}
+                                        value={spec.specialization_id}
+                                        key={spec.specialization_id}>{spec.specialization_name}
                                     </option>
                                 ))}
                         </select>

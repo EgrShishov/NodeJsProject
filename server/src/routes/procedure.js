@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const procedureController = require('../controllers/procedure');
+const passport = require('../config/passport');
 const {ensureReceptionist, auth} = require("../middleware/auth");
 
 router.get('/all', procedureController.getAllProcedures);

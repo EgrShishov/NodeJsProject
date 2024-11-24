@@ -2,17 +2,21 @@ const {sequelize} = require('../db/connection');
 const {QueryTypes} = require("sequelize");
 
 exports.getAllDoctors = async () => {
-    const [results, metadata] = await sequelize.query(`
+    const results = await sequelize.query(`
     SELECT
+        doctors.doctor_id,
         doctors.first_name,
         doctors.last_name,
         doctors.middle_name,
         doctors.career_start_year,
+        doctors.date_of_birth,
         s.specialization_name,
         u.photo_url,
         u.email
     FROM Doctors as doctors
-    JOIN Specializations as s ON doctors.specialization_id = s.specialization_id;`,
+        JOIN Users as u ON u.user_id = doctors.user_id
+        JOIN Specializations as s ON doctors.specialization_id = s.specialization_id;
+    `,
         {
             type: QueryTypes.SELECT
         });
@@ -21,36 +25,66 @@ exports.getAllDoctors = async () => {
 }
 
 exports.getDoctorById = async (doctorId) => {
-    const [results, metadata] = await sequelize.query(`
+    const results  = await sequelize.query(`
     SELECT
         doctors.first_name,
         doctors.last_name,
         doctors.middle_name,
         doctors.career_start_year,
+        doctors.date_of_birth,
         s.specialization_name,
         u.photo_url,
         u.email
     FROM Doctors as doctors
-    JOIN Specializations as s ON doctors.specialization_id = s.specialization_id
+        JOIN Users as u ON u.user_id = doctors.user_id
+        JOIN Specializations as s ON doctors.specialization_id = s.specialization_id
     WHERE doctors.doctor_id = ?;`,
         {
             replacements: [doctorId],
             type: QueryTypes.SELECT
         });
 
-    return results;
+    return results[0];
+};
+
+exports.getDoctorByUserId = async (id) => {
+    const results  = await sequelize.query(`
+    SELECT
+        doctors.first_name,
+        doctors.last_name,
+        doctors.middle_name,
+        doctors.career_start_year,
+        doctors.date_of_birth,
+        s.specialization_name,
+        u.photo_url,
+        u.email
+    FROM Doctors as doctors
+        JOIN Users as u ON u.user_id = doctors.user_id
+        JOIN Specializations as s ON doctors.specialization_id = s.specialization_id
+    WHERE doctors.user_id = ?;`,
+        {
+            replacements: [id],
+            type: QueryTypes.SELECT
+        });
+
+    return results[0];
 }
 
 exports.getDoctorsBySpecialization = async (spec) => {
-    const [results, metadata] = await sequelize.query(`
+    const results  = await sequelize.query(`
         SELECT
+            doctors.doctor_id,
             doctors.first_name,
             doctors.last_name,
             doctors.middle_name,
             doctors.career_start_year,
-            s.specialization_name
+            doctors.date_of_birth,
+            s.specialization_name,
+            u.email,
+            u.photo_url
         FROM Doctors as doctors
-        JOIN Specializations as s ON doctors.specialization_id = s.specialization_id
+            JOIN Specializations as s ON doctors.specialization_id = s.specialization_id
+            JOIN Users u ON u.user_id = doctors.user_id
         WHERE s.specialization_name = ?;`,
         {
             replacements: [spec],
@@ -58,15 +92,27 @@ exports.getDoctorsBySpecialization = async (spec) => {
         }
     );
 
-    return results;
+    return results[0];
 }
 
 exports.deleteDoctor = async (doctorId) => {
-//returning doctor instance
+    try {
+        const result = await sequelize.query(`
+        CALL delete_doctors_account(:id);`,
+            {
+                replacements: {
+                    id: doctorId,
+                },
+                type: QueryTypes.DELETE
+            });
+        return result[0];
+    } catch (error){
+        throw new Error(`Ошибка в удалении аккаунта доктора: ${error}`);
+    }
 };
 
 exports.createDoctor = async (data) => {
-    const [results, metadata] = await sequelize.query(
+    const results= await sequelize.query(
         'CALL create_doctors_account(:email, :password, :firstName, :lastName, :middleName, :phoneNumber, :dob, :specialization, :careerStartYear)',
         {
             replacements: {
@@ -83,11 +129,11 @@ exports.createDoctor = async (data) => {
             type: QueryTypes.RAW
         }
     );
-    return results;
+    return results[0];
 };
 
 exports.editDoctor = async (id, data) => {
-    const [results, metadata] = await sequelize.query(`
+    const results= await sequelize.query(`
         UPDATE Doctors
         SET first_name = ?, last_name = ?, middle_name = ?, specialization_id = ?,
             career_start_year = ?, date_of_birth = ?
@@ -97,16 +143,16 @@ exports.editDoctor = async (id, data) => {
             type: QueryTypes.UPDATE
         });
 
-    return results;
+    return results[0];
 };
 
 exports.getDoctorsPatients = async (doctorId) => {
-    const [results, metadata] = await sequelize.query(`
-        CALL delete_doctors_account(?);`,
+    const results = await sequelize.query(`
+        CALL get_doctors_patients(?);`,
         {
-            replacements: [id],
-            type: QueryTypes.DELETE
+            replacements: [doctorId],
+            type: QueryTypes.RAW
         });
 
-    return results;
+    return results; //TODO
 };
