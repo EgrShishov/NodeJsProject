@@ -4,6 +4,7 @@ import {deletePatient, getAllPatients, getDoctorsPatients} from "../services/pat
 import {useNavigate, useParams} from "react-router-dom";
 import ReactPaginate from 'react-paginate';
 import {useAuth} from "../context/AuthContext.jsx";
+import {toast} from "react-toastify";
 
 const PatientsPage = () => {
     const [patients, setPatients] = useState([]);
@@ -21,7 +22,8 @@ const PatientsPage = () => {
 
     const fetchPatients = async () => {
         if (user && user.role === 'doctor'){
-            const patients = await getDoctorsPatients(user._id);
+            const patients = await getDoctorsPatients(user.user_id);
+            console.log(patients);
             if (patients) setPatients(patients);
         } else {
             const patients = await getAllPatients();
@@ -48,13 +50,19 @@ const PatientsPage = () => {
     };
 
     const handlePatientDelete = async (id) => {
-        await deletePatient(id);
-        await fetchPatients();
+        try {
+            await deletePatient(id);
+            await fetchPatients();
+        } catch (error) {
+            toast.error(`Ошибка в удалении пациента: ${error.message}`);
+        }
     };
 
     const filteredPatients = patients.filter(patient =>
-        patient.LastName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            patient.FirstName.toLowerCase().includes(searchQuery.toLowerCase())
+        patient.last_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            patient.first_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                patient.middle_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    patient.patients_name?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
     const handlePatientEdit = (patientId) => navigate(`/patients/${patientId}/edit`);
@@ -88,7 +96,10 @@ const PatientsPage = () => {
                     <option value="name">Имя</option>
                     <option value="cost">Возраст</option>
                 </select>
-                <button onClick={() => setNewPatientModalOpened(!isNewPatientModalOpened)}>Добавить Пациента</button>
+                {user && user.role === 'receptionist' &&
+                    <button onClick={() => setNewPatientModalOpened(!isNewPatientModalOpened)}>Добавить
+                        Пациента</button>
+                }
             </div>
 
             <div className="patients">
@@ -97,7 +108,7 @@ const PatientsPage = () => {
                         currentPatients.map((patient) => {
                             return (
                                 <PatientCard
-                                    key={patient._id}
+                                    key={patient.patient_id}
                                     profile={patient}
                                     onDeleteClick={handlePatientDelete}
                                     onEditClick={handlePatientEdit}

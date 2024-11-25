@@ -4,9 +4,9 @@ const { body, validationResult } = require('express-validator');
 const error = require("multer/lib/multer-error");
 
 const validateCreateResult = [
-    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('AppointmentId').notEmpty().withMessage('appointmentId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('PatientId').notEmpty().withMessage('patientId обязателен'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен'),
+    body('AppointmentId').notEmpty().withMessage('appointmentId обязателен'),
     body('Complaints').notEmpty().withMessage('complaints обязателен'),
     body('Recommendations').notEmpty().withMessage('recommendations обязателен'),
     body('Conclusion').notEmpty().withMessage('conclusion обязателен'),
@@ -58,7 +58,7 @@ exports.createResult = [
         });
         res.status(201).json(savedResult);
     } catch (error) {
-        res.status(500).json({ message: 'Error creating result' });
+        res.status(500).json({ message: `Error creating result: ${error.message}` });
     }
 }];
 

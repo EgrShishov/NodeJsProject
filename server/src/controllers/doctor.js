@@ -108,13 +108,10 @@ exports.createDoctor = [
 exports.deleteDoctor = async (req, res) => {
     try {
         const doctorId = req.params.id;
-        const doctor = await Doctor.deleteDoctor(doctorId);
-
-        if (!doctor) {
-            return res.status(404).json({ message: 'Врач не найден' });
+        const rowsAffected = await Doctor.deleteDoctor(doctorId);
+        if (rowsAffected === 0) {
+            return res.status(404).json({message: `Врач ${doctorId} не найден`});
         }
-
-        await User.deleteAccount(doctor.UserId);
         res.status(200).json({ message: 'Врач успешно удалён' });
     } catch (error) {
         res.status(500).json({ message: `Ошибка при удалении врача: ${error.message}` });

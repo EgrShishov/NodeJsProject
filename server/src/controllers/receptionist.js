@@ -3,10 +3,10 @@ const { body, validationResult } = require('express-validator');
 const transporter = require("../config/emailsender");
 
 const validateCreateReceptionist = [
-    body('firstName').isString().withMessage('firstName должен быть строкой').notEmpty().withMessage('firstName обязателен'),
-    body('lastName').isString().withMessage('lastName должен быть строкой').notEmpty().withMessage('lastName обязателен'),
-    body('middleName').optional().isString().withMessage('middleName должен быть строкой'),
-    body('dateOfBirth').isDate().withMessage('dateOfBirth должен быть датой в формате YYYY-MM-DD'),
+    body('first_name').isString().withMessage('firstName должен быть строкой').notEmpty().withMessage('firstName обязателен'),
+    body('last_name').isString().withMessage('lastName должен быть строкой').notEmpty().withMessage('lastName обязателен'),
+    body('middle_name').optional().isString().withMessage('middleName должен быть строкой'),
+    body('date_of_birth').isDate().withMessage('dateOfBirth должен быть датой в формате YYYY-MM-DD'),
     body('email').isString().withMessage('email должен быть строкой').notEmpty().withMessage('email обязателен'),
 ];
 
@@ -44,18 +44,18 @@ exports.createReceptionist = [
     try {
         console.log(req.body);
 
-        const { email, firstName, lastName, middleName, dateOfBirth, phoneNumber } = req.body;
+        const { email, first_name, last_name, middle_name, date_of_birth, phone_number } = req.body;
 
         const generatedPassword = Math.random().toString(36).slice(-8)
-        const name = `${firstName} ${lastName} ${middleName}`;
+        const name = `${first_name} ${last_name} ${middle_name}`;
         const savedReceptionist = await Receptionist.createReceptionist({
             email,
             password: generatedPassword,
-            first_name: firstName,
-            last_name: lastName,
-            middle_name: middleName,
-            phone_umber: phoneNumber,
-            date_of_birth: dateOfBirth
+            first_name: first_name,
+            last_name: last_name,
+            middle_name: middle_name,
+            phone_number: phone_number,
+            date_of_birth: date_of_birth
         });
 
         const mailOptions = {
@@ -78,7 +78,7 @@ exports.createReceptionist = [
             res.status(500).json({ message: "Registration successful, but email could not be sent." });
         }
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при создании регистратора' });
+        res.status(500).json({ message: `Ошибка при создании регистратора: ${error.message}` });
     }
 }];
 
@@ -86,13 +86,13 @@ exports.editReceptionist = async (req, res) => {
     try {
         const receptionistId = req.params.id;
         const updates = req.body;
-        const receptionist = await Receptionist.editReceptionist(receptionistId, updates);
+        const rowsAffected = await Receptionist.editReceptionist(receptionistId, updates);
 
-        if (!receptionist) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ message: 'Регистратор не найден' });
         }
 
-        res.status(200).json(receptionist);
+        res.status(200).json();
     } catch (error) {
         res.status(500).json({ message: `Ошибка при обнволении данных регистратора: ${error.message}` });
     }
@@ -101,12 +101,11 @@ exports.editReceptionist = async (req, res) => {
 exports.deleteReceptionist = async (req, res) => {
     try {
         const receptionistId = req.params.id;
-        const receptionist = await Receptionist.deleteReceptionist(receptionistId);
+        const rowsAffected = await Receptionist.deleteReceptionist(receptionistId);
 
-        if (!receptionist) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ message: 'Регистратор не найден' });
         }
-        await User.deleteAccount(receptionist.UserId);
         res.status(200).json({ message: 'Регистратор успешно удалён' });
     } catch (error) {
         res.status(500).json({ message: `Ошибка при удалении регистратора: ${error.message}` });

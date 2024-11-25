@@ -114,9 +114,11 @@ const DoctorScheduleComponent = ({ workingHours, bookedSlots, onAppointmentBooke
                 day: selectedSlot.day,
                 date: selectedSlot.date,
                 time: selectedSlot.slot,
-                doctorId: formData.DoctorId,
-                officeId: formData.OfficeId,
-                serviceId: formData.ServiceId,
+                DoctorId: formData.DoctorId,
+                OfficeId: formData.OfficeId,
+                ServiceId: formData.ServiceId,
+                PatientId: formData.PatientId,
+                ProcedureId: formData.ProcedureId,
             });
             setModalOpen(false);
             setSelectedSlot(null);

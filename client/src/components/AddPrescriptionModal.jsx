@@ -11,7 +11,7 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
     const [errors, setErrors] = useState({});
     const [formData, setFormData] = useState({
         PatientId: '',
-        DoctorId: '',
+        DoctorId: doctor?.user_id,
         Medication: '',
         Dosage: '',
         Duration: '',
@@ -37,7 +37,7 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
         if (doctor) {
             setFormData((prevData) => ({
                 ...prevData,
-                DoctorId: doctor.doctor_id,
+                DoctorId: doctor.user_id,
             }));
         }
     }, [doctor]);
@@ -58,21 +58,21 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
         setFormData((prevData) => ({
             ...prevData,
             [name]: value,
+            DoctorId: doctor?.user_id
         }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        console.log('mama');
+        console.log(formData);
         const formErrors = validateForm();
-        console.log('mama2');
         if (Object.keys(formErrors).length > 0) {
             setErrors(formErrors);
             toast.error("Исправьте ошибки в форме.");
         } else {
-            console.log(formData);
             onSubmit(formData);
             onClose();
+            console.log(formData);
             setFormData({
                 PatientId: '',
                 DoctorId: '',
@@ -125,7 +125,7 @@ const AddPrescriptionModal = ({ isOpen, onClose, onSubmit, doctor }) => {
                             required
                         >
                             {doctor ? (
-                                <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                                <option key={doctor.user_id} value={doctor.user_id}>
                                     {doctor.last_name} {doctor.first_name} {doctor.middle_name}
                                 </option>
                             ) : (

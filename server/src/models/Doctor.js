@@ -27,6 +27,7 @@ exports.getAllDoctors = async () => {
 exports.getDoctorById = async (doctorId) => {
     const results  = await sequelize.query(`
     SELECT
+        doctors.doctor_id,
         doctors.first_name,
         doctors.last_name,
         doctors.middle_name,
@@ -50,6 +51,7 @@ exports.getDoctorById = async (doctorId) => {
 exports.getDoctorByUserId = async (id) => {
     const results  = await sequelize.query(`
     SELECT
+        doctors.doctor_id as user_id,
         doctors.first_name,
         doctors.last_name,
         doctors.middle_name,
@@ -112,24 +114,44 @@ exports.deleteDoctor = async (doctorId) => {
 };
 
 exports.createDoctor = async (data) => {
-    const results= await sequelize.query(
-        'CALL create_doctors_account(:email, :password, :firstName, :lastName, :middleName, :phoneNumber, :dob, :specialization, :careerStartYear)',
-        {
-            replacements: {
-                email: data.email,
-                password: data.password,
-                firstName: data.first_name,
-                lastName: data.last_name,
-                middleName: data.middle_name,
-                phoneNumber: data.phone_number,
-                dob: data.date_of_birth,
-                specialization: data.specialization_id,
-                careerStartYear: data.career_start_year
-            },
-            type: QueryTypes.RAW
-        }
-    );
-    return results[0];
+    try {
+        const query = `
+        CALL create_doctors_account(
+            :email,
+            :password,
+            :first_name,
+            :last_name,
+            :middle_name,
+            :phone_number,
+            :date_of_birth,
+            :spec_id,
+            :career_start_year,
+            NULL,
+            NULL
+        );
+    `;
+
+        const replacements = {
+            email: data.email,
+            password: data.password,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            middle_name: data.middle_name,
+            phone_number: data.phone_number,
+            date_of_birth: data.date_of_birth,
+            spec_id: data.specialization_id,
+            career_start_year: data.career_start_year,
+        };
+
+        const result = await sequelize.query(query, {
+            replacements
+        });
+
+        console.log(result);
+        return result[0];
+    } catch (error) {
+        throw new Error (`Ошибка в создании доктора на уровне sql: ${error}`);
+    }
 };
 
 exports.editDoctor = async (id, data) => {
@@ -148,11 +170,11 @@ exports.editDoctor = async (id, data) => {
 
 exports.getDoctorsPatients = async (doctorId) => {
     const results = await sequelize.query(`
-        CALL get_doctors_patients(?);`,
+        SELECT * FROM get_doctors_patients(:id);`,
         {
-            replacements: [doctorId],
-            type: QueryTypes.RAW
+            replacements: {id: doctorId},
+            type: QueryTypes.SELECT
         });
 
-    return results; //TODO
+    return results;
 };

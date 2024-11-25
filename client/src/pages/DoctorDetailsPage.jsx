@@ -6,6 +6,7 @@ import {getDoctorsSchedule} from "../services/appointmentsService.js";
 import {createAppointment} from "../services/appointmentsService.js";
 import {useAuth} from "../context/AuthContext.jsx";
 import {toast} from "react-toastify";
+import app from "../App.jsx";
 
 const DoctorDetailsPage = () => {
     const [doctorProfile, setDoctorProfile] = useState(null);
@@ -28,12 +29,7 @@ const DoctorDetailsPage = () => {
         const experience = currentYear - profile.career_start_year;
 
         setExperience(experience);
-        setDoctorDetails({
-            id: profile.doctor_id,
-            name: name,
-            office: profile.office_id,
-            serviceName: profile.service_id,
-        });
+        console.log(doctorProfile);
     };
 
     const fetchDoctorsSchedule = async (id) => {
@@ -59,14 +55,17 @@ const DoctorDetailsPage = () => {
 
     const handleNewAppointmentBooked = async (appointmentDetails) => {
         try {
+            console.log(appointmentDetails);
             const data = {
-                PatientId: user.user_id,
-                DoctorId: appointmentDetails.doctor_id,
-                OfficeId: appointmentDetails.office_id,
-                ServiceId: appointmentDetails.service_id,
+                PatientId: appointmentDetails.PatientId,
+                DoctorId: appointmentDetails.DoctorId,
+                OfficeId: appointmentDetails.OfficeId,
+                ServiceId: appointmentDetails.ServiceId,
                 AppointmentDate: appointmentDetails.date,
                 AppointmentTime: appointmentDetails.time,
+                ProcedureId: appointmentDetails.ProcedureId,
             };
+            console.log(data);
             const response = await createAppointment(data);
             if (response) {
                 toast.success(

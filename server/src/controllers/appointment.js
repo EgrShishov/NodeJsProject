@@ -2,10 +2,10 @@ const Appointment = require('../models/Appointment');
 const { body, validationResult } = require('express-validator');
 
 const validateCreateAppointment = [
-    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
-    body('OfficeId').notEmpty().withMessage('officeId обязателен').isMongoId().withMessage('officeId должен быть действительным ID'),
-    body('ServiceId').notEmpty().withMessage('serviceId обязателен').isMongoId().withMessage('serviceId должен быть действительным ID'),
+    body('PatientId').notEmpty().withMessage('patientId обязателен'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен'),
+    body('OfficeId').notEmpty().withMessage('officeId обязателен'),
+    body('ServiceId').notEmpty().withMessage('serviceId обязателен'),
     body('AppointmentDate').notEmpty().withMessage('appointmentDate обязателен').isDate().withMessage('appointmentDate должен быть датой в формате YYYY-MM-DD'),
     body('AppointmentTime').notEmpty().withMessage('appointmentTime обязателен').matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/).withMessage('appointmentTime должен быть временем в формате HH:mm')
 ];
@@ -51,15 +51,12 @@ exports.createAppointment = [
 exports.approveAppointment = async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const appointment = await Appointment.getAppointmentById(appointmentId);
+        const rowsAffected = await Appointment.updateStatus(appointmentId, true);
 
-        if (!appointment) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ message: 'Приём не найден' });
-        }
-
-        appointment.IsApproved = true;
-        await appointment.save();
-        res.status(200).json({ message: 'Приём подтверждён', appointment });
+}
+        res.status(200).json({ message: 'Приём подтверждён', rowsAffected });
     } catch (error) {
         res.status(500).json({ message: `Ошибка при подтверждении приёма: ${error.message}` });
     }
@@ -68,12 +65,12 @@ exports.approveAppointment = async (req, res) => {
 exports.cancelAppointment = async (req, res) => {
     try {
         const appointmentId = req.params.id;
-        const appointment = await Appointment.cancelAppointment(appointmentId);
+        const rowsAffected = await Appointment.cancelAppointment(appointmentId);
 
-        if (!appointment) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ error: 'Приём не найден' });
         }
-        res.status(200).json({ message: 'Приём отменен', appointment })
+        res.status(200).json({ message: 'Приём отменен', rowsAffected })
     } catch (error) {
         res.status(500).json({ message: `Ошибка при отмене приёма: ${error.message}` })
     }
@@ -83,6 +80,7 @@ exports.getAppointmentsSchedule = async (req, res) => {
     try {
         const doctorId = req.params.doctorId;
         const busySlots = await Appointment.getBusySlotsByDoctor(doctorId);
+        console.log(busySlots);
         res.status(200).json(busySlots);
     } catch (error) {
         res.status(500).json({message: `Ошибка в получении расписания: ${error.message}`});

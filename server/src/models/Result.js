@@ -3,23 +3,17 @@ const {sequelize} = require('../db/connection');
 
 exports.getAllResults = async () => {
     try {
-        const [results, metadata] = await sequelize.query(`
+        const results = await sequelize.query(`
         SELECT
-            p.first_name AS patient_first_name,
-            p.last_name AS patient_last_name,
-            p.middle_name AS patient_middle_name,
-            doc.first_name AS doctor_first_name,
-            doc.last_name AS doctor_last_name,
-            doc.middle_name AS doctor_middle_name,
-            r.complaints AS complaints,
-            r.conclusion AS conclusion,
-            r.recommendations AS recommendations,
-            d.file_path AS document_path
+            CONCAT(p.last_name, ' ', p.first_name, ' ', p.middle_name) AS patients_name,
+            CONCAT(doc.last_name, ' ', doc.first_name, ' ', doc.middle_name) AS doctors_name,
+            r.complaints,
+            r.conclusion,
+            r.recommendations
         FROM Results AS r
-            JOIN Documents AS d ON (r.document_id=d.document_id)
-            JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
-            JOIN Patients AS p ON (r.patient_id=a.patient_id)
-            JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id)
+             JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
+             JOIN Patients AS p ON (a.patient_id=p.patient_id)
+             JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id);
         `, {
             type: QueryTypes.SELECT
         });
@@ -34,22 +28,18 @@ exports.getResultById = async (id) => {
     try {
         const [results, metadata] = await sequelize.query(`
         SELECT
-            p.first_name AS patient_first_name,
-            p.last_name AS patient_last_name,
-            p.middle_name AS patient_middle_name,
-            doc.first_name AS doctor_first_name,
-            doc.last_name AS doctor_last_name,
-            doc.middle_name AS doctor_middle_name,
-            r.complaints AS complaints,
-            r.conclusion AS conclusion,
-            r.recommendations AS recommendations,
-            d.file_path AS document_path
+            CONCAT(p.last_name, ' ', p.first_name, ' ', p.middle_name) AS patients_name,
+            CONCAT(doc.last_name, ' ', doc.first_name, ' ', doc.middle_name) AS doctors_name,
+            r.complaints,
+            r.conclusion,
+            r.recommendations
         FROM Results AS r
-            JOIN Documents AS d ON (r.document_id=d.document_id)
-            JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
-            JOIN Patients AS p ON (r.patient_id=a.patient_id)
-            JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id)
+             JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
+             JOIN Patients AS p ON (a.patient_id=p.patient_id)
+             JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id)
+        WHERE r.result_id = ?;
         `, {
+            replacements: [id],
             type: QueryTypes.SELECT
         });
 
@@ -61,22 +51,22 @@ exports.getResultById = async (id) => {
 
 exports.createResult = async (data) => {
     try {
-        const [results, metadata] = await sequelize.query(`
-        CALL create_medical_result(:p_id, :d_id, :a_id, :d_type, :d_path, :complaints, :recommendations, :conclusion)`, {
+        const results = await sequelize.query(`
+        CALL create_medical_result(:p_id, :d_id, :a_id, :d_type, :d_path, :complaints, :recommendations, :conclusion);`, {
             replacements: {
                 p_id: data.patient_id,
                 d_id: data.doctor_id,
                 a_id: data.appointment_id,
                 d_type: data.document_type,
                 d_path: data.document_path,
-                complaints,
-                recommendations,
-                conclusion
+                complaints: data.complaints,
+                recommendations: data.recommendations,
+                conclusion: data.conclusion
             },
-            type: QueryTypes.INSERT
+            type: QueryTypes.RAW
         });
 
-        return results;
+        return results[0];
     } catch (error) {
         throw new Error(`Ошибка в получении всех результатов: ${error}`);
     }
@@ -84,24 +74,19 @@ exports.createResult = async (data) => {
 
 exports.getResultsByPatient = async (patientId) => {
     try {
-        const [results, metadata] = await sequelize.query(`
-        SELECT
-            p.first_name AS patient_first_name,
-            p.last_name AS patient_last_name,
-            p.middle_name AS patient_middle_name,
-            doc.first_name AS doctor_first_name,
-            doc.last_name AS doctor_last_name,
-            doc.middle_name AS doctor_middle_name,
-            r.complaints AS complaints,
-            r.conclusion AS conclusion,
-            r.recommendations AS recommendations,
-            d.file_path AS document_path
+        const results = await sequelize.query(`
+         SELECT
+            CONCAT(p.last_name, ' ', p.first_name, ' ', p.middle_name) AS patients_name,
+            CONCAT(doc.last_name, ' ', doc.first_name, ' ', doc.middle_name) AS doctors_name,
+            r.complaints,
+            r.conclusion,
+            r.recommendations,
+            r.document_id
         FROM Results AS r
-            JOIN Documents AS d ON (r.document_id=d.document_id)
-            JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
-            JOIN Patients AS p ON (r.patient_id=a.patient_id)
-            JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id)
-        WHERE r.patient_id = ?
+             JOIN Appointments AS a ON (r.appointment_id=a.appointment_id)
+             JOIN Patients AS p ON (a.patient_id=p.patient_id)
+             JOIN Doctors AS doc ON (doc.doctor_id=a.doctor_id)
+        WHERE r.patient_id = ?;
         `, {
             replacements: [patientId],
             type: QueryTypes.SELECT
@@ -115,7 +100,7 @@ exports.getResultsByPatient = async (patientId) => {
 
 exports.editResult = async (id, data) => {
     try {
-        const [result, metadata] = await sequelize.query(`
+        const result= await sequelize.query(`
         UPDATE Results
         SET complaints = ?, recommendations = ?, conclusion = ?
         WHERE result_id = ?;`,
@@ -123,7 +108,7 @@ exports.editResult = async (id, data) => {
                 replacements: [data.complaints, data.recommendations, data.conclusion, id],
                 type: QueryTypes.UPDATE
             });
-        return result;
+        return result[0];
     } catch (error) {
         throw new Error(`Ошибка в удалении результата: ${error}`);
     }
@@ -131,14 +116,14 @@ exports.editResult = async (id, data) => {
 
 exports.deleteResult = async (id) => {
     try {
-        const [result, metadata] = await sequelize.query(`
+        const result = await sequelize.query(`
         DELETE FROM Results
         WHERE results_id = ?`,
             {
                 replacements: [id],
                 type: QueryTypes.DELETE
             });
-        return result;
+        return result[0];
     } catch (error) {
         throw new Error(`Ошибка в удалении результата: ${error}`);
     }

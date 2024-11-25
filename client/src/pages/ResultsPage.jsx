@@ -41,12 +41,12 @@ const ResultsPage = () => {
             <ToastContainer />
             <h2>Результаты обследований</h2>
             {loading ? (
-                <div className="loader">Загрузка...</div>
+                <div className="loader"></div>
             ) : (
                 <div className="results-list">
                     {results.length > 0 ? (
                         results.map((res) => (
-                            <ResultCard key={res._id} result={res}/>
+                            <ResultCard key={res.result_id} result={res}/>
                         ))
                     ) : (
                         <p>Нет данных для отображения</p>

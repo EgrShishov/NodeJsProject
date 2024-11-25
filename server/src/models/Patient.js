@@ -23,6 +23,7 @@ exports.createPatient = async (data) => {
 exports.getAllPatients = async () => {
     const results  = await sequelize.query(`
     SELECT
+        p.patient_id,
         p.first_name,
         p.last_name,
         p.middle_name,
@@ -41,6 +42,7 @@ exports.getAllPatients = async () => {
 exports.getPatientById = async (id) => {
     const results = await sequelize.query(`
     SELECT
+        p.patient_id,
         p.first_name,
         p.last_name,
         p.middle_name,
@@ -61,6 +63,7 @@ exports.getPatientById = async (id) => {
 exports.getPatientByUserId = async (id) => {
     const results = await sequelize.query(`
     SELECT
+        p.patient_id as user_id,
         p.first_name,
         p.last_name,
         p.middle_name,

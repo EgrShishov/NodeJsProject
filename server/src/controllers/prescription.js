@@ -4,8 +4,8 @@ const Patient = require('../models/Patient');
 const { body, validationResult } = require('express-validator');
 
 const validateCreatePrescription = [
-    body('PatientId').notEmpty().withMessage('patientId обязателен').isMongoId().withMessage('patientId должен быть действительным ID'),
-    body('DoctorId').notEmpty().withMessage('doctorId обязателен').isMongoId().withMessage('doctorId должен быть действительным ID'),
+    body('PatientId').notEmpty().withMessage('patientId обязателен'),
+    body('DoctorId').notEmpty().withMessage('doctorId обязателен'),
     body('PrescriptionDate').notEmpty().withMessage('prescriptionDate обязателен').isDate().withMessage('prescriptionDate должен быть датой в формате YYYY-MM-DD'),
     body('Medication').notEmpty().withMessage('medication обязателен'),
     body('Dosage').notEmpty().withMessage('dosage обязателен'),
@@ -14,9 +14,7 @@ const validateCreatePrescription = [
 
 exports.getAllPrescriptions = async (req, res) => {
     try {
-        const prescriptions = await Prescription.find()
-            .populate('DoctorId', 'FirstName MiddleName LastName')
-            .populate('PatientId', 'FirstName MiddleName LastName');
+        const prescriptions = await Prescription.getAllPrescriptions();
 
         res.status(200).json(prescriptions);
     } catch (error) {
@@ -26,9 +24,7 @@ exports.getAllPrescriptions = async (req, res) => {
 
 exports.getPrescriptionById = async (req, res) => {
     try {
-        const prescription = await Prescription.findById(req.params.id)
-            .populate('DoctorId', 'FirstName LastName')
-            .populate('PatientId', 'FirstName LastName');
+        const prescription = await Prescription.getPrescriptionById(req.params.id);
 
         if (!prescription) {
             return res.status(404).json({ message: 'Рецепт не найден' });
@@ -50,14 +46,7 @@ exports.createPrescription = [
     try {
         const { DoctorId, PatientId, PrescriptionDate, Medication, Dosage, Duration } = req.body;
 
-        const doctor = await Doctor.findById(DoctorId);
-        const patient = await Patient.findById(PatientId);
-
-        if (!doctor || !patient) {
-            return res.status(400).json({ message: 'Доктор или пациент не найдены' });
-        }
-
-        const newPrescription = new Prescription({
+        const savedPrescription = await Prescription.prescribeMedication({
             DoctorId,
             PatientId,
             PrescriptionDate,
@@ -66,10 +55,9 @@ exports.createPrescription = [
             Duration
         });
 
-        const savedPrescription = await newPrescription.save();
         res.status(201).json(savedPrescription);
     } catch (error) {
-        res.status(500).json({ message: 'Ошибка при создании рецепта' });
+        res.status(500).json({ message: `Ошибка при создании рецепта: ${error.message}` });
     }
 }];
 
@@ -77,13 +65,13 @@ exports.editPrescription = async (req, res) => {
     try {
         const prescriptionId = req.params.id;
         const updates = req.body;
-        const updatedPrescription = await Prescription.findByIdAndUpdate(prescriptionId, updates, { new: true });
+        const rowsAffected = await Prescription.editPrescription(prescriptionId, updates);
 
-        if (!updatedPrescription) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
-        res.status(200).json(updatedPrescription);
+        res.status(200).json(rowsAffected);
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при редактировании рецепта' });
     }
@@ -92,9 +80,9 @@ exports.editPrescription = async (req, res) => {
 exports.deletePrescription = async (req, res) => {
     try {
         const prescriptionId = req.params.id;
-        const prescription = await Prescription.findByIdAndDelete(prescriptionId);
+        const rowsAffected = await Prescription.deletePrescription(prescriptionId);
 
-        if (!prescription) {
+        if (rowsAffected === 0) {
             return res.status(404).json({ message: 'Рецепт не найден' });
         }
 
@@ -106,9 +94,7 @@ exports.deletePrescription = async (req, res) => {
 
 exports.getPatientPrescriptions = async (req, res) => {
     try {
-        const prescription = await Prescription.find({ PatientId: req.params.patientId })
-            .populate('DoctorId', 'FirstName MiddleName LastName')
-            .populate('PatientId', 'FirstName MiddleName LastName');
+        const prescription = await Prescription.getPrescriptionsByPatient(req.params.patientId);
 
         if (!prescription) {
             return res.status(404).json({ message: 'Рецепт не найден' });

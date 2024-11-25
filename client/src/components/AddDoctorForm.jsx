@@ -60,7 +60,7 @@ class AddDoctorForm extends Component {
                 doctors_middle_name: this.state.doctors_middle_name,
                 birthday_date: this.state.birthday_date,
                 email: this.state.email,
-                phone_number: this.phone_number,
+                phone_number: this.state.phone_number,
                 career_start_year: this.state.career_start_year,
                 specializationId: this.state.specializationId,
             });
@@ -160,7 +160,7 @@ class AddDoctorForm extends Component {
                     </div>
 
                     <div className="form-field">
-                        <label>Личниый номер телефона:</label><br/>
+                        <label>Личный номер телефона:</label><br/>
                         <input
                             type="text"
                             name="phone_number"

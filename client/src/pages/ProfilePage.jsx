@@ -50,7 +50,7 @@ const ProfilePage = () => {
     }, []);
 
     useEffect(() => {
-        if (profileData) fetchScheduleSlots(profileData._id);
+        if (profileData) fetchScheduleSlots(profileData.user_id);
     }, [scheduleOpened]);
 
     //receptionists actions
@@ -62,14 +62,14 @@ const ProfilePage = () => {
     const handleOnViewPayments = () => navigate('/payments/');
 
     //patients actions
-    const handleMyAppointments = () => navigate(`/appointments/${profileData._id}`);
-    const handleMyResults = () => navigate(`/results/${profileData._id}`);
-    const handleMyPrescriptions = () => navigate(`/prescriptions/${profileData._id}`);
-    const handleMyInvoices = () => navigate(`/invoices/${profileData._id}`);
-    const handleMyPayments = () => navigate(`/payments/${profileData._id}`);
+    const handleMyAppointments = () => navigate(`/appointments/${profileData.user_id}`);
+    const handleMyResults = () => navigate(`/results/${profileData.user_id}`);
+    const handleMyPrescriptions = () => navigate(`/prescriptions/${profileData.user_id}`);
+    const handleMyInvoices = () => navigate(`/invoices/${profileData.user_id}`);
+    const handleMyPayments = () => navigate(`/payments/${profileData.user_id}`);
 
     //doctors actions
-    const handleMyPatients = () => navigate(`/doctors/${profileData._id}/patients`);
+    const handleMyPatients = () => navigate(`/doctors/${profileData.user_id}/patients`);
     const handleAddPrescription = () => openPrescriptionModal();
     const handleViewSchedule = () => setScheduleOpened(!scheduleOpened);
     const handleAddResults = () => openResultsModal();
@@ -96,6 +96,7 @@ const ProfilePage = () => {
     const handleAddingResults = async (data) => {
         try {
             const response = await createResult(data);
+            console.log(data);
             if (response) {
                 toast.success(`Результаты успешно добавлены!.`);
                 closeResultsModal();

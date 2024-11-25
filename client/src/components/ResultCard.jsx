@@ -1,16 +1,17 @@
 import {toast} from "react-toastify";
 
 const ResultCard = ({ result }) => {
-    const { PatientId, DoctorId, Complaints, Recommendations, Conclusion, DocumentId } = result;
+    const { patients_name, doctors_name, recommendations, complaints, conclusion, document_id } = result;
 
-    const handleDownload = async (documentId) => {
-        if (!DocumentId) {
+    console.log(result);
+    const handleDownload = async (document_id) => {
+        if (!document_id) {
             toast.error('Документ отсутствует для загрузки.');
             return;
         }
 
         try {
-            const response = await fetch(`http://localhost:5000/documents/download/${documentId}`, {
+            const response = await fetch(`http://localhost:5000/documents/download/${document_id}`, {
                 method: 'GET',
                 headers: {
                     'Accept': 'application/pdf'
@@ -26,7 +27,7 @@ const ResultCard = ({ result }) => {
             const url = window.URL.createObjectURL(blob);
             const link = document.createElement('a');
             link.href = url;
-            link.setAttribute('download', `result_${documentId}.pdf`);
+            link.setAttribute('download', `result_${document_id}.pdf`);
             document.body.appendChild(link);
             link.click();
             link.remove();
@@ -40,16 +41,16 @@ const ResultCard = ({ result }) => {
             <div className="result-card">
                 <h3>Медицинское заключение</h3>
                 <p>
-                    <strong>Пациент:</strong> {PatientId ? `${PatientId.FirstName} ${PatientId.MiddleName} ${PatientId.LastName}` : 'Неизвестно'}
+                    <strong>Пациент:</strong> {patients_name}
                 </p>
                 <p>
-                    <strong>Доктор:</strong> {DoctorId ? `${DoctorId.FirstName} ${DoctorId.MiddleName} ${DoctorId.LastName}` : 'Неизвестно'}
+                    <strong>Доктор:</strong> {doctors_name}
                 </p>
-                <p><strong>Жалобы:</strong> {Complaints || 'Нет данных'}</p>
-                <p><strong>Рекомендации:</strong> {Recommendations || 'Нет данных'}</p>
-                <p><strong>Заключение:</strong> {Conclusion || 'Нет данных'}</p>
+                <p><strong>Жалобы:</strong> {complaints || 'Нет данных'}</p>
+                <p><strong>Рекомендации:</strong> {recommendations || 'Нет данных'}</p>
+                <p><strong>Заключение:</strong> {conclusion || 'Нет данных'}</p>
                 <div className="actions">
-                    <button onClick={() => handleDownload(DocumentId._id)} className="download-btn">Скачать PDF</button>
+                    <button onClick={() => handleDownload(document_id)} className="download-btn">Скачать PDF</button>
                 </div>
             </div>
         </>

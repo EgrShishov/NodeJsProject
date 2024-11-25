@@ -5,12 +5,14 @@ import {getAllDoctors} from '../services/doctorsService.js';
 import {getAllOffices} from "../services/officesService.js";
 import {getServices} from "../services/servicesService.js";
 import {toast} from "react-toastify";
+import {getAllProcedures} from "../services/proceduresService.js";
 
 const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, date, time}) => {
     const [doctors, setDoctors] = useState([]);
     const [patients, setPatients] = useState([]);
     const [offices, setOffices] = useState([]);
     const [services, setServices] = useState([]);
+    const [procedures, setProcedures] = useState([]);
     const [formData, setFormData] = useState({
         PatientId: patient?.patient_id,
         DoctorId: doctor?.doctor_id,
@@ -18,15 +20,18 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
         AppointmentTime: time,
         OfficeId: '',
         ServiceId: '',
+        ProcedureId: '',
     });
 
     const fetchData = async() => {
         try {
             const officesData = await getAllOffices();
             const servicesData = await getServices();
+            const proceduresData = await getAllProcedures();
 
             setOffices(officesData);
             setServices(servicesData);
+            setProcedures(proceduresData)
             if (!patient) {
                 const patientData = await getAllPatients();
                 console.log(patientData);
@@ -66,6 +71,7 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
 
     const handleSubmit = (e) => {
         e.preventDefault();
+        console.log(formData);
         if (formData.PatientId && formData.DoctorId && formData.OfficeId && formData.AppointmentDate && formData.AppointmentTime && formData.ServiceId) {
             onSubmit(formData);
             onClose();
@@ -76,6 +82,7 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                 AppointmentTime: '',
                 OfficeId: '',
                 ServiceId: '',
+                ProcedureId: '',
             });
         } else {
             toast.error(`Заполните все поля`);
@@ -102,18 +109,18 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <label>Пациент:</label>
                     <select name="PatientId" value={formData.PatientId} onChange={handleChange} required>
                         {patient ? (
-                            <option key={patient.patient_id} value={patient.patient_id}>
+                            <option key={patient.patient_id} value={formData.PatientId}>
                                 {patient.last_name} {patient.first_name} {patient?.middle_name}
                             </option>
                         ) : (
-                        <>
-                            <option value="">Выберите пациента</option>
-                            {patients.map((patient) => (
-                                <option key={patient.patient_id} value={patient.patient_id}>
-                                    {patient.last_name} {patient.first_name} {patient?.middle_name}
-                                </option>
-                            ))}
-                        </>
+                            <>
+                                <option value="">Выберите пациента</option>
+                                {patients.map((patient) => (
+                                    <option key={patient.patient_id} value={patient.patient_id}>
+                                        {patient.last_name} {patient.first_name} {patient?.middle_name}
+                                    </option>
+                                ))}
+                            </>
                         )}
                     </select>
                 </div>
@@ -122,7 +129,7 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                     <label>Доктор:</label>
                     <select name="DoctorId" value={formData.DoctorId} onChange={handleChange} required>
                         {doctor ? (
-                            <option key={doctor.doctor_id} value={doctor.doctor_id}>
+                            <option key={doctor.doctor_id} value={formData.DoctorId}>
                                 {doctor.last_name} {doctor.first_name} {doctor?.middle_name}
                             </option>
                         ) : (
@@ -160,6 +167,18 @@ const AddAppointmentModal = ({ isOpen, onClose, onSubmit, patient, doctor, day, 
                         {services.map((service) => (
                             <option key={service.service_id} value={service.service_id}>
                                 {service.service_name}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+
+                <div>
+                    <label>Нужная процедура:</label>
+                    <select name="ProcedureId" value={formData.ProcedureId} onChange={handleChange} required>
+                        <option value="">Выберите процедуру</option>
+                        {procedures.map((proc) => (
+                            <option key={proc.procedure_id} value={proc.procedure_id}>
+                                {proc.procedure_name}
                             </option>
                         ))}
                     </select>

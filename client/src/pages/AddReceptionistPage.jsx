@@ -11,6 +11,7 @@ const AddReceptionistPage = () => {
     const [middleName, setMiddleName] = useState("");
     const [email, setEmail] = useState("");
     const [dateOfBirth, setDateOfBirth] = useState(new Date());
+    const [phoneNumber, setPhoneNumber] = useState("");
 
     const navigate = useNavigate();
 
@@ -19,15 +20,13 @@ const AddReceptionistPage = () => {
 
         try {
             const formData = {
-                firstName,
-                lastName,
-                middleName,
-                email,
-                dateOfBirth
+                first_name: firstName,
+                last_name: lastName,
+                middle_name: middleName,
+                email: email,
+                date_of_birth: dateOfBirth,
+                phone_number: phoneNumber
             };
-
-            console.log(formData);
-
             const response = await createReceptionist(formData);
             if (response) {
                 toast.success(`Регистратор успешно создан!`);
@@ -87,6 +86,17 @@ const AddReceptionistPage = () => {
                         name="dateOfBirth"
                         value={dateOfBirth}
                         onChange={(e) => setDateOfBirth(e.target.value)}
+                        required
+                    />
+                </div>
+
+                <div className="form-field">
+                    <label>Личный номер телефона:</label><br/>
+                    <input
+                        type="text"
+                        name="phoneNumber"
+                        value={phoneNumber}
+                        onChange={(e) => setPhoneNumber(e.target.value)}
                         required
                     />
                 </div>

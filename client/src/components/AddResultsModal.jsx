@@ -32,6 +32,8 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
             setPatients(patientsData);
             setDoctors(doctorsData);
             setAppointments(appointmentsData);
+            console.log(appointmentsData);
+
         } catch (error) {
             toast.error(`Ошибка загрузки данных: ${error.message}`);
         }
@@ -100,15 +102,6 @@ const AddResultModal = ({ isOpen, onClose, onSubmit }) => {
         }
 
         onSubmit(formData);
-/*        try {
-            const response = await createResult(formData);
-            if (response) {
-                onClose();
-                toast.success('Результаты обследования успешно созданы!');
-            }
-        } catch (error) {
-            toast.error(`Ошибка создания результата обследования: ${error.message}`);
-        }*/
     };
 
     return (

@@ -2,27 +2,46 @@ const { DataTypes, QueryTypes} = require('sequelize');
 const {sequelize} = require('../db/connection');
 
 exports.createReceptionist = async (data) => {
-    const results = await sequelize.query(
-        'CALL create_receptionists_account(:email, :password, :firstName, :lastName, :middleName, :phoneNumber, :dob)',
-        {
-            replacements: {
-                email: data.email,
-                password: data.password,
-                firstName: data.first_name,
-                lastName: data.last_name,
-                middleName: data.middle_name,
-                phoneNumber: data.phone_number,
-                dob: data.date_of_birth
-            },
-            type: QueryTypes.RAW
-        }
-    );
-    return results[0];
+    try {
+        const query = `
+        CALL create_receptionists_account(
+            :email,
+            :password,
+            :first_name,
+            :last_name,
+            :middle_name,
+            :phone_number,
+            :date_of_birth,
+            NULL,
+            NULL);
+        `;
+
+        const replacements = {
+            email: data.email,
+            password: data.password,
+            first_name: data.first_name,
+            last_name: data.last_name,
+            middle_name: data.middle_name,
+            phone_number: data.phone_number,
+            date_of_birth: data.date_of_birth
+        };
+
+        console.log(replacements);
+
+        const result = await sequelize.query(query, {
+            replacements
+        });
+
+        return result[0];
+    } catch (error) {
+        throw new Error (`Ошибка в создании регистратора: ${error}`);
+    }
 };
 
 exports.getAllReceptionists = async () => {
     const results= await sequelize.query(`
     SELECT
+        r.receptionist_id,
         r.first_name,
         r.last_name,
         r.middle_name,
@@ -62,6 +81,7 @@ exports.getReceptionistById = async (id) => {
 exports.getReceptionistByUserId = async (id) => {
     const results = await sequelize.query(`
     SELECT
+        r.receptionist_id as user_id,
         r.first_name,
         r.last_name,
         r.middle_name,
@@ -89,7 +109,7 @@ exports.editReceptionist = async (id, data) => {
             type: QueryTypes.UPDATE
         });
 
-    return results[0];
+    return results;
 };
 
 exports.deleteReceptionist = async (id) => {
@@ -97,8 +117,8 @@ exports.deleteReceptionist = async (id) => {
     CALL delete_receptionists_account(?);`,
         {
             replacements: [id],
-            type: QueryTypes.SELECT
+            type: QueryTypes.DELETE
         });
 
-    return results[0];
+    return results;
 };

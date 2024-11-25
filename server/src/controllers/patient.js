@@ -40,7 +40,7 @@ exports.getDoctorsPatients = async (req, res) => {
     try {
         const { doctorId } = req.params;
 
-        const patients = await Doctor.getDoctorsPatients(doctorId); // TODO
+        const patients = await Doctor.getDoctorsPatients(doctorId);
         res.status(200).json(patients);
     } catch (error) {
         res.status(500).json({ message: `Ошибка в получении пациентов для врача: ${error.message}` });

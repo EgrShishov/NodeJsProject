@@ -6,7 +6,9 @@ const PatientCard = ({ profile, onEditClick, onDeleteClick, onViewProfileClick }
     const { user } = useAuth();
 
     useEffect(() => {
-        setName(`${profile.first_name} ${profile.middle_name || ''} ${profile.last_name}`);
+        if (user && user.role === 'doctor') {
+            setName(profile.patients_name);
+        } else setName(`${profile.first_name} ${profile.middle_name || ''} ${profile.last_name}`);
     }, []);
 
     const formatter = new Intl.DateTimeFormat('ru-RU', {

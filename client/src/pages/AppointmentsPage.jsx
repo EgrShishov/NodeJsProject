@@ -34,6 +34,7 @@ const AppointmentsPage = () => {
 
     useEffect(() => {
         fetchAppointments();
+        console.log(appointments);
     }, []);
 
     const handleNewAppointment = () => navigate("/doctors/");
@@ -42,15 +43,14 @@ const AppointmentsPage = () => {
         const term = e.target.value.toLowerCase();
         setSearchTerm(term);
         const filtered = appointments.filter((appointment) =>
-            appointment.title.toLowerCase().includes(term) ||
-            appointment.date.includes(term)
+            appointment.appointment_date.includes(term)
         );
         setFilteredAppointments(filtered);
     };
 
     const handleDateFilter = (e) => {
         const selectedDate = e.target.value;
-        const filtered = appointments.filter((appointment) => appointment.date === selectedDate);
+        const filtered = appointments.filter((appointment) => appointment.appointment_date === selectedDate);
         setFilteredAppointments(filtered);
     };
 
@@ -91,7 +91,7 @@ const AppointmentsPage = () => {
                     ) : (
                         filteredAppointments.map((appointment) => (
                             <AppointmentCard
-                                key={appointment._id}
+                                key={appointment.appointment_id}
                                 appointment={appointment}
                             />
                         ))

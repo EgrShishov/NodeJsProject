@@ -123,7 +123,7 @@ function App() {
 }
 
 function RequireRole({ allowedRoles, children }) {
-    const { user, isAuthenticated } = useAuth();
+    const { user } = useAuth();
 
     if (!user) return <div>Loading...</div>;
     return user && allowedRoles.includes(user.role) ? children : <Navigate to="/forbidden" replace />
