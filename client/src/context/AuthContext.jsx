@@ -46,12 +46,6 @@ export const AuthProvider = ({ children }) => {
     const googleLogin = async () => {
         try {
             google();
-    /*            const profileData = await profile();
-                if (profileData) {
-                    setUser(profileData);
-                    setIsAuthenticated(true);
-                    navigate('/profile');
-                }*/
         } catch (error) {
             console.error('Google login failed:', error.message);
             navigate('/login');

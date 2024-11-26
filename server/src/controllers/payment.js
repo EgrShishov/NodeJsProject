@@ -5,8 +5,8 @@ const User = require('../models/User');
 exports.getAllPayments = async (req, res) => {
     try {
         const payments = await Payment.find()
-            .populate('patientId', 'FirstName SecondName LastName')
-            .populate('appointmentId');
+            .populate('PatientId', 'FirstName MiddleName LastName')
+            .populate('AppointmentId', 'AppointmentDate AppointmentTime');
         res.status(200).json(payments);
     } catch (error) {
         res.status(500).json({ message: 'Ошибка при получении платежей' });

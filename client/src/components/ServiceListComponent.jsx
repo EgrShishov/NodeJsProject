@@ -6,7 +6,7 @@ const ServiceList = ({ services, changeStatus, role }) => {
                     <h3>{service.ServiceName}</h3>
                     <div className="service-item__category">Category: {service.CategoryName}</div>
                     <div className="service-item__status">Status: {service.IsActive ? "Active" : "Inactive"}</div>
-                    {role === 'receptionist' && (
+                    {role && role === 'receptionist' && (
                         <button onClick={() => changeStatus(service._id, service.IsActive)}
                         >
                             Make {`${!service.IsActive ? "active" : "inactive"}`}

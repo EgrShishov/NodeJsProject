@@ -20,6 +20,7 @@ const PaymentsPage = () => {
             if (data) {
                 setPayments(data);
             }
+            console.log('payments', data);
         } catch (error) {
             setError(error);
         }
@@ -54,8 +55,9 @@ const PaymentsPage = () => {
                 />
                 <select onChange={(e) => handleSort(e.target.value)} value={sortField}>
                     <option value="">Сортировка</option>
-                    <option value="cost">Сумма</option>
-                    <option value="date">Дата платежа</option>
+                    <option value="Amount">Сумма</option>
+                    <option value="PaymentDate">Дата платежа</option>
+                    <option value="IsFinished">По завершенности</option>
                 </select>
             </div>
 
@@ -68,7 +70,7 @@ const PaymentsPage = () => {
                         )
                     })
                 ) : (
-                    <div>Loading payments...</div>
+                    <div className="loader"></div>
                 )}
             </div>
         </div>

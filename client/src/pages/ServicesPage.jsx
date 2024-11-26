@@ -36,7 +36,7 @@ const ServicesPage = () => {
     return (
         <div className="services-page">
             <h2>Available Services</h2>
-            <ServiceListComponent services={serviceList} changeStatus={handleChangeStatus} role={user.role}/>
+            <ServiceListComponent services={serviceList} changeStatus={handleChangeStatus} role={user ? user.role : null}/>
         </div>
     );
 };

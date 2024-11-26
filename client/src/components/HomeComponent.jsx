@@ -1,43 +1,24 @@
 import {getWeatherByCity} from "../api/weather";
 import {getRickAndMortyRandomInfo} from "../api/rickandmorty";
 import {useEffect, useState} from "react";
+import {Link} from "react-router-dom";
 
 const HomeComponent = () => {
     const [position, setPosition] = useState(null);
     const [weather, setWeather] = useState(null);
     const [rickAndMortyFact, setRickAndMortyFact] = useState(null);
-    const [scrollY, setScrollY] = useState(0);
-
-    const scaleValue = 1 + scrollY / 500
 
     useEffect(() => {
-        const handleScroll = () => setScrollY(window.scrollY);
-        window.addEventListener('scroll', handleScroll);
-        return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+        const slides = document.querySelectorAll(".single-slider");
+        let currentSlide = 0;
 
-    useEffect(() => {
-        const left_doctor = document.getElementById('doctor_left');
-        const right_doctor = document.getElementById('doctor_right');
-        const text = document.getElementById('text');
-        const bgText = document.getElementById('text-bg');
-
-        left_doctor.style.left = `-${scrollY/0.7}px`
-        right_doctor.style.left = `${scrollY/0.7}px`
-        text.style.bottom = `-${scrollY}px`;
-        bgText.style.scale = `${scaleValue}`;
-        bgText.style.right = `${scrollY/scaleValue/0.7}px`;
-    }, [scrollY, scaleValue])
-
-    useEffect(() => {
-        const handleScroll = () => {
-            setScrollY(window.scrollY);
+        const changeSlide = () => {
+            slides.forEach(slide => slide.classList.remove("single-slider-active"));
+            slides[currentSlide].classList.add("single-slider-active");
+            currentSlide = (currentSlide + 1) % slides.length;
         };
-        window.addEventListener('scroll', handleScroll);
-
-        return () => {
-            window.removeEventListener('scroll', handleScroll);
-        };
+        setInterval(changeSlide, 5000);
+        changeSlide();
     }, []);
 
     useEffect(() => {
@@ -66,23 +47,109 @@ const HomeComponent = () => {
         setWeatherData();
     }, [position]);
 
+
     return (
         <div className="home-component">
-            <section id="top">
-                <img src='../../public/medical_results.png' id='bg'/>
-                <h2 id="text">AgendaClinic</h2>
-                <h1 id="text-bg">AgendaClinic</h1>
-                <img src='../../public/left_doctor.png' id="doctor_left"/>
-                <img src='../../public/right_doctor.png' id="doctor_right"/>
+            <section className="slider">
+                <div className="hero-slider">
+                    <div className="single-slider" style={{backgroundImage: "url('public/slider2.jpg')"}}>
+                        <div className="container">
+                            <div className="text-block">
+                                <div className="text">
+                                    <h1><span>Agenda Clinic</span> Provide <span>Medical</span> Services That You
+                                        Can <span>Trust!</span></h1>
+                                    <p>Добро пожаловать в Agenda Clinic. Agenda Clinic была основана в 2024 году группой
+                                        профессионалов в области медицины, стремящихся предоставить высококачественное
+                                        медицинское обслуживание в дружелюбной и комфортной обстановке.</p>
+                                    <div className="action">
+                                        <Link to="/doctors" className="btn">Get Appointment</Link>
+                                        <a href="#" className="btn primary">Learn More</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="single-slider" style={{backgroundImage: "url('public/slider.jpg')"}}>
+                        <div className="container">
+                            <div className="text-block">
+                                <div className="text">
+                                    <h1><span>Agenda Clinic</span> Provide <span>Medical</span> Services That You
+                                        Can <span>Trust!</span></h1>
+                                    <p>Добро пожаловать в Agenda Clinic. Agenda Clinic была основана в 2024 году группой
+                                        профессионалов в области медицины, стремящихся предоставить высококачественное
+                                        медицинское обслуживание в дружелюбной и комфортной обстановке.</p>
+                                    <div className="action">
+                                        <Link to="/doctors" className="btn">Get Appointment</Link>
+                                        <a href="#" className="btn primary">About Us</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="single-slider" style={{backgroundImage: "url('public/slider3.jpg')"}}>
+                        <div className="container">
+                            <div className="text-block">
+                                <div className="text">
+                                    <h1><span>Agenda Clinic</span> Provide <span>Medical</span> Services That You
+                                        Can <span>Trust!</span></h1>
+                                    <p>Добро пожаловать в Agenda Clinic. Agenda Clinic была основана в 2024 году группой
+                                        профессионалов в области медицины, стремящихся предоставить высококачественное
+                                        медицинское обслуживание в дружелюбной и комфортной обстановке.</p>
+                                    <div className="action">
+                                        <Link to="/doctors" className="btn">Get Appointment</Link>
+                                        <a href="#" className="btn primary">Contact Now</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </section>
 
-            <section id="sec">
-                <h2>Добро пожаловать в Agenda Clinic</h2>
+            <div id="fun-facts" className="fun-facts section overlay">
+                <div className="container">
+                    <ul className="navbar">
+                        <li>
+                            <div className="single-fun">
+                                <i className="icofont icofont-home"></i>
+                                <div className="content">
+                                    <span className="counter">3468</span>
+                                    <p>Оффисов по всей беларуси</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="single-fun">
+                                <i className="icofont icofont-user-alt-3"></i>
+                                <div className="content">
+                                    <span className="counter">557</span>
+                                    <p>Специалистов и докторов (не пациентов!!!)</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="single-fun">
+                                <i className="icofont-simple-smile"></i>
+                                <div className="content">
+                                    <span className="counter">4379</span>
+                                    <p>Здоровых пациентов</p>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <div className="single-fun">
+                                <i className="icofont icofont-table"></i>
+                                <div className="content">
+                                    <span className="counter">0.5</span>
+                                    <p>Лет опыта у нас</p>
+                                </div>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
 
-                <p>Agenda Clinic была основана в 2024 году группой профессионалов в области медицины, стремящихся
-                    предоставить высококачественное медицинское обслуживание в дружелюбной и комфортной обстановке. Наша
-                    клиника расположена в центре города, что делает её доступной для всех желающих получить
-                    квалифицированную медицинскую помощь.</p>
+            <section id="sec">
                 <p>С первых дней своего существования Agenda Clinic мы ставили перед собой цель не только лечить
                     болезни, но и заботиться о здоровье и благополучии наших пациентов. Мы начали с небольшого
                     коллектива врачей и медсестёр, и постепенно, благодаря положительным отзывам и рекомендации
@@ -147,7 +214,7 @@ const HomeComponent = () => {
                                 <div className="info-card__species">{rickAndMortyFact.species}</div>
                             </div>
                             <div className="info-group">
-                            <div className="info-card__gender">Гендер:</div>
+                                <div className="info-card__gender">Гендер:</div>
                                 <div className="info-card__gender">{rickAndMortyFact.gender}</div>
                             </div>
                         </div>
