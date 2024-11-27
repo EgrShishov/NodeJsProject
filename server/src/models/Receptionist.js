@@ -103,13 +103,13 @@ exports.editReceptionist = async (id, data) => {
     const results = await sequelize.query(`
         UPDATE Receptionists
         SET first_name = ?, last_name = ?, middle_name = ?, date_of_birth = ?
-        WHERE receptionist_id = ?;`,
+        WHERE user_id = ?;`,
         {
             replacements: [data.first_name, data.last_name, data.middle_name, data.date_of_birth, id],
             type: QueryTypes.UPDATE
         });
 
-    return results;
+    return results[0];
 };
 
 exports.deleteReceptionist = async (id) => {

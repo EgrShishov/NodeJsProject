@@ -4,16 +4,26 @@ const {QueryTypes} = require("sequelize");
 exports.getUserById = async (id) => {
     console.log('get user by od', id);
     const results= await sequelize.query(`
-        SELECT * 
-        FROM users WHERE user_id=?`,
+        SELECT * FROM users WHERE user_id=?`,
         {
             replacements: [id],
             type: QueryTypes.SELECT
         });
 
-    console.log(results);
     return results[0];
 }
+
+exports.updateUser = async (id, data) => {
+    const results = await sequelize.query(`
+        UPDATE users 
+        SET email=?, user_name=?, photo_url=? WHERE user_id=?`,
+        {
+            replacements: [data.email, data.name, data.urlPhoto, id],
+            type: QueryTypes.UPDATE
+        });
+
+    return results[0];
+};
 
 exports.getUserByEmail = async (email) => {
     const results = await sequelize.query(`

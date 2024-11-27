@@ -157,11 +157,10 @@ exports.createDoctor = async (data) => {
 exports.editDoctor = async (id, data) => {
     const results= await sequelize.query(`
         UPDATE Doctors
-        SET first_name = ?, last_name = ?, middle_name = ?, specialization_id = ?,
-            career_start_year = ?, date_of_birth = ?
-        WHERE doctor_id = ?;`,
+        SET first_name = ?, last_name = ?, middle_name = ?, date_of_birth = ?
+        WHERE user_id = ?;`,
         {
-            replacements: [data.first_name, data.last_name, data.middle_name, data.specialization_id, data.career_start_year, data.date_of_birth, id],
+            replacements: [data.first_name, data.last_name, data.middle_name, data.date_of_birth, id],
             type: QueryTypes.UPDATE
         });
 

@@ -14,7 +14,6 @@ const ProfileComponent = ({ profileData, setProfileData }) => {
         }
     };
 
-    console.log(profileData);
     return (
         <div className="profile">
             {profileData ? (

@@ -294,34 +294,36 @@ exports.updateProfileInfo = async (req, res, next) => {
     const { first_name, last_name, middle_name, date_of_birth, email, picture } = req.body
 
     const decoded = jwt.verify(accessToken, accessTokenSecret);
-    const userId = decoded._id;
+    const userId = decoded.id;
 
     try {
-        const user = await User.findByIdAndUpdate(userId, {
-            email, name: `${first_name} ${middle_name} ${last_name}`, urlPhoto: picture
-        }, { new: true });
+        const body = {
+            email: email, name: `${first_name} ${middle_name} ${last_name}`, urlPhoto: picture
+        };
+        console.log(userId, body)
+        await User.updateUser(userId, body);
 
+        const user = await User.getUserById(userId);
         console.log(user);
-        let role = await Role.findById(user.roleId);
+        let role = await Role.getRoleById(user.role_id);
         let profile = null;
         const updates = {
-            FirstName: first_name,
-            LastName: last_name,
-            MiddleName: middle_name,
-            DateOfBirth: date_of_birth
+            first_name: first_name,
+            last_name: last_name,
+            middle_name: middle_name,
+            date_of_birth: date_of_birth
         }
 
-        if (role.RoleName === 'receptionist') {
-            profile = await Receptionist.findOneAndUpdate({ UserId: user._id}, updates, {new: true})
-                .populate('UserId', 'urlPhoto email');
-        } else if (role.RoleName === 'doctor') {
-            profile = await Doctor.findOneAndUpdate({ UserId: user._id}, updates, {new: true})
-                .populate('UserId', 'urlPhoto email');
-        } else if (role.RoleName === 'patient') {
-            profile = await Patient.findOneAndUpdate({ UserId: user._id }, updates, {new: true})
-                .populate('UserId', 'urlPhoto email');
+        if (role.role_name === 'receptionist') {
+            await Receptionist.editReceptionist(user.user_id, updates);
+            profile = await Receptionist.getReceptionistByUserId(user.user_id);
+        } else if (role.role_name === 'doctor') {
+            await Doctor.editDoctor(user.user_id, updates);
+            profile = await Doctor.getDoctorByUserId(user.user_id);
+        } else if (role.role_name === 'patient') {
+            await Patient.editPatient(user.user_id , updates);
+            profile = await Patient.getPatientByUserId(user.user_id);
         }
-
         res.status(200).json(profile);
     } catch (err) {
         return res.status(500).json({message: `Unexpected server error: ${err.message}`});
