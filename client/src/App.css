@@ -17,9 +17,11 @@
   font-weight: 400;
   font-style: normal;
 }
-/* HTML: <div class="loader"></div> */
+
 .loader {
-  width: 60px;
+  position: relative;
+  z-index: 1000;
+  width: 70px;
   aspect-ratio: 1;
   display: flex;
   color: #000;
@@ -27,18 +29,20 @@
   box-sizing: border-box;
   border-radius: 50%;
   background:
-          radial-gradient(circle 5px, currentColor 95%,#0000),
-          linear-gradient(currentColor 50%,#0000 0) 50%/4px 60% no-repeat;
+          radial-gradient(circle 5px, currentColor 95%, #0000),
+          linear-gradient(currentColor 50%, #0000 0) 50%/4px 60% no-repeat;
   animation: l1 2s infinite linear;
 }
+
 .loader:before {
   content: "";
   flex: 1;
-  background:linear-gradient(currentColor 50%,#0000 0) 50%/4px 80% no-repeat;
+  background: linear-gradient(currentColor 50%, #0000 0) 50%/4px 80% no-repeat;
   animation: inherit;
 }
+
 @keyframes l1 {
-  100% {transform: rotate(1turn)}
+  100% { transform: rotate(1turn); }
 }
 
 body {

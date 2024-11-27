@@ -1,28 +1,22 @@
-import {useState, useMemo, useEffect} from "react";
+import {useState, useMemo} from "react";
 import DoctorScheduleCard from "./DoctorScheduleCard.jsx";
 import {approveAppointment, cancelAppointment} from "../services/appointmentsService.js";
 import { toast } from "react-toastify";
+import {formatISO} from "date-fns";
 
 const DoctorsPersonalScheduleComponent = ({ initialSlots }) => {
     const [slots, setSlots] = useState(initialSlots);
-    const [view, setView] = useState("upcoming");
 
-    const today = useMemo(() => new Date(), []);
+    console.log(initialSlots);
+
+    const today = useMemo(() => formatISO(new Date(), {representation: 'date'}), []);
     const upcomingSlots = useMemo(
-        () => slots?.filter((slot) => new Date(slot.date) >= today) || [],
+        () => slots?.filter((slot) => formatISO(new Date(slot.AppointmentDate), {representation: 'date'}) >= today) || [],
         [slots, today]
-    );
-
-    const allSlots = useMemo(() => slots || [], [slots]);
-
-    const displayedSlots = useMemo(
-        () => (view === "upcoming" ? upcomingSlots : allSlots),
-        [view, upcomingSlots, allSlots]
     );
 
     const handleUpdateSlotStatus = async (id, isApproved) => {
         try {
-            console.log(slots);
             if (isApproved) {
                 await cancelAppointment(id);
                 toast.success("Appointment canceled successfully!");
@@ -32,7 +26,7 @@ const DoctorsPersonalScheduleComponent = ({ initialSlots }) => {
             }
             setSlots((prevSlots) =>
                 prevSlots.map((slot) =>
-                    slot._id === id ? { ...slot, IsApproved: !isApproved } : slot
+                    slot.appointment_id === id ? { ...slot, IsApproved: !isApproved } : slot
                 )
             );
         } catch (error) {
@@ -42,31 +36,13 @@ const DoctorsPersonalScheduleComponent = ({ initialSlots }) => {
 
     return (
         <div className="doctor-schedule-component">
-            <h2>Встречи на сегодня:</h2>
-
-            <div className="view-toggle">
-                <button
-                    onClick={() => setView("upcoming")}
-                    className={`toggle-button ${view === "upcoming" ? "active" : ""}`}
-                    aria-pressed={view === "upcoming"}
-                >
-                    Ближайшее
-                </button>
-                <button
-                    onClick={() => setView("all")}
-                    className={`toggle-button ${view === "all" ? "active" : ""}`}
-                    aria-pressed={view === "all"}
-                >
-                    Все расписание
-                </button>
-            </div>
-
+            <h2>Ваши встречи:</h2>
             <div className="schedule-list">
-                {slots ? (
-                    displayedSlots.length > 0 ? (
-                        displayedSlots.map((slot) => (
+                {slots && upcomingSlots ? (
+                    upcomingSlots.length > 0 ? (
+                        upcomingSlots.map((slot) => (
                             <DoctorScheduleCard
-                                key={slot.id}
+                                key={slot._id}
                                 slot={slot}
                                 handleUpdateSlotStatus={handleUpdateSlotStatus}
                             />
@@ -75,7 +51,7 @@ const DoctorsPersonalScheduleComponent = ({ initialSlots }) => {
                         <p>Нет доступных расписаний для вас.</p>
                     )
                 ) : (
-                    <div className="loader"></div>
+                    <div className="loader">Загрузка встреч</div>
                 )}
             </div>
         </div>

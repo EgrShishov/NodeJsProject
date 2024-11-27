@@ -187,4 +187,14 @@ class AddDoctorForm extends Component {
     }
 }
 
+AddDoctorForm.defaultProps = {
+    doctors_first_name: '',
+    doctors_last_name: '',
+    doctors_middle_name: '',
+    birthday_date: '',
+    career_start_year: '',
+    specializationId: '',
+    email: '',
+};
+
 export default AddDoctorForm;

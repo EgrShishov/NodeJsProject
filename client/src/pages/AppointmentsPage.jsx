@@ -42,15 +42,15 @@ const AppointmentsPage = () => {
         const term = e.target.value.toLowerCase();
         setSearchTerm(term);
         const filtered = appointments.filter((appointment) =>
-            appointment.title.toLowerCase().includes(term) ||
-            appointment.date.includes(term)
+            appointment.AppointmentDate.includes(term)
         );
         setFilteredAppointments(filtered);
     };
 
     const handleDateFilter = (e) => {
         const selectedDate = e.target.value;
-        const filtered = appointments.filter((appointment) => appointment.date === selectedDate);
+        console.log(appointments);
+        const filtered = appointments.filter((appointment) => new Date(appointment.AppointmentDate).toISOString().slice(0, 10) === selectedDate);
         setFilteredAppointments(filtered);
     };
 
